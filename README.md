@@ -26,3 +26,4 @@ Noah W. Garfinkle
 - [ ] Computer Euclidean distance
 - [ ] Compute routing distance
 - [ ] Set up pgrouting
+- [x] test commiting using Atom
