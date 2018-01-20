@@ -27,3 +27,24 @@ Noah W. Garfinkle
 - [ ] Compute routing distance
 - [ ] Set up pgrouting
 - [x] test commiting using Atom
+
+## Functions I need to replicate from R
+- [ ] CRS
+- [ ] spTransform
+- [ ] extent
+- [ ] writeRaster
+- [ ] projection
+- [ ] raster(matrix)
+- [ ] raster(path)
+- [ ] readOGR
+- [ ] rasterize
+- [ ] mosaic
+- [ ] res
+- [ ] aggregate
+- [ ] resample
+- [ ] distance
+- [ ] weightRaster
+- [ ] reclassify
+- [ ] plot
+- [ ] subs
+- [ ] crop
