@@ -1,5 +1,6 @@
 <PAMDataset>
   <PAMRasterBand band="1">
+    <UnitType>m</UnitType>
     <Histograms>
       <HistItem>
         <HistMin>110.5026178010471</HistMin>

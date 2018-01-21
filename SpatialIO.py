@@ -117,16 +117,29 @@ class RasterLayer:
         self.rasterPath = None
         self.raster = None
         self.crs = None
+        self.scale = None
+        self.minimum = None
+        self.maximum = None
+        self.unitType = None
+        self.colorInterpretation = None
+        self.colorTable = None
+
 
     def from_empty(self,lx,ly,ux,uy,crs,scale):
         return 0
 
     def from_file(self,raster_path):
         self.rasterPath = raster_path
+        self.raster = gdal.Open(raster_path)
         proj = self.raster.GetProjection()
         srs = osr.SpatialReference(wkt=proj)
-        #epsg = srs.GetAttrValue('AUTHORITY',1) # https://gis.stackexchange.com/questions/267321/extracting-epsg-from-a-raster-using-gdal-bindings-in-python
         self.crs = srs.ExportToWkt()
+        self.scale = self.raster.GetRasterBand(1).GetScale()
+        self.minimum = self.raster.GetRasterBand(1).GetMinimum()
+        self.maximum = self.raster.GetRasterBand(1).GetMaximum()
+        self.unitType = self.raster.GetRasterBand(1).GetUnitType()
+        self.colorInterpretation = self.raster.GetRasterBand(1).GetColorInterpretation()
+        self.colorTable = self.raster.GetRasterBand(1).GetColorTable()
 
     def plot(self):
         return 0
@@ -150,11 +163,13 @@ class RasterLayer:
     def crop(self,lx,ly,ux,uy):
         return 0
 
+
+
 class VectorLayer:
     def __init__(self,name="Not set"):
         self.df = None
         self.name = name
-postgis
+
     def loadFeatureLayerFromFile(self,filePath):
         #Support shapefile, geojson
         self.df = gpd.read_file(filePath)
@@ -166,7 +181,7 @@ postgis
         self.df = gpd.read_postgis(sql,con,geom_col=geom_col,crs=crs,index_col=index_col,params=params)
 
 
-class Map:postgis
+class Map:
     def __init__(self,name="Not set"):
         self.map = folium.Map([48., 5.], tiles='stamentoner', zoom_start=6)
         self.name = name
@@ -198,25 +213,25 @@ class Map:postgis
 
 map = Map(name="test map")
 rl = RasterLayer(name="test raster")
+rl.from_file("/home/noah/GIT/dissertation/test_data/testelevunproj.tif")
 vl = VectorLayer(name="test vector")
-
 
 """
 Manages all test functions for SpatialIO
-"""output_file("burtin.html", title="burtin.py example")
+"""
 def test():
     doctest.testmod()
 
 
-def testGeoDataFrame():
-    g = GeoDataFrame()
-    g.createGeoDataFrame(CRS.WMAS,columns=['geometry','a'])
-    g.addColumn('b')
-    g.addRow({'geometry':Point(49,50),'a':1,'b':'c'})
-    print g.crs
-    g.plot()
-    print g.to_json()
-    g.to_shapefile("./results/test.shp")
-    g.reproject(CRS.WGS84)
-    g.plot()
-    print g.crs
+#def testGeoDataFrame():
+g = GeoDataFrame()
+g.createGeoDataFrame(CRS.WMAS,columns=['geometry','a'])
+g.addColumn('b')
+g.addRow({'geometry':Point(49,50),'a':1,'b':'c'})
+print g.crs
+g.plot()
+print g.to_json()
+g.to_shapefile("./results/test.shp")
+g.reproject(CRS.WGS84)
+g.plot()
+print g.crs
