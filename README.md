@@ -3,8 +3,39 @@ Code for my PhD at the University of Illinois at Urbana-Champaign
 Noah W. Garfinkle
 *garfink2@illinois.edu*
 
+<p align="center">
+  <a href="https://www.noahgarfinkle.github.io">
+  </a>
+
+  <h3 align="center">dissertation</h3>
+
+  <p align="center">
+    My dissertation
+    <br>
+    <a href="https://www.noahgarfinkle.github.io"><strong>See me on GITHUB»</strong></a>
+    <br>
+    <br>
+    <a href="https://www.noahgarfinkle.github.io">Item 1</a>
+    ·
+    <a href="https://www.noahgarfinkle.github.io">Item 2</a>
+    ·
+    <a href="https://www.noahgarfinkle.github.io">Item 3</a>
+  </p>
+</p>
+
+<br>
+
+## Table of contents
+
+- [Purpose](#purpose)
+- [Status](#status)
+- [Requirements](#requirements)
+- [functions I need to replicate from R](functions-I-need-to-replicate-from-r)
+
 ## Purpose
 > To get a PhD
+
+## Status
 
 ## Requirements
 * Python 2.7
