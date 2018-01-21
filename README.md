@@ -12,6 +12,10 @@ Noah W. Garfinkle
 
 ## Installation
 
+## LICENSE
+
+## CHANGELOG
+
 ## Examples
 ```Python
     def foo():
