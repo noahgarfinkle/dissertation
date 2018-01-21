@@ -21,6 +21,8 @@ __status__ = "Development"
 __python_version__ = "2.7"
 __date_created__ = "20 January 2018"
 
+import doctest
+
 
 from enum import Enum
 class CRS(Enum):
@@ -66,3 +68,9 @@ class Map:
         # https://ocefpaf.github.io/python4oceanographers/blog/2015/12/14/geopandas_folium/
         # http://andrewgaidus.com/leaflet_webmaps_python/
         return 0
+
+"""
+Manages all test functions for SpatialIO
+"""
+def test():
+    doctest.testmod()

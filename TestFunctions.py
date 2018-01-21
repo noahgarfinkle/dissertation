@@ -5,7 +5,7 @@ import rasterio as rs
 import geopandas as pd
 import numpy as np
 #testRasterPath = "/home/noah/Missori_FLW/DataHUB/R_Friendly/Raster/DEM_CMB_ELV_SRTMVF2.tif"
-testRasterPath = "/home/noah/GIT/dissertation/testelevunproj.tif"
+testRasterPath = "/home/noah/GIT/dissertation/test_data/testelevunproj.tif"
 raster = rs.open(testRasterPath)
 rasterData = raster.read()
 plt.imshow(rasterData[0,:,:])
@@ -28,7 +28,7 @@ graster.sum()
 graster.std()
 #df = graster.to_geopandas()
 graster2 = graster **2
-graster2.to_tiff('./testexponential')
+graster2.to_tiff('./tmp/testexponential')
 
 value = graster.map_pixel_location(100,100)
 #graster.map_pixel(value[1],value[0])
@@ -87,7 +87,7 @@ class Raster:
         self.rasterPath = newPath
 
     def reproject(self,crs=CRS.WMAS):
-        tmpRaster = "./tmp.tif"
+        tmpRaster = "./tmp/tmp.tif"
         spatRef = osr.SpatialReference()
         spatRef.ImportFromEPSG(crs.value)
         gdal.Warp(tmpRaster,self.raster,dstSRS=spatRef)
@@ -101,7 +101,7 @@ r.from_file(testRasterPath)
 
 r.crs
 r.reproject()
-r.crsLicense
+r.crs
 
 # test using doctest, https://docs.python.org/2/library/doctest.html
 """
@@ -155,5 +155,6 @@ def factorial(n):
         result *= factor
         factor += 1
     return result
+
 import doctest
 doctest.testmod()
