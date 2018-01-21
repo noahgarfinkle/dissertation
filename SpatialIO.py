@@ -78,6 +78,15 @@ class GeoDataFrame:
         self.df = gpd.GeoDataFrame(crs=crsDict,columns=columns)
         self.crs = crs
 
+    def from_shapefile(self,filePath):
+        return None
+
+    def from_json(self,json):
+        return None
+
+    def from_postgis(self,postgis,query):
+        return None
+
     def addColumn(self,colName):
         self.df[colName] = None
 
@@ -142,14 +151,12 @@ class RasterLayer:
         return 0
 
 class VectorLayer:
-    def __init_(self,name="Not set"):
+    def __init__(self,name="Not set"):
         self.df = None
         self.name = name
-
+postgis
     def loadFeatureLayerFromFile(self,filePath):
-        """
-        Support shapefile, geojson
-        """
+        #Support shapefile, geojson
         self.df = gpd.read_file(filePath)
 
     def crop(self,lx,ly,ux,uy):
@@ -159,7 +166,7 @@ class VectorLayer:
         self.df = gpd.read_postgis(sql,con,geom_col=geom_col,crs=crs,index_col=index_col,params=params)
 
 
-class Map:
+class Map:postgis
     def __init__(self,name="Not set"):
         self.map = folium.Map([48., 5.], tiles='stamentoner', zoom_start=6)
         self.name = name
@@ -187,10 +194,11 @@ class Map:
         print("Map saved to %s" %(filePath))
 
 
-def testComposit():
-    map = Map(name="test map")
-    rl = RasterLayer(name="test raster")
-    
+# test composite
+
+map = Map(name="test map")
+rl = RasterLayer(name="test raster")
+vl = VectorLayer(name="test vector")
 
 
 """
