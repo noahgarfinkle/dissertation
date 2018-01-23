@@ -39,6 +39,41 @@ def get_nearest_node(lon,lat):
 nearestNode = get_nearest_node(-92.1647,37.7252) # Fort Leonard Wood, the negative is really important!
 nearestNode
 
+def shorterQueryWithoutDistance(lon,lat):
+    sql = "SELECT * FROM ways_vertices_pgr ORDER BY the_geom <-> ST_GeometryFromText('POINT(%s %s)',4326) LIMIT 1;" %(lon,lat)
+    nearestNode = pd.read_sql_query(sql,con=conn)
+    return nearestNode
+
+nearestNode = shorterQueryWithoutDistance(-92.1647,37.7252) # Fort Leonard Wood, the negative is really important!
+nearestNode
+
+
+def drivingDistance(startNode,distance):
+    sql = "SELECT * FROM pgr_drivingDistance('SELECT id, source, target, cost, reverse_cost FROM ways',%s,%s);" %(startNode,distance)
+    drivingDistance = pd.read_sql_query(sql,con=conn)
+    nodes = list(drivingDistance['node'])
+    nodes = [str(node) for node in nodes]
+    edges = list(drivingDistance['edge'])
+    edges = [str(edge) for edge in edges]
+    sql_nodes = "select * from ways_vertices_pgr where id in (%s)" %(",".join(nodes))
+    df_nodes = gpd.read_postgis(sql_nodes,con=conn,geom_col="the_geom")
+    sql_edges = "select * from ways where id in (%s)" %(",".join(edges))
+    df_edges = gpd.read_postgis(sql_edges,con=conn,geom_col="the_geom")
+    df_nodes.crs = {'init':'epsg:4326'}
+    df_edges.crs = {'init':'epsg:4326'}
+    nodes_gjson = df_nodes.to_crs(epsg='4326').to_json()
+    edges_gjson = df_edges.to_crs(epsg='4326').to_json()
+    nodes_features = folium.features.GeoJson(nodes_gjson)
+    edges_features = folium.features.GeoJson(edges_gjson)
+    map2 = folium.Map( tiles='stamentoner', zoom_start=6)
+    # https://ocefpaf.github.io/python4oceanographers/blog/2015/12/14/geopandas_folium/
+    #map2.add_child(nodes_features)
+    map2.add_child(edges_features)
+    map2.save('./results/mapwithdrivedistance.html')
+    return nodes_features, edges_features
+
+nodes_features, edges_features = drivingDistance(634267,0.1)
+
 connString = "dbname='routing' user='postgres' host='localhost' password='postgres'"
 conn = psycopg2.connect(connString)
 cur = conn.cursor()
@@ -53,7 +88,7 @@ sql2 = "select * from ways where id in (%s)" %(",".join(edges))
 df2 = gpd.read_postgis(sql2,con=conn,geom_col="the_geom")
 df2
 df2.plot()
-map = folium.Map([48., 5.], tiles='stamentoner', zoom_start=6)
+map = folium.Map([-92.1647,37.7252], tiles='stamentoner', zoom_start=6)
 # https://ocefpaf.github.io/python4oceanographers/blog/2015/12/14/geopandas_folium/
 df2.crs = {'init':'epsg:4326'}
 gjson = df2.to_crs(epsg='4326').to_json()
