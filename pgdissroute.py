@@ -74,6 +74,24 @@ def drivingDistance(startNode,distance):
 
 nodes_features, edges_features = drivingDistance(634267,0.1)
 
+
+def kMultipleRoutes(startNode,endNode,k):
+    sql = "SELECT * FROM pgr_ksp('SELECT id, source, target, cost, reverse_cost FROM ways',%s,%s,%s);" %(startNode,endNode,k)
+    df = pd.read_sql_query(sql,con=conn)
+    edges = list(df['edge'])
+    edges = [str(edge) for edge in edges]
+    sql2 = "select * from ways where id in (%s)" %(",".join(edges))
+    df2 = gpd.read_postgis(sql2,con=conn,geom_col="the_geom")
+    map = folium.Map( tiles='stamentoner', zoom_start=6)
+    # https://ocefpaf.github.io/python4oceanographers/blog/2015/12/14/geopandas_folium/
+    df2.crs = {'init':'epsg:4326'}
+    gjson = df2.to_crs(epsg='4326').to_json()
+    lines = folium.features.GeoJson(gjson)
+    map.add_child(lines)
+    map.save('./results/mapwithmultipleroutes.html')
+
+kMultipleRoutes(634267,3,2)
+
 connString = "dbname='routing' user='postgres' host='localhost' password='postgres'"
 conn = psycopg2.connect(connString)
 cur = conn.cursor()
