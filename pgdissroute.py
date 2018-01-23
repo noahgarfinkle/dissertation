@@ -88,7 +88,7 @@ sql2 = "select * from ways where id in (%s)" %(",".join(edges))
 df2 = gpd.read_postgis(sql2,con=conn,geom_col="the_geom")
 df2
 df2.plot()
-map = folium.Map([-92.1647,37.7252], tiles='stamentoner', zoom_start=6)
+map = folium.Map( tiles='stamentoner', zoom_start=6)
 # https://ocefpaf.github.io/python4oceanographers/blog/2015/12/14/geopandas_folium/
 df2.crs = {'init':'epsg:4326'}
 gjson = df2.to_crs(epsg='4326').to_json()
