@@ -6,10 +6,43 @@ import folium.plugins as plugins
 
 %matplotlib inline
 
+def get_nearest_node(lon,lat):
+    sql_CreateFunction = """CREATE OR REPLACE FUNCTION get_nearest_node
+        (IN x_long double precision, IN y_lat double precision) -- input parameters
+        RETURNS TABLE -- structure of output
+        (
+          node_id bigint ,
+          dist integer -- distance to the nearest station
+        ) AS $$
+
+        BEGIN
+
+        RETURN QUERY
+
+          SELECT id as node_id,
+             CAST
+             (st_distance_sphere(the_geom, st_setsrid(st_makepoint(x_long,y_lat),4326)) AS INT)
+             AS d
+          FROM ways_vertices_pgr
+          ORDER BY the_geom <-> st_setsrid(st_makepoint(x_long, y_lat), 4326)
+          LIMIT 1;
+
+          -- geometric operator <-> means "distance between"
+
+        END;
+        $$ LANGUAGE plpgsql;"""
+    cur.execute(sql_CreateFunction)
+    sql_queryNode = "SELECT * FROM get_nearest_node(%s,%s)" %(lon,lat)
+    nearestNode = pd.read_sql_query(sql_queryNode,con=conn)
+    return nearestNode
+
+nearestNode = get_nearest_node(-92.1647,37.7252) # Fort Leonard Wood, the negative is really important!
+nearestNode
+
 connString = "dbname='routing' user='postgres' host='localhost' password='postgres'"
 conn = psycopg2.connect(connString)
 cur = conn.cursor()
-sql = "select * from pgr_dijkstra('select id, source, target, cost, reverse_cost FROM ways',2,3);"
+sql = "select * from pgr_dijkstra('select id, source, target, cost, reverse_cost FROM ways',634267,3);"
 cur.execute(sql)
 rows = cur.fetchall()
 df = pd.read_sql_query(sql,con=conn)
