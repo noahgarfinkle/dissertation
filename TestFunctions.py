@@ -86,7 +86,8 @@ class Raster:
     def export(self,newPath):
         self.rasterPath = newPath
 
-    def reproject(self,crs=CRS.WMAS):
+    def reproject(self,crs=CRS.WMAS):rl.minimum
+
         tmpRaster = "./tmp/tmp.tif"
         spatRef = osr.SpatialReference()
         spatRef.ImportFromEPSG(crs.value)
@@ -106,7 +107,46 @@ r.crs
 # test using doctest, https://docs.python.org/2/library/doctest.html
 """
 This is a test
->>> factorial(5)
+>>> factorial(5)class Raster:
+    def __init__(self):
+        self.rasterPath = None
+        self.raster = None
+        self.crs = "None"
+
+    def from_empty(self,lx,ly,ux,uy,crs,scale):
+        return 0
+
+    def from_file(self,raster_path):
+        self.rasterPath = raster_path
+        self.raster = gdal.Open(raster_path)
+        proj = self.raster.GetProjection()
+        srs = osr.SpatialReference(wkt=proj)
+        #epsg = srs.GetAttrValue('AUTHORITY',1) # https://gis.stackexchange.com/questions/267321/extracting-epsg-from-a-raster-using-gdal-bindings-in-python
+        self.crs = srs.ExportToWkt()
+
+    def plot(self):
+        return 0
+
+    def export(self,newPath):
+        self.rasterPath = newPath
+
+    def reproject(self,crs=CRS.WMAS):rl.minimum
+
+        tmpRaster = "./tmp/tmp.tif"
+        spatRef = osr.SpatialReference()
+        spatRef.ImportFromEPSG(crs.value)
+        gdal.Warp(tmpRaster,self.raster,dstSRS=spatRef)
+        self.raster = gdal.Open(tmpRaster)
+        self.crs = spatRef.ExportToWkt()
+        self.rasterPath = "In memory: export to update"
+
+
+r = Raster()
+r.from_file(testRasterPath)
+
+r.crs
+r.reproject()
+r.crs
 120
 """
 def factorial(n):
