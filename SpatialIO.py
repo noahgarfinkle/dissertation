@@ -121,37 +121,6 @@ Images can be saved as new files using the save() function. The resulting file w
         print self.df.head()
 
 
-
-def readColorTable(color_file):
-    '''
-    The method for reading the color file.
-    * If alpha is not defined, a 255 value is set (no transparency).
-    '''
-
-    color_table = {}
-    if color_file != None:
-        if exists(color_file) is False:
-            raise Exception("Color file " + color_file + " does not exist")
-
-        fp = open(color_file, "r")
-        for line in fp:
-            if line.find('#') == -1 and line.find('/') == -1:
-                entry = line.split()
-                if len(entry) == 5:
-                    alpha = int(entry[4])
-                else:
-                    alpha=255
-                color_table[eval(entry[0])]=[int(entry[1]),int(entry[2]),int(entry[3]),alpha]
-        fp.close()
-    else:
-        color_table[127] = [255,0,0,0.3]
-        color_table[150] = [0,255,0,0.3]
-        color_table[200] = [0,0,255,0.3]
-        color_table[240] = [192,192,192,0.3]
-
-    return color_table
-
-
 class RasterLayer:
     def __init__(self,name="Not set"):
         self.name = name
@@ -211,90 +180,6 @@ class RasterLayer:
         os.system(cdArgument)
         os.system(argument)
         return argument
-
-    def toPNG(self, out_file_name, color_file=None , raster_band=1, discrete=True):
-        # http://geoexamples.blogspot.com/2013/06/gdal-performance-ii-create-png-from.html
-        # http://geoexamples.blogspot.com/2012/02/colorize-raster-with-gdal-python.html
-
-        dataset = self.raster
-        if dataset == None:
-            raise Exception("Unable to read the data file")
-
-        band = dataset.GetRasterBand(raster_band)
-
-        block_sizes = band.GetBlockSize()
-        x_block_size = block_sizes[0]
-        y_block_size = block_sizes[1]
-
-        xsize = band.XSize
-        ysize = band.YSize
-
-        max_value = band.GetMaximum()
-        min_value = band.GetMinimum()
-
-        if max_value == None or min_value == None:
-            stats = band.GetStatistics(0, 1)
-            max_value = stats[1]
-            min_value = stats[0]
-
-        #Reading the color table
-        color_table = readColorTable(color_file)
-        #Adding an extra value to avoid problems with the last & first entry
-        if sorted(color_table.keys())[0] > min_value:
-            color_table[min_value - 1] = color_table[sorted(color_table.keys())[0]]
-
-        if sorted(color_table.keys())[-1] < max_value:
-            color_table[max_value + 1] = color_table[sorted(color_table.keys())[-1]]
-        #Preparing the color table and the output file
-        classification_values = color_table.keys()
-        classification_values.sort()
-
-
-        rgb = zeros((ysize, xsize, 4), dtype = uint8)
-
-        for i in range(0, ysize, y_block_size):
-            if i + y_block_size < ysize:
-                rows = y_block_size
-            else:
-                rows = ysize - i
-
-            for j in range(0, xsize, x_block_size):
-                if j + x_block_size < xsize:
-                    cols = x_block_size
-                else:
-                    cols = xsize - j
-
-
-                values = band.ReadAsArray(j, i, cols, rows)
-                r = zeros((rows, cols), dtype = uint8)
-                g = zeros((rows, cols), dtype = uint8)
-                b = zeros((rows, cols), dtype = uint8)
-                a = zeros((rows, cols), dtype = uint8)
-
-                for k in range(len(classification_values) - 1):
-                    #print classification_values[k]
-                    if classification_values[k] < max_value and (classification_values[k + 1] > min_value ):
-                        mask = logical_and(values >= classification_values[k], values < classification_values[k + 1])
-                        if discrete == True:
-                            r = r + color_table[classification_values[k]][0] * mask
-                            g = g + color_table[classification_values[k]][1] * mask
-                            b = b + color_table[classification_values[k]][2] * mask
-                            a = a + color_table[classification_values[k]][3] * mask
-                        else:
-                            v0 = float(classification_values[k])
-                            v1 = float(classification_values[k + 1])
-
-                            r = r + mask * (color_table[classification_values[k]][0] + (values - v0)*(color_table[classification_values[k + 1]][0] - color_table[classification_values[k]][0])/(v1-v0) )
-                            g = g + mask * (color_table[classification_values[k]][1] + (values - v0)*(color_table[classification_values[k + 1]][1] - color_table[classification_values[k]][1])/(v1-v0) )
-                            b = b + mask * (color_table[classification_values[k]][2] + (values - v0)*(color_table[classification_values[k + 1]][2] - color_table[classification_values[k]][2])/(v1-v0) )
-                            a = a + mask * (color_table[classification_values[k]][3] + (values - v0)*(color_table[classification_values[k + 1]][3] - color_table[classification_values[k]][3])/(v1-v0) )
-
-                rgb[i:i+rows,j:j+cols, 0] = r
-                rgb[i:i+rows,j:j+cols, 1] = g
-                rgb[i:i+rows,j:j+cols, 2] = b
-                rgb[i:i+rows,j:j+cols, 3] = a
-
-        scipy.misc.imsave(out_file_name, rgb)
 
 
 
