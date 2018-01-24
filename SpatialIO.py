@@ -44,6 +44,7 @@ from numpy import zeros
 from numpy import uint8
 import scipy
 import os
+from PIL import Image, ImageChops
 
 %matplotlib inline
 
@@ -82,7 +83,7 @@ class GeoDataFrame:
         self.name = "Not Set"
         self.type = "Point"
         self.crs = None
-Images can be saved as new files using the save() function. The resulting file will have all the same metadata and number of bands, but with all processing applied. The datatype of the new image will be the same as the old one unless the dtype keyword is provided. Note that providing the dtype keyword does not scale the values however, it is up to the user to scale values to the desired range to match the output file created. Use the GeoImage.autoscale() function to automatically scale all bands, or use the GeoRaster.scale() function on each band to specify the input and output ranges.
+
     def createGeoDataFrame(self,crs,columns=['geometry']):
         crsDict = {'init':'epsg:%s' %(crs.value)}
         self.df = gpd.GeoDataFrame(crs=crsDict,columns=columns)
@@ -133,6 +134,10 @@ class RasterLayer:
         self.unitType = None
         self.colorInterpretation = None
         self.colorTable = None
+        self.lx = None
+        self.ly = None
+        self.ux = None
+        self.uy = None
 
 
     def from_empty(self,lx,ly,ux,uy,crs,scale):
@@ -150,6 +155,12 @@ class RasterLayer:
         self.unitType = self.raster.GetRasterBand(1).GetUnitType()
         self.colorInterpretation = self.raster.GetRasterBand(1).GetColorInterpretation()
         self.colorTable = self.raster.GetRasterBand(1).GetColorTable()
+        # get the extents, https://gis.stackexchange.com/questions/104362/how-to-get-extent-out-of-geotiff
+        geoTransform = self.raster.GetGeoTransform()
+        self.lx = geoTransform[0]
+        self.uy = geoTransform[3]
+        self.ux = self.lx + geoTransform[1] * self.raster.RasterXSize
+        self.ly = self.uy + geoTransform[5] * self.raster.RasterYSize
 
     def plot(self):
         return 0
@@ -206,12 +217,15 @@ class Map:
     def addRasterLayerAsOverlay(self,rasterLayer,opacity):
         # http://qingkaikong.blogspot.in/2016/06/using-folium-5-image-overlay-overlay.html
         # http://nbviewer.jupyter.org/github/python-visualization/folium/blob/master/examples/ImageOverlay.ipynb
+        # http://nbviewer.jupyter.org/github/ocefpaf/folium_notebooks/blob/master/test_image_overlay_gulf_stream.ipynb
         # 1. get boundary of raster
-        min_lon, max_lon, min_lat, max_lat = rasterLayer.raster.GetExtent()
-        bounds =[[min_lat, min_lon], [max_lat, max_lon]]
+        bounds =[[rasterLayer.ly,rasterLayer.lx], [rasterLayer.uy,rasterLayer.ux]]
 
         # 2. export raster to png
         data = np.array(rasterLayer.raster.GetRasterBand(1).ReadAsArray())
+        pngPath = "./tmp/temppng.png"
+        rasterLayer.toPNG(pngPath)
+        img = Image.open(pngPath)
 
         # 3. add ImageOverlay
         self.map.add_children(plugins.ImageOverlay(data,opacity=opacity,bounds=bounds))
@@ -232,7 +246,16 @@ map = Map(name="test map")
 rl = RasterLayer(name="test raster")
 rl.from_file("/home/noah/GIT/dissertation/test_data/testelevunproj.tif")
 vl = VectorLayer(name="test vector")
-rl.toPNG("./results/testout.png")
+rl.toPNG("./tmp/testout5.png")
+rl.lx
+rl.ux
+rl.ly
+rl.uy
+map.addRasterLayerAsOverlay(rl,0.5)
+map.saveMap("./results/addingrasterlayer.html")
+
+
+
 
 """
 Manages all test functions for SpatialIO
