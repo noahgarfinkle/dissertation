@@ -174,7 +174,6 @@ class RasterLayer:
         return 0
 
     def toPNG(self,outputPath):
-        outputPath = "./results/testout3.png"
         argument = "gdaldem hillshade -of PNG %s %s" %(self.rasterPath,outputPath)
         cdArgument = "cd /home/noah/GIT/dissertation/results"
         os.system(cdArgument)
