@@ -109,7 +109,26 @@ def kMultipleRoutes_LatLon(startLon,startLat,endLon,endLat,k):
     map.add_child(lines)
     map.save('./results/mapwithmultipleroutes.html')
 
-kMultipleRoutes_LatLon(-92.068859,37.846720,-92.142373,37.557935,3)
+kMultipleRoutes_LatLon(-92.068859,37.846720,-92.142373,37.557935,100)
+
+def route(startLat,startLon,endLat,endLon):
+    startNode = int(get_nearest_node(startLon,startLat)["node_id"])
+    endNode = int(get_nearest_node(endLon,endLat)["node_id"])
+    sql = "select * from pgr_dijkstra('select id, source, target, cost, reverse_cost FROM ways',%s,%s);" %(startNode,endNode)
+    cur.execute(sql)
+    rows = cur.fetchall()
+    df = pd.read_sql_query(sql,con=conn)
+    edges = list(df['edge'])
+    edges = [str(edge) for edge in edges]
+    sql2 = "select * from ways where id in (%s)" %(",".join(edges))
+    df2 = gpd.read_postgis(sql2,con=conn,geom_col="the_geom")
+    map = folium.Map( tiles='stamentoner', zoom_start=6)
+    # https://ocefpaf.github.io/python4oceanographers/blog/2015/12/14/geopandas_folium/
+    df2.crs = {'init':'epsg:4326'}
+    gjson = df2.to_crs(epsg='4326').to_json()
+    lines = folium.features.GeoJson(gjson)
+    map.add_child(lines)
+    map.save('./results/mapwithroute.html')
 
 
 connString = "dbname='routing' user='postgres' host='localhost' password='postgres'"
