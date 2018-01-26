@@ -239,6 +239,14 @@ class Map:
         self.map.save(filePath)
         print("Map saved to %s" %(filePath))
 
+    def addCoolIcon(self,lat,lon,icon):
+        # https://www.kaggle.com/daveianhickey/how-to-folium-for-maps-heatmaps-time-series
+        coolIcon = folium.Marker([51.5183, 0.3206],
+              popup='East London',
+              icon=folium.Icon(color='blue',icon='bar-chart', prefix='fa')
+             )
+             # icon=folium.Icon(color='red',icon='bicycle', prefix='fa')
+        self.map.add_child(coolIcon)
 
 class GenerationalSolutions:
     def __init__(self):
@@ -261,6 +269,7 @@ rl.ux
 rl.ly
 rl.uy
 map.addRasterLayerAsOverlay(rl,0.5)
+map.addCoolIcon(38.878057,-90.28944,'bar-chart')
 map.saveMap("./results/addingrasterlayer.html")
 
 g = GenerationalSolutions()
