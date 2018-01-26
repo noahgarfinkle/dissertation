@@ -240,6 +240,15 @@ class Map:
         print("Map saved to %s" %(filePath))
 
 
+class GenerationalSolutions:
+    def __init__(self):
+        self.dataFrame = GeoDataFrame()
+        self.dataFrame.createGeoDataFrame(CRS.WMAS,columns=['geometry','generation','score'])
+
+    def addPoint(self,lat,lon,generation,score):
+        geom = Point(lon,lat)
+        self.dataFrame.addRow({'geometry':geom,'generation':generation,'score':score})
+
 # test composite
 
 map = Map(name="test map")
@@ -254,8 +263,10 @@ rl.uy
 map.addRasterLayerAsOverlay(rl,0.5)
 map.saveMap("./results/addingrasterlayer.html")
 
-
-
+g = GenerationalSolutions()
+g.addPoint(50,-93,1,1)
+g.dataFrame.df
+g.dataFrame.df.plot()
 
 """
 Manages all test functions for SpatialIO
