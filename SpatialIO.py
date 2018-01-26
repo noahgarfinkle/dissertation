@@ -248,6 +248,9 @@ class Map:
              # icon=folium.Icon(color='red',icon='bicycle', prefix='fa')
         self.map.add_child(coolIcon)
 
+    def addTimeSeriesHeatMap(self):
+        return 0
+
 class GenerationalSolutions:
     def __init__(self):
         self.dataFrame = GeoDataFrame()
