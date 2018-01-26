@@ -111,7 +111,7 @@ def kMultipleRoutes_LatLon(startLon,startLat,endLon,endLat,k):
 
 kMultipleRoutes_LatLon(-92.068859,37.846720,-92.142373,37.557935,100)
 
-def route(startLat,startLon,endLat,endLon):
+def route(startLon,startLat,endLon,endLat):
     startNode = int(get_nearest_node(startLon,startLat)["node_id"])
     endNode = int(get_nearest_node(endLon,endLat)["node_id"])
     sql = "select * from pgr_dijkstra('select id, source, target, cost, reverse_cost FROM ways',%s,%s);" %(startNode,endNode)
@@ -130,6 +130,7 @@ def route(startLat,startLon,endLat,endLon):
     map.add_child(lines)
     map.save('./results/mapwithroute.html')
 
+route(-92.068859,37.846720,-92.142373,37.557935)
 
 connString = "dbname='routing' user='postgres' host='localhost' password='postgres'"
 conn = psycopg2.connect(connString)
