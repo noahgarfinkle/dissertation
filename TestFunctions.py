@@ -107,7 +107,9 @@ r.crs
 # test using doctest, https://docs.python.org/2/library/doctest.html
 """
 This is a test
->>> factorial(5)class Raster:
+>>> factorial(5)
+
+class Raster:
     def __init__(self):
         self.rasterPath = None
         self.raster = None
