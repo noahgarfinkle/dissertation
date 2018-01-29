@@ -168,3 +168,6 @@ map.save('./results/mapwithrouteandpopups.html')
 
 def createCustomCost():
     return 0
+
+def routeWithAvoidance(linkIDsToAvoid=[]):
+    return 0
