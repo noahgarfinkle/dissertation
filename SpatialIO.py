@@ -264,7 +264,8 @@ class GenerationalSolutions:
 
 map = Map(name="test map")
 rl = RasterLayer(name="test raster")
-rl.from_file("/home/noah/GIT/dissertation/test_data/testelevunproj.tif")
+#rl.from_file("/home/noah/GIT/dissertation/test_data/testelevunproj.tif")
+rl.from_file("C:/Users/Noah/Documents/GIT/dissertation/test_data/testelevunproj.tif")
 vl = VectorLayer(name="test vector")
 rl.toPNG("./tmp/testout5.png")
 rl.lx
