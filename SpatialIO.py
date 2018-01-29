@@ -274,7 +274,7 @@ rl.ly
 rl.uy
 map.addRasterLayerAsOverlay(rl,0.5)
 map.addCoolIcon(38.878057,-90.28944,'bar-chart')
-map.saveMap("./results/addingrasterlayer.html")
+map.saveMap("./results/addingrasterlayer2.html")
 
 g = GenerationalSolutions()
 g.addPoint(50,-93,1,1)

@@ -171,3 +171,6 @@ def createCustomCost():
 
 def routeWithAvoidance(linkIDsToAvoid=[]):
     return 0
+
+def queryRoadAndPutMarkerOnMidPoint(roadID):
+    return 0
