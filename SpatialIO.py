@@ -249,7 +249,18 @@ class Map:
         self.map.add_child(coolIcon)
 
     def addTimeSeriesHeatMap(self):
-        return 0
+        heat_data = []
+        for gen in range(0,5):
+            gen = []
+            for i in range(0,21):
+                lat = np.random.randint(35,50)
+                lon = np.random.randint(-90,-80)
+                val = [lat,lon]
+                gen.append(val)
+            heat_data.append(gen)
+        hm = plugins.HeatMapWithTime(heat_data)
+        self.map.add_child(hm)
+
 
 class GenerationalSolutions:
     def __init__(self):
@@ -263,6 +274,7 @@ class GenerationalSolutions:
 # test composite
 
 map = Map(name="test map")
+map.addTimeSeriesHeatMap()
 rl = RasterLayer(name="test raster")
 #rl.from_file("/home/noah/GIT/dissertation/test_data/testelevunproj.tif")
 rl.from_file("C:/Users/Noah/Documents/GIT/dissertation/test_data/testelevunproj.tif")
@@ -274,7 +286,7 @@ rl.ly
 rl.uy
 map.addRasterLayerAsOverlay(rl,0.5)
 map.addCoolIcon(38.878057,-90.28944,'bar-chart')
-map.saveMap("./results/addingrasterlayer2.html")
+map.saveMap("./results/testHeatMapWithTime.html")
 
 g = GenerationalSolutions()
 g.addPoint(50,-93,1,1)
