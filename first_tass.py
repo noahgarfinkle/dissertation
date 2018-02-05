@@ -73,3 +73,25 @@ a = RegularGridSampler(polygon=df)
 df.bounds
 df.bounds.min()
 df.bounds.max()
+df[:1].bounds
+subset = df[:1]
+subset.plot()
+bounds = subset.bounds
+
+ptList = []
+for x in floatrange(bounds['minx'][0],bounds['maxx'][0],0.1):
+    for y in floatrange(bounds['miny'][0],bounds['maxy'][0],0.1):
+        point = Point(x,y)
+        if subset.contains(point)[0]:
+            ptList.append(point)
+
+
+df2 = gpd.GeoDataFrame(ptList)
+df2.columns = ['geometry']
+plt.hold()
+
+subset.plot()
+df2.plot()
+# http://geopandas.org/mapping.html
+base = subset.plot()
+df2.plot(ax=base)
