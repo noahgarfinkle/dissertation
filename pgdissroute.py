@@ -6,6 +6,10 @@ import folium.plugins as plugins
 
 %matplotlib inline
 
+connString = "dbname='routing' user='postgres' host='localhost' password='postgres'"
+conn = psycopg2.connect(connString)
+cur = conn.cursor()
+
 def get_nearest_node(lon,lat):
     sql_CreateFunction = """CREATE OR REPLACE FUNCTION get_nearest_node
         (IN x_long double precision, IN y_lat double precision) -- input parameters
