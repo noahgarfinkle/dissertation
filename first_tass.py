@@ -14,10 +14,6 @@ import fiona
 import geopandas as gpd
 
 # https://gis.stackexchange.com/questions/113799/how-to-read-a-shapefile-in-python
-shape = fiona.open('./test_data/S_HUC_Ar.shp')
-feature = shape.shapeRecords()[0]
-first = feature.shape.__geo_interface__
-shp_geom = shape(first['geometry']
 
 df = gpd.read_file('./test_data/S_HUC_Ar.shp')
 %matplotlib inline
@@ -69,7 +65,7 @@ def RegularGridSampler(PolygonPointSampler):
                 if p.within(self.polygon):
                     self.samples.append(p)
 
-a = RegularGridSampler(polygon=df)
+a = RegularGridSampler(df)
 df.bounds
 df.bounds.min()
 df.bounds.max()
