@@ -60,7 +60,7 @@ Noah W. Garfinkle
 - [ ] Read in and manipulate rasters
 - [ ] Computer Euclidean distance
 - [ ] Compute routing distance
-- [ ] Set up pgrouting
+- [x] Set up pgrouting
 - [x] test commiting using Atom
 
 ## Functions I need to replicate from R

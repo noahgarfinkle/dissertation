@@ -173,10 +173,12 @@ map.save('./results/mapwithrouteandpopups.html')
 def createCustomCost():
     return 0
 
-def routeWithAvoidance(linkIDsToAvoid=[]):
+def routeWithAvoidance(startLon,startLat,endLon,endLat,linkIDsToAvoid=[]):
     startNode = int(get_nearest_node(startLon,startLat)["node_id"])
     endNode = int(get_nearest_node(endLon,endLat)["node_id"])
-    sql = "select * from pgr_dijkstra('select id, source, target, cost, reverse_cost FROM ways',%s,%s);" %(startNode,endNode)
+    linkIDsToAvoid = [str(x) for x in linkIDsToAvoid]
+    linksToAvoidString = ','.join(linkIDsToAvoid)  # https://stackoverflow.com/questions/44778/how-would-you-make-a-comma-separated-string-from-a-list
+    sql = "select * from pgr_dijkstra('select id, source, target, cost, reverse_cost FROM ways WHERE id NOT IN (%s)',%s,%s);" %(linksToAvoidString,startNode,endNode)
     cur.execute(sql)
     rows = cur.fetchall()
     df = pd.read_sql_query(sql,con=conn)
@@ -190,8 +192,12 @@ def routeWithAvoidance(linkIDsToAvoid=[]):
     gjson = df2.to_crs(epsg='4326').to_json()
     lines = folium.features.GeoJson(gjson)
     map.add_child(lines)
-    map.save('./results/mapwithroute.html')
+    map.save('./results/mapwithrouteavoidance.html')
     return df2
+
+avoidanceIDs = [690751,690752,1302738,702378,709829]
+df2 = routeWithAvoidance(-92.068859,37.846720,-92.142373,37.557935,avoidanceIDs)
+df2.sort_values(by='length',ascending=False)
 
 def queryRoadAndPutMarkerOnMidPoint(roadID):
     return 0
