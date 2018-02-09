@@ -4,7 +4,7 @@ Noah W. Garfinkle
 *garfink2@illinois.edu*
 
 <p align="center">
-  <a href="https://www.noahgarfinkle.github.io">
+  <a href="https://noahgarfinkle.github.io">
   </a>
 
   <h3 align="center">dissertation</h3>
@@ -12,14 +12,14 @@ Noah W. Garfinkle
   <p align="center">
     My dissertation
     <br>
-    <a href="https://www.noahgarfinkle.github.io"><strong>See me on GITHUB»</strong></a>
+    <a href="https://noahgarfinkle.github.io"><strong>See me on GITHUB»</strong></a>
     <br>
     <br>
-    <a href="https://www.noahgarfinkle.github.io">Item 1</a>
+    <a href="https://noahgarfinkle.github.io">Item 1</a>
     ·
-    <a href="https://www.noahgarfinkle.github.io">Item 2</a>
+    <a href="https://noahgarfinkle.github.io">Item 2</a>
     ·
-    <a href="https://www.noahgarfinkle.github.io">Item 3</a>
+    <a href="https://noahgarfinkle.github.io">Item 3</a>
   </p>
 </p>
 
