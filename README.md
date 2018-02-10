@@ -57,8 +57,11 @@ Noah W. Garfinkle
 ## 10-12 FEBRUARY Tasks
 - [ ] Create demo XML file
 - [ ] Write XML parser
-- [ ] Raster first pass
-- [ ] Point/polygon second pass
+- [ ] Area of Interest
+- [ ] Site Suitability
+- [ ] Site Configuration
+- [ ] Site Evaluation
+- [ ] Site Relations
 
 ## Tasks
 - [x] set up a repo
