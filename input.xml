@@ -17,26 +17,59 @@
           <Eval value="27" score="60"/>
         </Criteria>
       </Criterion>
+      <SecondPass>
+
+      </SecondPass>
     </SiteSearch>
 
     <SiteSearch Type="Airfield" studyObjectiveID="1">
+      <AreaOfInterest CRS="3857" GeoJson=""/>
+      <Criterion>
 
+      </Criterion>
+      <SecondPass>
+
+      </SecondPass>
     </SiteSearch>
 
     <SiteSearch Type="FARP" studyObjectiveID="2">
+      <AreaOfInterest CRS="3857" GeoJson=""/>
+      <Criterion>
 
+      </Criterion>first
+      <SecondPass>
+
+      </SecondPass>
     </SiteSearch>
 
     <SiteSearch Type="TAA" studyObjectiveID="3">
+      <AreaOfInterest CRS="3857" GeoJson=""/>
+      <Criterion>
 
+      </Criterion>
+      <SecondPass>
+
+      </SecondPass>
     </SiteSearch>
 
     <SiteSearch Type="TAA" studyObjectiveID="4">
+      <AreaOfInterest CRS="3857" GeoJson=""/>first
+      <Criterion>
 
+      </Criterion>
+      <SecondPass>
+
+      </SecondPass>
     </SiteSearch>
 
     <SiteSearch Type="TAA" studyObjectiveID="5">
+      <AreaOfInterest CRS="3857" GeoJson=""/>
+      <Criterion>
 
+      </Criterion>
+      <SecondPass>
+
+      </SecondPass>
     </SiteSearch>
   </SiteSearches>
   <SiteRelationalConstraints>

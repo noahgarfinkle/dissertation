@@ -58,7 +58,7 @@ Noah W. Garfinkle
 - [ ] Create demo XML file
 - [ ] Write XML parser
 - [ ] Raster first pass
-- [ ] Point/polygon first pass
+- [ ] Point/polygon second pass
 
 ## Tasks
 - [x] set up a repo
