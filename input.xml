@@ -1,0 +1,48 @@
+<SiteSearch resultDir='' studystudyObjectiveID=''>
+  <Sites>
+    <ContingencyBase studyObjectiveID='0'>
+      <AreaOfInterest CRS='3857' GeoJson=''/>
+      <Criterion>
+        <Criteria layerPath="./test_data/elevation.tif" layerName="slope" operation="slope" operationParameters="degrees,30,m" layerType="Raster" weight="" exclusionary="False" note="prioritize average slope over 30m between 2 and 8 degrees">
+          <EvalFallBack score = 0/>
+          <Eval lowerBound="0" upperBound="2" score="40"/>
+          <Eval lowerBound="2" upperBound="8" score="100"/>
+          <Eval lowerBound="8" upperBound="12" score="20"/>
+        </Criteria>
+        <Criteria layerPath="./test_data/land_cover.tif" layerName="land_cover" operation="mode" operationParameters="30,m" layerType="Raster" weight="" exclusionary="False" note="">
+          <EvalFallBack score = 0/>
+          <Eval value="3" score="60"/>
+          <Eval value="4" score="60"/>
+          <Eval value="5" score="100"/>
+          <Eval value="27" score="60"/>
+        </Criteria>
+      </Criterion>
+    </ContingencyBase>
+
+    <Airfield studyObjectiveID='1'>
+
+    </Airfield>
+
+    <FARP studyObjectiveID='2'>
+
+    </FARP>
+
+    <TAA studyObjectiveID='3'>
+
+    </TAA>
+
+    <TAA studyObjectiveID='4'>
+
+    </TAA>
+
+    <TAA studyObjectiveID='5'>
+
+    </TAA>
+  </Sites>
+  <SiteRelationalConstraints>
+    <SiteRelationalConstraint studyObjectiveList="0,1" constraintType='routingDistance' constraintParameters="'less than',3200,'m'" note="CB access to airfield"/>
+    <SiteRelationalConstraint studyObjectiveList="0,3" constraintType='routingDistance' constraintParameters="'less than',3200,'m'" note="CB access to airfield"/>
+    <SiteRelationalConstraint studyObjectiveList="2,3,4,5" constraintType='euclideanDistance' constraintParameters="'less than',1600,'m'" note="Golden Hour"/>
+    <SiteRelationalConstraint studyObjectiveList="1,2" constraintType='euclideanDistance' constraintParameters="'greater than',800,'m'" note="Airfield standoff from FARP"/>
+  </SiteRelationalConstraints>
+</SiteSearch>
