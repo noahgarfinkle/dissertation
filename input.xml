@@ -2,7 +2,7 @@
   <SiteSearches>
     <SiteSearch Type="Contingency Base" studyObjectiveID="0">
       <AreaOfInterest CRS="3857" GeoJson=""/>
-      <Criterion>
+      <SiteSuitability>
         <Criteria layerPath="./test_data/elevation.tif" layerName="slope" operation="slope" operationParameters="degrees,30,m" layerType="Raster" weight="" exclusionary="False" note="prioritize average slope over 30m between 2 and 8 degrees">
           <EvalFallBack score = "0"/>
           <Eval lowerBound="0" upperBound="2" score="40"/>
@@ -16,60 +16,78 @@
           <Eval value="5" score="100"/>
           <Eval value="27" score="60"/>
         </Criteria>
-      </Criterion>
-      <SecondPass>
+      </SiteSuitability>
+      <SiteConfiguration>
 
-      </SecondPass>
+      </SiteConfiguration>
+      <SiteEvaluation>
+
+      </SiteEvaluation>
     </SiteSearch>
 
     <SiteSearch Type="Airfield" studyObjectiveID="1">
       <AreaOfInterest CRS="3857" GeoJson=""/>
-      <Criterion>
+      <SiteSuitability>
 
-      </Criterion>
-      <SecondPass>
+      </SiteSuitability>
+      <SiteConfiguration>
 
-      </SecondPass>
+      </SiteConfiguration>
+      <SiteEvaluation>
+
+      </SiteEvaluation>
     </SiteSearch>
 
     <SiteSearch Type="FARP" studyObjectiveID="2">
       <AreaOfInterest CRS="3857" GeoJson=""/>
-      <Criterion>
+      <SiteSuitability>
 
-      </Criterion>first
-      <SecondPass>
+      </SiteSuitability>
+      <SiteConfiguration>
 
-      </SecondPass>
+      </SiteConfiguration>
+      <SiteEvaluation>
+
+      </SiteEvaluation>
     </SiteSearch>
 
     <SiteSearch Type="TAA" studyObjectiveID="3">
       <AreaOfInterest CRS="3857" GeoJson=""/>
-      <Criterion>
+      <SiteSuitability>
 
-      </Criterion>
-      <SecondPass>
+      </SiteSuitability>
+      <SiteConfiguration>
 
-      </SecondPass>
+      </SiteConfiguration>
+      <SiteEvaluation>
+
+      </SiteEvaluation>
     </SiteSearch>
 
     <SiteSearch Type="TAA" studyObjectiveID="4">
       <AreaOfInterest CRS="3857" GeoJson=""/>first
-      <Criterion>
+      <SiteSuitability>
 
-      </Criterion>
-      <SecondPass>
+      </SiteSuitability>
+      <SiteConfiguration>
 
-      </SecondPass>
+      </SiteConfiguration>
+      <SiteEvaluation>
+
+      </SiteEvaluation>
     </SiteSearch>
 
     <SiteSearch Type="TAA" studyObjectiveID="5">
       <AreaOfInterest CRS="3857" GeoJson=""/>
-      <Criterion>
+      <SiteSuitability>
 
-      </Criterion>
-      <SecondPass>
+      </SiteSuitability>
+      <SiteConfiguration>
 
-      </SecondPass>
+      </SiteConfiguration>
+      <SiteEvaluation>
+
+      </SiteEvaluation>
     </SiteSearch>
   </SiteSearches>
   <SiteRelationalConstraints>

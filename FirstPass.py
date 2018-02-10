@@ -23,9 +23,8 @@ from lxml import etree as ET
 http://lxml.de/tutorial.html
 """
 
-# TEST INPUTS
-xmlPath = "./input.xml"
 
+# CLASSES
 class SiteSearch:
     def __init__(self):
         return None
@@ -60,3 +59,6 @@ class Input:
         siteRelationalConstraints = self.root[1]
         siteRelationalConstraint = SiteRelationalConstraint()
         self.siteRelationalConstraints.append(siteRelationalConstraint)
+
+# TESTS
+xmlPath = "./input.xml"
