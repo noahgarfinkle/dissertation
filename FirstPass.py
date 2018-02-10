@@ -1,33 +1,27 @@
-import xml.etree.ElementTree as ET
-dataDir = ""
-resultDir = ""
-lat_min = -4.12933991491484
-lon_min = 39.3832397460938
-lat_max = -3.86151427357038
-lon_max = 39.7416687011719
-qafCellSize = 857
-populationDensityWeight = 0.2
-slopeWeight = 0.2
-msrWeight = 0.2
-apodWeight = 0.2
+from lxml import etree as ET
 
-# https://docs.python.org/2/library/xml.etree.elementtree.html
+# http://lxml.de/tutorial.html
 xmlPath = "./input.xml"
 tree = ET.parse(xmlPath)
 root = tree.getroot()
 root.tag
 root.attrib
 
+
 for child in root:
     print child.tag
     print child.attrib
+    for grandchild in child:
+        print grandchild.tag
+        print grandchild.attrib
 
 for site in root.iter('ContingencyBase'):
     print site.tag
     print site.attrib
 
+evals = ET.SubElement(root,"eval")
 
-
+print ET.tostring(root,pretty_print=True)
 
 def readXML(xmlPath):
     tree = ET.parse(xmlPath)
