@@ -1,10 +1,13 @@
 from lxml import etree as ET
 
+# http://lxml.de/tutorial.html
+xmlPath = "./input.xml"
+
 class SiteSearch:
     def __init__(self):
         return None
 
-class siteRelationalConstraint:
+class SiteRelationalConstraint:
     def __init__(self):
         return None
 
@@ -13,24 +16,24 @@ class Input:
         self.xmlPath = xmlPath
         self.tree = ET.parse(xmlPath)
         self.root = tree.getroot()
+        self.siteSearches = []
+        self.siteRelationalConstraints = []
+        self.resultDir = root.attrib['resultDir']
+        self.studyObjectiveID = root.attrib['studyObjectiveID']
 
     def pretty_print(self):
         print ET.tostring(self.root,pretty_print=True)
 
+    def retrieveSiteSearches(self):
+        siteSearches = self.root[0]
+        for siteSearchElement in siteSearches:
+            print "%s: %s" %(siteSearchElement.tag, siteSearchElement.attrib)
+            for siteSearchElementChild in siteSearchElement:
+                print "\t%s: %s" %(siteSearchElementChild.tag,siteSearchElementChild.attrib)
+            siteSearch = SiteSearch()
+            self.siteSearches.append(siteSearch)
 
-
-
-# http://lxml.de/tutorial.html
-xmlPath = "./input.xml"
-tree = ET.parse(xmlPath)
-root = tree.getroot()
-root.tag
-root.attrib
-
-root.getchildren()
-sites = root[0]
-
-for child in sites:
-    print "%s: %s" %(child.tag, child.attrib)
-    for grandchild in child:
-        print "\t%s: %s" %(grandchild.tag,grandchild.attrib)
+    def retrieveSiteRelationalConstraints(self):
+        siteRelationalConstraints = self.root[1]
+        siteRelationalConstraint = SiteRelationalConstraint()
+        self.siteRelationalConstraints.append(siteRelationalConstraint)
