@@ -1,6 +1,29 @@
+# -*- coding: utf-8 -*-
+"""Parses an XML file in order to evaluate sites
+"""
+
+__author__ = "Noah W. Garfinkle"
+__copyright__ = "Copyright 2018, Noah W. Garfinkle"
+__credits__ = ["Dr. Ximing Cai", "Dr. George Calfas", "Thomas 'Max' Foltz",
+                    "Juliana McMillan-Wilhoit", "Matthew Hiett",
+                    "Dylan Pasley"]
+__license__ = "GPL"
+__version__ = "0.0.1"
+__version_dinosaur__ = "Apotosauras"
+__maintainer__ = "Noah Garfinkle"
+__email__ = "garfink2@illinois.edu"
+__status__ = "Development"
+__python_version__ = "2.7"
+__date_created__ = "10 FEBRUARY 2018"
+
+# IMPORTS
 from lxml import etree as ET
 
-# http://lxml.de/tutorial.html
+""" REFERENCES
+http://lxml.de/tutorial.html
+"""
+
+# TEST INPUTS
 xmlPath = "./input.xml"
 
 class SiteSearch:
