@@ -3,19 +3,19 @@
     <SiteSearch Type="Contingency Base" studyObjectiveID="0">
       <AreaOfInterest CRS="3857" GeoJson=""/>
       <SiteSuitability>
-        <Criteria layerPath="./test_data/elevation.tif" layerName="slope" operation="slope" operationParameters="degrees,30,m" layerType="Raster" weight="" exclusionary="False" note="prioritize average slope over 30m between 2 and 8 degrees">
+        <SiteSuitabilityCriteria layerPath="./test_data/elevation.tif" layerName="slope" operation="slope" operationParameters="degrees,30,m" layerType="Raster" weight="" exclusionary="False" note="prioritize average slope over 30m between 2 and 8 degrees">
           <EvalFallBack score = "0"/>
-          <Eval lowerBound="0" upperBound="2" score="40"/>
-          <Eval lowerBound="2" upperBound="8" score="100"/>
-          <Eval lowerBound="8" upperBound="12" score="20"/>
-        </Criteria>
-        <Criteria layerPath="./test_data/land_cover.tif" layerName="land_cover" operation="mode" operationParameters="30,m" layerType="Raster" weight="" exclusionary="False" note="">
+          <SiteSuitabilityCriteriaEvaluation lowerBound="0" upperBound="2" score="40"/>
+          <SiteSuitabilityCriteriaEvaluation lowerBound="2" upperBound="8" score="100"/>
+          <SiteSuitabilityCriteriaEvaluation lowerBound="8" upperBound="12" score="20"/>
+        </SiteSuitabilityCriteria>
+        <SiteSuitabilityCriteria layerPath="./test_data/land_cover.tif" layerName="land_cover" operation="mode" operationParameters="30,m" layerType="Raster" weight="" exclusionary="False" note="">
           <EvalFallBack score = "0"/>
-          <Eval value="3" score="60"/>
-          <Eval value="4" score="60"/>
-          <Eval value="5" score="100"/>
-          <Eval value="27" score="60"/>
-        </Criteria>
+          <SiteSuitabilityCriteriaEvaluation value="3" score="60"/>
+          <SiteSuitabilityCriteriaEvaluation value="4" score="60"/>
+          <SiteSuitabilityCriteriaEvaluation value="5" score="100"/>
+          <SiteSuitabilityCriteriaEvaluation value="27" score="60"/>
+        </SiteSuitabilityCriteria>
       </SiteSuitability>
       <SiteConfiguration>
 

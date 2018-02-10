@@ -27,6 +27,15 @@ http://lxml.de/tutorial.html
 # CLASSES
 class SiteSearch:
     def __init__(self):
+        self.crs = None
+        self.AreaOfInterest = None
+
+class SiteSuitabilityCriteria:
+    def __init__(self):
+        return None
+
+class SiteSuitabilityCriteriaEvaluation:
+    def __init__(self):EvalFallBack
         return None
 
 class SiteRelationalConstraint:
@@ -38,8 +47,8 @@ class Input:
         self.xmlPath = xmlPath
         self.tree = ET.parse(xmlPath)
         self.root = tree.getroot()
-        self.siteSearches = []
-        self.siteRelationalConstraints = []
+        self.siteSearches = self.retrieveSiteSearches()
+        self.siteRelationalConstraints = self.retrieveSiteRelationalConstraints()
         self.resultDir = root.attrib['resultDir']
         self.studyObjectiveID = root.attrib['studyObjectiveID']
 
@@ -47,18 +56,22 @@ class Input:
         print ET.tostring(self.root,pretty_print=True)
 
     def retrieveSiteSearches(self):
-        siteSearches = self.root[0]
-        for siteSearchElement in siteSearches:
+        siteSearches = []
+        siteSearchesElement = self.root[0]
+        for siteSearchElement in siteSearchesElement:
             print "%s: %s" %(siteSearchElement.tag, siteSearchElement.attrib)
             for siteSearchElementChild in siteSearchElement:
                 print "\t%s: %s" %(siteSearchElementChild.tag,siteSearchElementChild.attrib)
             siteSearch = SiteSearch()
-            self.siteSearches.append(siteSearch)
+            siteSearches.append(siteSearch)
+        return siteSearches
 
     def retrieveSiteRelationalConstraints(self):
         siteRelationalConstraints = self.root[1]
         siteRelationalConstraint = SiteRelationalConstraint()
-        self.siteRelationalConstraints.append(siteRelationalConstraint)
+        siteSearchRelationalConstraints = []
+        siteRelationalConstraints.append(siteRelationalConstraint)
+        return siteSearchRelationalConstraints
 
 # TESTS
 xmlPath = "./input.xml"
