@@ -1,5 +1,11 @@
 from lxml import etree as ET
 
+class InputFile:
+    def __init__(self,xmlPath):
+        self.xmlPath = xmlPath
+
+
+
 # http://lxml.de/tutorial.html
 xmlPath = "./input.xml"
 tree = ET.parse(xmlPath)
@@ -7,19 +13,16 @@ root = tree.getroot()
 root.tag
 root.attrib
 
+root.getchildren()
+sites = root[0]
 
-for child in root:
-    print child.tag
-    print child.attrib
+for child in sites:
+    print "%s: %s" %(child.tag, child.attrib)
     for grandchild in child:
-        print grandchild.tag
-        print grandchild.attrib
+        print "\t%s: %s" %(grandchild.tag,grandchild.attrib)
 
-for site in root.iter('ContingencyBase'):
-    print site.tag
-    print site.attrib
 
-evals = ET.SubElement(root,"eval")
+
 
 print ET.tostring(root,pretty_print=True)
 

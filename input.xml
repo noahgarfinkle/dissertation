@@ -1,6 +1,6 @@
-<SiteSearch resultDir="" studystudyObjectiveID="">
-  <Sites>
-    <ContingencyBase studyObjectiveID="0">
+<Input resultDir="" studystudyObjectiveID="">
+  <SiteSearches>
+    <SiteSearch Type="Contingency Base" studyObjectiveID="0">
       <AreaOfInterest CRS="3857" GeoJson=""/>
       <Criterion>
         <Criteria layerPath="./test_data/elevation.tif" layerName="slope" operation="slope" operationParameters="degrees,30,m" layerType="Raster" weight="" exclusionary="False" note="prioritize average slope over 30m between 2 and 8 degrees">
@@ -17,32 +17,32 @@
           <Eval value="27" score="60"/>
         </Criteria>
       </Criterion>
-    </ContingencyBase>
+    </SiteSearch>
 
-    <Airfield studyObjectiveID="1">
+    <SiteSearch Type="Airfield" studyObjectiveID="1">
 
-    </Airfield>
+    </SiteSearch>
 
-    <FARP studyObjectiveID="2">
+    <SiteSearch Type="FARP" studyObjectiveID="2">
 
-    </FARP>
+    </SiteSearch>
 
-    <TAA studyObjectiveID="3">
+    <SiteSearch Type="TAA" studyObjectiveID="3">
 
-    </TAA>
+    </SiteSearch>
 
-    <TAA studyObjectiveID="4">
+    <SiteSearch Type="TAA" studyObjectiveID="4">
 
-    </TAA>
+    </SiteSearch>
 
-    <TAA studyObjectiveID="5">
+    <SiteSearch Type="TAA" studyObjectiveID="5">
 
-    </TAA>
-  </Sites>
+    </SiteSearch>
+  </SiteSearches>
   <SiteRelationalConstraints>
     <SiteRelationalConstraint studyObjectiveList="0,1" constraintType="routingDistance" constraintParameters="less than,3200,m" note="CB access to airfield"/>
     <SiteRelationalConstraint studyObjectiveList="0,3" constraintType="routingDistance" constraintParameters="less than,3200,m" note="CB access to airfield"/>
     <SiteRelationalConstraint studyObjectiveList="2,3,4,5" constraintType="euclideanDistance" constraintParameters="less than,1600,m" note="Golden Hour"/>
     <SiteRelationalConstraint studyObjectiveList="1,2" constraintType="euclideanDistance" constraintParameters="greater than,800,m" note="Airfield standoff from FARP"/>
   </SiteRelationalConstraints>
-</SiteSearch>
+</Input>
