@@ -54,6 +54,12 @@ Noah W. Garfinkle
         return True
 ```
 
+## 10-12 FEBRUARY Tasks
+- [ ] Create demo XML file
+- [ ] Write XML parser
+- [ ] Raster first pass
+- [ ] Point/polygon first pass
+
 ## Tasks
 - [x] set up a repo
 - [ ] convert all current functions from R to Python
