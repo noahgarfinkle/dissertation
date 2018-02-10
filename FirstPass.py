@@ -1,3 +1,4 @@
+import xml.etree.ElementTree as ET
 dataDir = ""
 resultDir = ""
 lat_min = -4.12933991491484
@@ -9,6 +10,28 @@ populationDensityWeight = 0.2
 slopeWeight = 0.2
 msrWeight = 0.2
 apodWeight = 0.2
+
+# https://docs.python.org/2/library/xml.etree.elementtree.html
+xmlPath = "./input.xml"
+tree = ET.parse(xmlPath)
+root = tree.getroot()
+root.tag
+root.attrib
+
+for child in root:
+    print child.tag
+    print child.attrib
+
+for site in root.iter('ContingencyBase'):
+    print site.tag
+    print site.attrib
+
+
+
+
+def readXML(xmlPath):
+    tree = ET.parse(xmlPath)
+    root = tree.getroot()
 
 def firstPass(dataDir,resultDir,lat_min,lon_min,lat_max,lon_max,qafCellSize,populationDensityWeight,slopeWeight,msrWeight,apodWeight):
     return 0
