@@ -222,25 +222,18 @@ df_proj.plot(column="NAME")
 
 aoiWKT = df_proj['geometry'][0].to_wkt()
 aoiLoaded = loads(aoiWKT)
-bounds = aoiLoaded.bounds
-bb = df_proj['geometry'][1].envelope
-filter_df = gpd.GeoDataFrame(gpd.GeoSeries(bb),columns=['geometry'])
-filter_df.head()
-filtered_DF = gpd.overlay(filter_df,df_proj,how='intersection')
-filtered_DF.head()
-bounds = df_proj['geometry'][21].envelope.bounds
-envelope = df_proj['geometry'][21].envelope
-bounds
-df_proj_stripped = df_proj.drop(0)
-filtered_DF2 = df_proj_stripped.cx[bounds[0]:bounds[2],bounds[1]:bounds[3]]
-filtered_DF2
-filtered_DF2.plot(column="HUC_NAME")
+
+def filterDF(df,lx,ly,ux,uy):
+    filteredDF = df.cx[lx:ux,ly:uy]
+    return filteredDF
 
 
-df_proj.geometry[21]
-df_proj.plot(column="HUC_NAME")
 
-filtered_DF2
+lx,ly,ux,uy = df_proj['geometry'][11].envelope.bounds
+filtered = filterDF(df_proj,lx,ly,ux,uy)
+filtered.plot()
+
+
 """
 """
 def buildSearchGrid(aoiWKT,aoiWKTProjection=4326,gridSpacing=30,exclusionFeatures = []):
