@@ -29,6 +29,7 @@ import matplotlib.pyplot as plt
 """ REFERENCES
 http://lxml.de/tutorial.html
 https://mapbox.s3.amazonaws.com/playground/perrygeo/rasterio-docs/cookbook.html#rasterizing-geojson-features
+http://skipperkongen.dk/2012/03/06/hello-world-of-raster-creation-with-gdal-and-python/
 """
 
 
@@ -84,7 +85,7 @@ class Input:
 # SPATIAL FUNCTIONS
 def distance():
     distances = gdal.distances()
-
+qafCellSize
     return None
 
 def creatQAFRaster(crs,lx,ly,ux,uy,qafCellSize):
@@ -95,20 +96,15 @@ def creatQAFRaster(crs,lx,ly,ux,uy,qafCellSize):
     newUY = ly + (numberYCells * qafCellSize)
 
     qafMatrix = np.empty([numberXCells,numberYCells])
-
-    """
-  nx <- ceiling((ux - lx) / qafCellSize)
-  ny <- ceiling((uy - ly) / qafCellSize)
-
-  ux <- lx + (nx * qafCellSize)
-  uy <- ly + (ny * qafCellSize)
-
-  qafMatrix <- matrix(0,ny,nx)
-  qafRaster <- raster(qafMatrix)
-  extent(qafRaster) <- c(lx,ux,ly,uy)
-
-  projection(qafRaster) <- CRS('+init=epsg:3857') # wgs 1984 web mercator auxillary sphere
-    """
+    driver = gdal.GetDriverByName("GTiff")
+    dst_ds = driver.Create("./tmp/emtpyRaster.tif",numberXCells,numberYCells,0,gdal.GDT_Byte)
+    pixel_width,pixel_height = qafCellSize
+    topLeftX = lx
+    topLeftY = newUY
+    dst_ds.SetGeoTransform([topLeftX,pixel_width,0,topLeftY,0,-pixel_height])
+    srs = osr.SpatialReference()
+    srs.ImportFromEPSG(crs)
+    dst_ds.SetProjection(srs.ExportToWkt())
 
 def createQAFGridSurface():
     return 0
@@ -120,10 +116,9 @@ xmlPath = "./input.xml"
 raster_path = "/home/noah/FLW_Missouri Mission Folder/RASTER/DEM_CMB_ELV_SRTMVF2.tif"
 raster = gdal.Open(raster_path)
 raster_array = raster.ReadAsArray()
-raster_array
-%matploblib inline
+%matplotlib inline
 plt.imshow(raster_array)
-vector_path = "/home/noah/FLW_Missouri Mission Folder/VECTOR/TransportationGroundChttps://mapbox.s3.amazonaws.com/playground/perrygeo/rasterio-docs/cookbook.html#rasterizing-geojson-featuresrv.shp"
+vector_path = "/home/noah/FLW_Missouri Mission Folder/VECTOR/TransportationGroundCrv.shp"
 driver = ogr.GetDriverByName('ESRI Shapefile')
 lines = driver.Open(vector_path,0)
 linesLayer = lines.GetLayer()
@@ -133,3 +128,27 @@ linesLayer = lines.GetLayer()
 
 
 rasterizedLinesLayer = gdal.RasterizeLayer(linesLayer)
+
+
+lat_min="-4.50181532782252"
+lon_min="39.315948486328125"
+lat_max="-4.2738327000745"
+lon_max="39.5452880859375"
+qafCellSize="30"
+
+numberXCells = np.ceiling((ux-lx)/qafCellSize)
+numberYCells = np.ceiling((uy-ly)/qafCellSize)
+
+newUX = lx + (numberXCells * qafCellSize)
+newUY = ly + (numberYCells * qafCellSize)
+
+qafMatrix = np.empty([numberXCells,numberYCells])
+driver = gdal.GetDriverByName("GTiff")
+dst_ds = driver.Create("./tmp/emtpyRaster.tif",numberXCells,numberYCells,0,gdal.GDT_Byte)
+pixel_width,pixel_height = qafCellSize
+topLeftX = lx
+topLeftY = newUY
+dst_ds.SetGeoTransform([topLeftX,pixel_width,0,topLeftY,0,-pixel_height])
+srs = osr.SpatialReference()
+srs.ImportFromEPSG(crs)
+dst_ds.SetProjection(srs.ExportToWkt())
