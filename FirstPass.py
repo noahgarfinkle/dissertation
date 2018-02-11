@@ -18,9 +18,17 @@ __date_created__ = "10 FEBRUARY 2018"
 
 # IMPORTS
 from lxml import etree as ET
+import gdaltools as gdt
+from osgeo import gdal, osr, ogr
+import geopandas as gpd
+import fiona
+import rasterio
+import numpy as np
+import matplotlib.pyplot as plt
 
 """ REFERENCES
 http://lxml.de/tutorial.html
+https://mapbox.s3.amazonaws.com/playground/perrygeo/rasterio-docs/cookbook.html#rasterizing-geojson-features
 """
 
 
@@ -34,7 +42,7 @@ class SiteSuitabilityCriteria:
     def __init__(self):
         return None
 
-class SiteSuitabilityCriteriaEvaluation:
+class SiteSuitabilityCriteriaEvaluahttps://mapbox.s3.amazonaws.com/playground/perrygeo/rasterio-docs/cookbook.html#rasterizing-geojson-featurestion:
     def __init__(self):EvalFallBack
         return None
 
@@ -73,5 +81,55 @@ class Input:
         siteRelationalConstraints.append(siteRelationalConstraint)
         return siteSearchRelationalConstraints
 
+# SPATIAL FUNCTIONS
+def distance():
+    distances = gdal.distances()
+
+    return None
+
+def creatQAFRaster(crs,lx,ly,ux,uy,qafCellSize):
+    numberXCells = np.ceiling((ux-lx)/qafCellSize)
+    numberYCells = np.ceiling((uy-ly)/qafCellSize)
+
+    newUX = lx + (numberXCells * qafCellSize)
+    newUY = ly + (numberYCells * qafCellSize)
+
+    qafMatrix = np.empty([numberXCells,numberYCells])
+
+    """
+  nx <- ceiling((ux - lx) / qafCellSize)
+  ny <- ceiling((uy - ly) / qafCellSize)
+
+  ux <- lx + (nx * qafCellSize)
+  uy <- ly + (ny * qafCellSize)
+
+  qafMatrix <- matrix(0,ny,nx)
+  qafRaster <- raster(qafMatrix)
+  extent(qafRaster) <- c(lx,ux,ly,uy)
+
+  projection(qafRaster) <- CRS('+init=epsg:3857') # wgs 1984 web mercator auxillary sphere
+    """
+
+def createQAFGridSurface():
+    return 0
+
 # TESTS
 xmlPath = "./input.xml"
+
+# test distance
+raster_path = "/home/noah/FLW_Missouri Mission Folder/RASTER/DEM_CMB_ELV_SRTMVF2.tif"
+raster = gdal.Open(raster_path)
+raster_array = raster.ReadAsArray()
+raster_array
+%matploblib inline
+plt.imshow(raster_array)
+vector_path = "/home/noah/FLW_Missouri Mission Folder/VECTOR/TransportationGroundChttps://mapbox.s3.amazonaws.com/playground/perrygeo/rasterio-docs/cookbook.html#rasterizing-geojson-featuresrv.shp"
+driver = ogr.GetDriverByName('ESRI Shapefile')
+lines = driver.Open(vector_path,0)
+linesLayer = lines.GetLayer()
+
+# rasterize the vector
+# https://github.com/mapplus/qgis-scripts/blob/master/scripts/Raster%20Euclidean%20Distance%20Analysis.py
+
+
+rasterizedLinesLayer = gdal.RasterizeLayer(linesLayer)

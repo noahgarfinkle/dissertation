@@ -59,6 +59,8 @@ Noah W. Garfinkle
 - [ ] Write XML parser
 - [ ] Area of Interest
 - [ ] Site Suitability
+  - [ ] Distance(qafRaster,df)
+    - [ ] RasterizeGeodataframe
 - [ ] Site Configuration
 - [ ] Site Evaluation
 - [ ] Site Relations

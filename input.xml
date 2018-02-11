@@ -2,7 +2,7 @@
   <SiteSearches>
     <SiteSearch Type="Contingency Base" studyObjectiveID="0">
       <AreaOfInterest CRS="3857" GeoJson=""/>
-      <SiteSuitability>
+      <SiteSuitability cellSize="30" cellSizeUnits="m">
         <SiteSuitabilityCriteria layerPath="./test_data/elevation.tif" layerName="slope" operation="slope" operationParameters="degrees,30,m" layerType="Raster" weight="" exclusionary="False" note="prioritize average slope over 30m between 2 and 8 degrees">
           <EvalFallBack score = "0"/>
           <SiteSuitabilityCriteriaEvaluation lowerBound="0" upperBound="2" score="40"/>
