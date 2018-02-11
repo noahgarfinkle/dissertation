@@ -250,3 +250,53 @@ filteredCounties.plot(ax=filteredRoads.plot(facecolor='red'),facecolor='Green')
 """
 def buildSearchGrid(aoiWKT,aoiWKTProjection=4326,gridSpacing=30,exclusionFeatures = []):
     return 0
+
+
+
+
+# CREATE A RASTER
+# http://skipperkongen.dk/2012/03/06/hello-world-of-raster-creation-with-gdal-and-python/
+import math
+
+width = 4000
+height = 3000
+
+driver = gdal.GetDriverByName("GTiff")
+
+dst_ds = driver.Create( "./results/testcreatedraster.tiff", width, height, 1, gdal.GDT_Byte )
+
+dst_ds.SetGeoTransform( [ 444720, 30, 0, 3751320, 0, -30 ] )
+
+srs = osr.SpatialReference()
+srs.ImportFromEPSG(25832)
+dst_ds.SetProjection( srs.ExportToWkt() )
+
+raster = np.zeros( (height, width), dtype=np.uint32 )
+color_range = 2**8
+seed = math.pi**10
+for i in range(height):
+	for j in range(width):
+		color = (seed*i*j) % color_range
+		raster[i][j] = color
+
+dst_ds.GetRasterBand(1).WriteArray( raster )
+testcreatedraster = gdal.Open("./results/testcreatedraster.tiff")
+testcreatedraster.GetGeoTransform()
+
+
+def createEmptyRaster(rasterPath,topLeftX,topLeftY,cellSize,width,height,epsg):
+    geotransform = [topLeftX,cellSize,0,topLeftY,0,-cellSize]
+    driver = gdal.GetDriverByName("GTiff")
+    dst_ds = driver.Create(rasterPath, width, height, 1, gdal.GDT_Byte )
+    dst_ds.SetGeoTransform(geotransform)
+    srs = osr.SpatialReference()
+    srs.ImportFromEPSG(epsg)
+    dst_ds.SetProjection(srs.ExportToWkt())
+    raster = np.zeros((height,width),dtype=np.uint32)
+    raster[25:50,25:50] = 100
+    dst_ds.GetRasterBand(1).WriteArray(raster)
+createEmptyRaster("./results/testemptyraster3.tif",lx,uy,30,100,100,3857)
+ds = gdal.Open('./results/testemptyraster3.tif')
+data = ds.ReadAsArray()
+data = np.flipud(data)
+plt.imshow(data)
