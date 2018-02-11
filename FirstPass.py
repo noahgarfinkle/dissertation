@@ -24,7 +24,10 @@ import geopandas as gpd
 import fiona
 import rasterio
 import numpy as np
+import shapely
+from shapely.wkt import loads
 import matplotlib.pyplot as plt
+%matplotlib inline
 
 """ REFERENCES
 http://lxml.de/tutorial.html
@@ -204,3 +207,41 @@ df_points['min_dist_to_lines'] = df_points.geometry.apply(min_distance, df_lines
 df_points.head()
 
 road_df = gpd.read_file(vector_path)
+
+
+# FIRST PASS IMPLEMENTATION
+df = gpd.read_file('./test_data/MO_2016_TIGER_Counties_shp/MO_2016_TIGER_Counties_shp.shp')
+df.head()
+df.plot(column="NAME")
+aoiJSON = df['geometry'][0].to_wkt()
+aoiJSON
+df.CRS = {'init':'epsg:4326'}
+df_proj = df.to_crs({'init':'epsg:3857'})
+df_proj.head()
+df_proj.plot(column="NAME")
+
+aoiWKT = df_proj['geometry'][0].to_wkt()
+aoiLoaded = loads(aoiWKT)
+bounds = aoiLoaded.bounds
+bb = df_proj['geometry'][1].envelope
+filter_df = gpd.GeoDataFrame(gpd.GeoSeries(bb),columns=['geometry'])
+filter_df.head()
+filtered_DF = gpd.overlay(filter_df,df_proj,how='intersection')
+filtered_DF.head()
+bounds = df_proj['geometry'][21].envelope.bounds
+envelope = df_proj['geometry'][21].envelope
+bounds
+df_proj_stripped = df_proj.drop(0)
+filtered_DF2 = df_proj_stripped.cx[bounds[0]:bounds[2],bounds[1]:bounds[3]]
+filtered_DF2
+filtered_DF2.plot(column="HUC_NAME")
+
+
+df_proj.geometry[21]
+df_proj.plot(column="HUC_NAME")
+
+filtered_DF2
+"""
+"""
+def buildSearchGrid(aoiWKT,aoiWKTProjection=4326,gridSpacing=30,exclusionFeatures = []):
+    return 0
