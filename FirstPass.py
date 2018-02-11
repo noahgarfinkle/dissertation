@@ -226,12 +226,18 @@ aoiLoaded = loads(aoiWKT)
 def filterDF(df,lx,ly,ux,uy):
     filteredDF = df.cx[lx:ux,ly:uy]
     return filteredDF
+vector_path = "./test_data/UtilityInfrastructureCrv_3.shp"
+roadsDF = gpd.read_file(vector_path)
+roadsDF.crs
+roadsDF.plot()
+roadsDF = roadsDF.to_crs({'init':'epsg:3857'})
 
+lx,ly,ux,uy = df_proj['geometry'][4].envelope.bounds
+filteredRoads = filterDF(roadsDF,lx,ly,ux,uy)
+filteredRoads.plot()
+filteredCounties = filterDF(df_proj,lx,ly,ux,uy)
+filteredCounties.plot(ax=filteredRoads.plot(facecolor='red'),facecolor='Green')
 
-
-lx,ly,ux,uy = df_proj['geometry'][11].envelope.bounds
-filtered = filterDF(df_proj,lx,ly,ux,uy)
-filtered.plot()
 
 
 """
