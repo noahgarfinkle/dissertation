@@ -28,7 +28,6 @@ import folium.plugins as plugins
 import numpy as np
 import geopandas as gpd
 from datetime import datetime, timedelta
-from shapely.geometry import Point
 import psycopg2
 from shapely.geometry import Point, Polygon
 from enum import Enum

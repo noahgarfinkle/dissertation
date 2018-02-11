@@ -226,7 +226,7 @@ aoiLoaded = loads(aoiWKT)
 def filterDataFrameByBounds(df,lx,ly,ux,uy):
     filteredDF = df.cx[lx:ux,ly:uy]
     return filteredDF
-
+df_proj
 def filterDataFrameByValue(df,column,argument):
     filteredDF = df[df[column]==argument]
     return filteredDF
@@ -293,10 +293,12 @@ def createEmptyRaster(rasterPath,topLeftX,topLeftY,cellSize,width,height,epsg):
     srs.ImportFromEPSG(epsg)
     dst_ds.SetProjection(srs.ExportToWkt())
     raster = np.zeros((height,width),dtype=np.uint32)
-    raster[25:50,25:50] = 100
+    raster[25:50,25:50] = 100 # this code is for testing
     dst_ds.GetRasterBand(1).WriteArray(raster)
 createEmptyRaster("./results/testemptyraster3.tif",lx,uy,30,100,100,3857)
 ds = gdal.Open('./results/testemptyraster3.tif')
 data = ds.ReadAsArray()
 data = np.flipud(data)
 plt.imshow(data)
+
+point = Point(lx,uy)
