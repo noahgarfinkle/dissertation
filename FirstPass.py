@@ -152,3 +152,10 @@ dst_ds.SetGeoTransform([topLeftX,pixel_width,0,topLeftY,0,-pixel_height])
 srs = osr.SpatialReference()
 srs.ImportFromEPSG(crs)
 dst_ds.SetProjection(srs.ExportToWkt())
+
+
+
+# shapely distances
+import fiona
+import shapely.geometry
+vct = fiona.open(vector_path)

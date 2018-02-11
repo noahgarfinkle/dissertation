@@ -64,6 +64,12 @@ Noah W. Garfinkle
 - [ ] Site Configuration
 - [ ] Site Evaluation
 - [ ] Site Relations
+- [ ] Re-evaluated approach to first pass
+  - [ ] GEOJSON AOI - exclusion cutouts + spacing = gridded dataframe of potential solutions, centerpoints of raster cells
+  - [ ] Filter vector dataframe with bounding box and by properties to decrease size
+  - [ ] Distance from point in solution dataframe to filtered vector dataFrame
+  - [ ] Extract from raster within distance of point and convert to array for custom analysis/ resampling
+  - [ ] Plot solution dataframe to raster with n/a where no solutions considered and ability to place any of the scores from the dataframe, saving to a geotiff
 
 ## Tasks
 - [x] set up a repo
