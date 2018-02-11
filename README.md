@@ -55,8 +55,8 @@ Noah W. Garfinkle
 ```
 
 ## 10-12 FEBRUARY Tasks
-- [ ] Create demo XML file
-- [ ] Write XML parser
+- [x] Create demo XML file
+- [x] Write XML parser
 - [ ] Area of Interest
 - [ ] Site Suitability
   - [ ] Distance(qafRaster,df)
