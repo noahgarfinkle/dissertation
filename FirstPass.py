@@ -25,6 +25,7 @@ import fiona
 import rasterio
 import numpy as np
 import shapely
+from shapely.geometry import Point, Polygon
 from shapely.wkt import loads
 import matplotlib.pyplot as plt
 %matplotlib inline
@@ -301,4 +302,8 @@ data = ds.ReadAsArray()
 data = np.flipud(data)
 plt.imshow(data)
 
-point = Point(lx,uy)
+point = Point(ux,uy)
+lx
+uy
+roadsDF.distance(point).min()
+roadsDF.plot()
