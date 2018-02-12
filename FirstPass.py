@@ -220,10 +220,15 @@ def queryRasterValueForPoint(x,y,raster_path,pointCRS=None,rasterCRS=None):
 
 # CURRENT TEST
 # https://gis.stackexchange.com/questions/16657/clipping-raster-with-vector-layer-using-gdal
-def calculateCutFill(featureGeometry,dem_path,finalElevation='average'):
+#finalElevation must either be number or string from validStats
+def calculateCutFill(df,dem_path,finalElevation='mean'):
+    if isinstance(finalElevation,basestring):
+        setElevationDF = generateRasterStatisticsForDataFrame(df,dem_path,stats=finalElevation)
+        for i,row in setElevationDF.iterrows:
+            print row
     return None
 
-
+validStats
 
 # TESTS
 # paths
