@@ -219,6 +219,20 @@ def queryRasterValueForPoint(x,y,raster_path,pointCRS=None,rasterCRS=None):
     return point_query(point,raster_path)
 
 # CURRENT TEST
+http://pythonhosted.org/rasterstats/manual.html#zonal-statistics
+def rasterStatCroppedRaster(df,raster_path):
+    raster = zonal_stats(df['geometry'],raster_path,raster_out=True)
+    return raster
+
+raster = zonal_stats(df['geometry'],raster_path,raster_out=True)
+testDF = pd.DataFrame(raster)
+testDF
+testDF['mini_raster_affine'][1]
+masked_array = testDF['mini_raster_array'][1]
+masked_array_np = np.array(masked_array)
+masked_array_np
+plt.imshow(masked_array_np)
+
 # https://gis.stackexchange.com/questions/16657/clipping-raster-with-vector-layer-using-gdal
 #finalElevation must either be number or string from validStats
 def calculateCutFill(df,dem_path,finalElevation='mean'):
