@@ -233,7 +233,10 @@ class Map:
     def addVectorLayerAsOverlay(self,vectorLayer):
         # https://ocefpaf.github.io/python4oceanographers/blog/2015/12/14/geopandas_folium/
         # http://andrewgaidus.com/leaflet_webmaps_python/
-        return 0
+        gjson = vectorLayer.df.to_crs('3857').to_json()
+        features = folium.features.GeoJson(gjson)
+        self.map.add_children(features)
+
 
     def saveMap(self,filePath):
         self.map.save(filePath)

@@ -10,6 +10,7 @@ import matplotlib as mpl
 import matplotlib.font_manager as font_manager
 from descartes import PolygonPatch
 import SpatialIO as io
+import folium
 import fiona
 import geopandas as gpd
 
@@ -78,12 +79,14 @@ subset = df[:1]
 subset.plot()
 bounds = subset.bounds
 
-ptList = []
-for x in floatrange(bounds['minx'][0],bounds['maxx'][0],0.1):
-    for y in floatrange(bounds['miny'][0],bounds['maxy'][0],0.1):
-        point = Point(x,y)
-        if subset.contains(point)[0]:
-            ptList.append(point)
+def generatePointsList(subset,distance):
+    ptList = []
+    for x in floatrange(bounds['minx'][0],bounds['maxx'][0],0.1):
+        for y in floatrange(bounds['miny'][0],bounds['maxy'][0],0.1):
+            point = Point(x,y)
+            if subset.contains(point)[0]:
+                ptList.append(point)
+    return ptList
 
 
 df2 = gpd.GeoDataFrame(ptList)
@@ -95,3 +98,22 @@ df2.plot()
 # http://geopandas.org/mapping.html
 base = subset.plot()
 df2.plot(ax=base)
+fig,ax = plt.subplots()
+ax.set_aspect('equal')
+subset.plot(ax=ax,color='white',edgecolor='black')
+df2.plot(ax=ax,marker='.',color='red',markersize=5)
+plt.show()
+plt
+df2.plot()
+subset.plot()
+map = io.Map()
+vl = io.VectorLayer()
+vl.df = subset
+
+
+vl2 = io.VectorLayer()
+vl2.df = df2
+
+map.addVectorLayerAsOverlay(vl)
+map.addVectorLayerAsOverlay(vl2)
+map.save("./results/grid.html")
