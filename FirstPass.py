@@ -228,11 +228,13 @@ def rasterStatCroppedRaster(df,raster_path):
 
 def test_rasterStatCroppedRaster(index = 40):
     df_subset = df[index:index + 1]
-    rasterDF = rasterStatCroppedRaster(df,raster_path)
+    rasterDF = rasterStatCroppedRaster(df_subset,raster_path)
     masked_array = rasterDF['mini_raster_array'][0]
     masked_array_np_masked = ma.masked_array(masked_array)
     masked_array_np = np.array(masked_array)
+    plt.figure()
     plt.imshow(masked_array_np_masked)
+    plt.figure()
     plt.imshow(masked_array_np)
     print "Mean Unmasked: %s, Mean Masked: %s" %(np.mean(masked_array_np),np.mean(masked_array_np_masked))
     np.mean(masked_array_np)
@@ -240,16 +242,8 @@ def test_rasterStatCroppedRaster(index = 40):
     return df['geometry'][index]
 
 returnedGeom = test_rasterStatCroppedRaster()
-raster = zonal_stats(df['geometry'][40],raster_path,all_touched=True,raster_out=True)
-testDF = pd.DataFrame(raster)
-masked_array_np_masked = ma.masked_array(masked_array)
-masked_array_np = np.array(masked_array)
-plt.imshow(masked_array_np_masked)
+returnedGeom
 
-plt.imshow(masked_array_np)
-np.mean(masked_array_np)
-np.mean(masked_array_np_masked)
-df['geometry'][40]
 
 
 # https://gis.stackexchange.com/questions/16657/clipping-raster-with-vector-layer-using-gdal
