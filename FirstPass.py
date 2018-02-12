@@ -167,12 +167,27 @@ def createEmptyRaster(rasterPath,topLeftX,topLeftY,cellSize,width,height,epsg):
     dst_ds.GetRasterBand(1).WriteArray(raster)
 
 
+def floatrange(start, stop, step):
+    while start < stop:
+        yield start
+        start += step
+
+def generateEvaluationGridDataFrame(polygon,gridSpacing):
+    pointList = []
+    bounds = polygon.bounds
+    ll = bounds[:2]
+    ur = bounds[2:]
+    for x in floatrange(ll[0],ur[0],gridSpacing):
+        for y in floatrange(ll[1],ur[1],gridSpacing):
+            point = Point(x,y)
+            if point.within(polygon):
+                pointList.append(point)
+    evaluationGridDataFrame = gpd.GeoDataFrame(pointList)
+    evaluationGridDataFrame.columns = ['geometry']
+    return evaluationGridDataFrame
 
 
-
-
-
-
+# CURRENT TEST
 
 
 
@@ -210,3 +225,8 @@ plt.imshow(data)
 
 point = Point(ux,uy)
 roadsDF.distance(point).min()
+
+
+aoiLoaded = loads(aoiWKT)
+testList = generateEvaluationGridDataFrame(aoiLoaded,3200)
+testList.plot()
