@@ -219,7 +219,9 @@ def queryRasterValueForPoint(x,y,raster_path,pointCRS=None,rasterCRS=None):
     return point_query(point,raster_path)
 
 # CURRENT TEST
-
+# https://gis.stackexchange.com/questions/16657/clipping-raster-with-vector-layer-using-gdal
+def calculateCutFill(featureGeometry,dem_path,finalElevation='average'):
+    return None
 
 
 
