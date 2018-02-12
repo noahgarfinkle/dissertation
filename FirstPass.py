@@ -228,7 +228,8 @@ def calculateCutFill(df,dem_path,finalElevation='mean'):
             print row
     return None
 
-validStats
+# https://github.com/perrygeo/python-rasterstats/blob/master/src/rasterstats/main.py
+# https://github.com/perrygeo/python-rasterstats/blob/master/src/rasterstats/utils.py
 
 # TESTS
 # paths
