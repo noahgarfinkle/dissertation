@@ -20,6 +20,7 @@ __date_created__ = "10 FEBRUARY 2018"
 from lxml import etree as ET
 import gdaltools as gdt
 from osgeo import gdal, osr, ogr
+import pandas as pd
 import geopandas as gpd
 import fiona
 import pyproj
@@ -205,6 +206,11 @@ def convertRasterToNumpyArray(raster_path):
     print data.shape
     print np.mean(data)
 
+def generateRasterCategoricalStatisticsForDataFrame(df,raster_Path):
+    row_stats_df = gpd.GeoDataFrame(raster_stats(vectors=df['geometry'],raster=raster_path,stats="count majority minority unique mean", copy_properties=True, nodata_value=0, categorical=True))
+    newDF = gpd.GeoDataFrame(pd.concat([df,row_stats_df],axis=1))
+    return newDF
+
 # CURRENT TEST
 raster_path = "./test_data/testelevunproj.tif"
 
@@ -212,7 +218,7 @@ raster_path = "./test_data/testelevunproj.tif"
 
 # https://github.com/perrygeo/python-rasterstats
 stats = zonal_stats('./test_data/MO_2016_TIGER_Counties_shp/MO_2016_TIGER_Counties_shp.shp',raster_path)
-
+stats
 point = "POINT(-10287442.575418131 4523429.485052726)"
 point_query(point,raster_path)
 
@@ -220,13 +226,10 @@ point_query(point,raster_path)
 df['mean'] = gpd.GeoDataFrame(zonal_stats(vectors=df['geometry'],raster=raster_path,stats='mean'))['mean']
 df.head()
 
-# http://www.perrygeo.com/python-rasterstats.html
-from rasterstats import raster_stats
-veg_stats = raster_stats(df['geometry'], raster_path,
-    stats="count majority minority unique",
-    copy_properties=True,
-    nodata_value=0,
-    categorical=True)
+dfStats = generateRasterCategoricalStatisticsForDataFrame(df,raster_path)
+dfStats.plot(column="mean")
+
+
 
 
 # TESTS
