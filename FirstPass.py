@@ -206,17 +206,17 @@ def convertRasterToNumpyArray(raster_path):
     print data.shape
     print np.mean(data)
 
-def generateRasterCategoricalStatisticsForDataFrame(df,raster_Path):
-    row_stats_df = gpd.GeoDataFrame(raster_stats(vectors=df['geometry'],raster=raster_path,stats="count majority minority unique mean", copy_properties=True, nodata_value=0, categorical=True))
+def generateRasterStatisticsForDataFrame(df,raster_Path,stats="count majority minority unique mean",isCategorical=False):
+    row_stats_df = gpd.GeoDataFrame(raster_stats(vectors=df['geometry'],raster=raster_path,stats=stats, copy_properties=True, nodata_value=0, categorical=isCategorical))
     newDF = gpd.GeoDataFrame(pd.concat([df,row_stats_df],axis=1))
     return newDF
+
+
 
 # CURRENT TEST
 raster_path = "./test_data/testelevunproj.tif"
 
-# zonal stats
 
-# https://github.com/perrygeo/python-rasterstats
 stats = zonal_stats('./test_data/MO_2016_TIGER_Counties_shp/MO_2016_TIGER_Counties_shp.shp',raster_path)
 stats
 point = "POINT(-10287442.575418131 4523429.485052726)"
@@ -226,11 +226,13 @@ point_query(point,raster_path)
 df['mean'] = gpd.GeoDataFrame(zonal_stats(vectors=df['geometry'],raster=raster_path,stats='mean'))['mean']
 df.head()
 
-dfStats = generateRasterCategoricalStatisticsForDataFrame(df,raster_path)
-dfStats.plot(column="mean")
+dfStatsCategorical = generateRasterStatisticsForDataFrame(df,raster_path,isCategorical=True)
+dfStatsCategorical.head()
+dfStatsCategorical.plot(column="mean")
 
-
-
+dfStatsNonCategorical = generateRasterStatisticsForDataFrame(df,raster_path,isCategorical=False)
+dfStatsNonCategorical.head()
+dfStatsNonCategorical.plot(column='majority')
 
 # TESTS
 # paths
