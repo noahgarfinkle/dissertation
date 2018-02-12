@@ -22,8 +22,10 @@ import gdaltools as gdt
 from osgeo import gdal, osr, ogr
 import geopandas as gpd
 import fiona
+import pyproj
 import rasterio
 import numpy as np
+import math
 import shapely
 from shapely.geometry import Point, Polygon
 from shapely.wkt import loads
@@ -35,7 +37,6 @@ http://lxml.de/tutorial.html
 https://mapbox.s3.amazonaws.com/playground/perrygeo/rasterio-docs/cookbook.html#rasterizing-geojson-features
 http://skipperkongen.dk/2012/03/06/hello-world-of-raster-creation-with-gdal-and-python/
 """
-
 
 # CLASSES
 class SiteSearch:
@@ -217,7 +218,7 @@ df.plot(column="NAME")
 aoiJSON = df['geometry'][0].to_wkt()
 aoiJSON
 df.CRS = {'init':'epsg:4326'}
-df_proj = df.to_crs({'init':'epsg:3857'})
+df_proj = df.to_crs({'init':'epsg:3857'})feat.project({"init":"EPSG:4326"})
 df_proj.head()
 df_proj.plot(column="NAME")
 
@@ -254,37 +255,6 @@ def buildSearchGrid(aoiWKT,aoiWKTProjection=4326,gridSpacing=30,exclusionFeature
 
 
 
-
-# CREATE A RASTER
-# http://skipperkongen.dk/2012/03/06/hello-world-of-raster-creation-with-gdal-and-python/
-import math
-
-width = 4000
-height = 3000
-
-driver = gdal.GetDriverByName("GTiff")
-
-dst_ds = driver.Create( "./results/testcreatedraster.tiff", width, height, 1, gdal.GDT_Byte )
-
-dst_ds.SetGeoTransform( [ 444720, 30, 0, 3751320, 0, -30 ] )
-
-srs = osr.SpatialReference()
-srs.ImportFromEPSG(25832)
-dst_ds.SetProjection( srs.ExportToWkt() )
-
-raster = np.zeros( (height, width), dtype=np.uint32 )
-color_range = 2**8
-seed = math.pi**10
-for i in range(height):
-	for j in range(width):
-		color = (seed*i*j) % color_range
-		raster[i][j] = color
-
-dst_ds.GetRasterBand(1).WriteArray( raster )
-testcreatedraster = gdal.Open("./results/testcreatedraster.tiff")
-testcreatedraster.GetGeoTransform()
-
-
 def createEmptyRaster(rasterPath,topLeftX,topLeftY,cellSize,width,height,epsg):
     geotransform = [topLeftX,cellSize,0,topLeftY,0,-cellSize]
     driver = gdal.GetDriverByName("GTiff")
@@ -307,7 +277,12 @@ def minimumDistanceFromPointToDataFrameFeatures(x,y,crs,df):
     return df.distance(point).min()
 
 def projectWKT(wkt,from_epsg,to_epsg):
-    return 0
+    feat = loads(wkt)
+    df_to_project = gpd.GeoDataFrame([feat])
+    df_to_project.columns = ['geometry']
+    df_to_project.crs = {'init':'EPSG:' + str(from_epsg)}
+    df_to_project.to_crs({'init':'EPSG:' + str(to_epsg)})
+    return df_to_project.geometry[0].to_wkt()
 
 point = Point(ux,uy)
 lx
