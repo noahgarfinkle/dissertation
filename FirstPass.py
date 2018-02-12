@@ -322,6 +322,19 @@ def zonal_stats(feat, input_zone_polygon, input_value_raster):
     return numpy.average(zoneraster),numpy.mean(zoneraster),numpy.median(zoneraster),numpy.std(zoneraster),numpy.var(zoneraster)
 
 # https://github.com/perrygeo/python-rasterstats
+from rasterstats import zonal_stats
+stats = zonal_stats('./test_data/MO_2016_TIGER_Counties_shp/MO_2016_TIGER_Counties_shp.shp',raster_path)
+
+from rasterstats import point_query
+point = "POINT(-10287442.575418131 4523429.485052726)"
+point_query(point,raster_path)
+
+# https://gis.stackexchange.com/questions/177035/geopandas-and-zonal-statistic-error
+df['mean'] = gpd.GeoDataFrame(zonal_stats(vectors=df['geometry'],raster=raster_path,stats='mean'))['mean']
+df.head()
+
+# http://www.perrygeo.com/python-rasterstats.html
+
 
 
 # TESTS
