@@ -31,7 +31,7 @@ import shapely
 from shapely.geometry import Point, Polygon
 from shapely.wkt import loads
 import shapely.geometry as geom
-from rasterstats import zonal_stats, raster_stats, point_query
+from rasterstats import zonal_stats, raster_stats, point_query, utils
 import matplotlib.pyplot as plt
 %matplotlib inline
 
@@ -206,18 +206,16 @@ def convertRasterToNumpyArray(raster_path):
     print data.shape
     print np.mean(data)
 
+validStats = utils.VALID_STATS
 def generateRasterStatisticsForDataFrame(df,raster_Path,stats="count majority minority unique mean",isCategorical=False):
     row_stats_df = gpd.GeoDataFrame(raster_stats(vectors=df['geometry'],raster=raster_path,stats=stats, copy_properties=True, nodata_value=0, categorical=isCategorical))
     newDF = gpd.GeoDataFrame(pd.concat([df,row_stats_df],axis=1))
     return newDF
 
 
-
 # CURRENT TEST
 point = "POINT(-10287442.575418131 4523429.485052726)"
 point_query(point,raster_path)
-
-
 
 
 
