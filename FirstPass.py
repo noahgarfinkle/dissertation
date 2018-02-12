@@ -118,6 +118,51 @@ def buildEvaluationGridDataFrame(aoiJSON,exclusionJson,gridSpacing):
     df = gpd.GeoDataFrame()
     df.columns = ['geometry','total']
 
+def filterDataFrameByBounds(df,lx,ly,ux,uy):
+    filteredDF = df.cx[lx:ux,ly:uy]
+    return filteredDF
+
+def filterDataFrameByValue(df,column,argument):
+    filteredDF = df[df[column]==argument]
+    return filteredDF
+
+def minimumDistanceFromPointToDataFrameFeatures(x,y,crs,df):
+    point = Point(x,y)
+    return df.distance(point).min()
+
+def projectWKT(wkt,from_epsg,to_epsg):
+    feat = loads(wkt)
+    df_to_project = gpd.GeoDataFrame([feat])
+    df_to_project.columns = ['geometry']
+    df_to_project.crs = {'init':'EPSG:' + str(from_epsg)}
+    df_to_project.to_crs({'init':'EPSG:' + str(to_epsg)})
+    return df_to_project.geometry[0].to_wkt()
+
+def buildSearchGrid(aoiWKT,aoiWKTProjection=4326,gridSpacing=30,exclusionFeatures = []):
+    return 0
+
+def createEmptyRaster(rasterPath,topLeftX,topLeftY,cellSize,width,height,epsg):
+    geotransform = [topLeftX,cellSize,0,topLeftY,0,-cellSize]
+    driver = gdal.GetDriverByName("GTiff")
+    dst_ds = driver.Create(rasterPath, width, height, 1, gdal.GDT_Byte )
+    dst_ds.SetGeoTransform(geotransform)
+    srs = osr.SpatialReference()
+    srs.ImportFromEPSG(epsg)
+    dst_ds.SetProjection(srs.ExportToWkt())
+    raster = np.zeros((height,width),dtype=np.uint32)
+    raster[25:50,25:50] = 100 # this code is for testing
+    dst_ds.GetRasterBand(1).WriteArray(raster)
+
+
+
+
+
+
+
+
+
+
+
 # TESTS
 xmlPath = "./input.xml"
 
@@ -225,13 +270,7 @@ df_proj.plot(column="NAME")
 aoiWKT = df_proj['geometry'][0].to_wkt()
 aoiLoaded = loads(aoiWKT)
 
-def filterDataFrameByBounds(df,lx,ly,ux,uy):
-    filteredDF = df.cx[lx:ux,ly:uy]
-    return filteredDF
-df_proj
-def filterDataFrameByValue(df,column,argument):
-    filteredDF = df[df[column]==argument]
-    return filteredDF
+
 
 
 vector_path = "./test_data/UtilityInfrastructureCrv_3.shp"
@@ -248,41 +287,14 @@ filteredCounties.plot(ax=filteredRoads.plot(facecolor='red'),facecolor='Green')
 
 
 
-"""
-"""
-def buildSearchGrid(aoiWKT,aoiWKTProjection=4326,gridSpacing=30,exclusionFeatures = []):
-    return 0
 
-
-
-def createEmptyRaster(rasterPath,topLeftX,topLeftY,cellSize,width,height,epsg):
-    geotransform = [topLeftX,cellSize,0,topLeftY,0,-cellSize]
-    driver = gdal.GetDriverByName("GTiff")
-    dst_ds = driver.Create(rasterPath, width, height, 1, gdal.GDT_Byte )
-    dst_ds.SetGeoTransform(geotransform)
-    srs = osr.SpatialReference()
-    srs.ImportFromEPSG(epsg)
-    dst_ds.SetProjection(srs.ExportToWkt())
-    raster = np.zeros((height,width),dtype=np.uint32)
-    raster[25:50,25:50] = 100 # this code is for testing
-    dst_ds.GetRasterBand(1).WriteArray(raster)
 createEmptyRaster("./results/testemptyraster3.tif",lx,uy,30,100,100,3857)
 ds = gdal.Open('./results/testemptyraster3.tif')
 data = ds.ReadAsArray()
 data = np.flipud(data)
 plt.imshow(data)
 
-def minimumDistanceFromPointToDataFrameFeatures(x,y,crs,df):
-    point = Point(x,y)
-    return df.distance(point).min()
 
-def projectWKT(wkt,from_epsg,to_epsg):
-    feat = loads(wkt)
-    df_to_project = gpd.GeoDataFrame([feat])
-    df_to_project.columns = ['geometry']
-    df_to_project.crs = {'init':'EPSG:' + str(from_epsg)}
-    df_to_project.to_crs({'init':'EPSG:' + str(to_epsg)})
-    return df_to_project.geometry[0].to_wkt()
 
 point = Point(ux,uy)
 lx
