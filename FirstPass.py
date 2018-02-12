@@ -29,6 +29,7 @@ import math
 import shapely
 from shapely.geometry import Point, Polygon
 from shapely.wkt import loads
+import shapely.geometry as geom
 import matplotlib.pyplot as plt
 %matplotlib inline
 
@@ -36,6 +37,12 @@ import matplotlib.pyplot as plt
 http://lxml.de/tutorial.html
 https://mapbox.s3.amazonaws.com/playground/perrygeo/rasterio-docs/cookbook.html#rasterizing-geojson-features
 http://skipperkongen.dk/2012/03/06/hello-world-of-raster-creation-with-gdal-and-python/
+https://github.com/mapplus/qgis-scripts/blob/master/scripts/Raster%20Euclidean%20Distance%20Analysis.py
+https://stackoverflow.com/questions/30740046/calculate-distance-to-nearest-feature-with-geopandas
+"""
+
+""" REFERENCE CODE
+setting up blank raster: dst_ds.SetGeoTransform([topLeftX,pixel_width,0,topLeftY,0,-pixel_height])
 """
 
 # CLASSES
@@ -139,7 +146,13 @@ def projectWKT(wkt,from_epsg,to_epsg):
     return df_to_project.geometry[0].to_wkt()
 
 def buildSearchGrid(aoiWKT,aoiWKTProjection=4326,gridSpacing=30,exclusionFeatures = []):
-    return 0
+    numberXCells = np.ceiling((ux-lx)/qafCellSize)
+    numberYCells = np.ceiling((uy-ly)/qafCellSize)
+
+    newUX = lx + (numberXCells * qafCellSize)
+    newUY = ly + (numberYCells * qafCellSize)
+
+    qafMatrix = np.empty([numberXCells,numberYCells])
 
 def createEmptyRaster(rasterPath,topLeftX,topLeftY,cellSize,width,height,epsg):
     geotransform = [topLeftX,cellSize,0,topLeftY,0,-cellSize]
@@ -164,97 +177,10 @@ def createEmptyRaster(rasterPath,topLeftX,topLeftY,cellSize,width,height,epsg):
 
 
 # TESTS
+# paths
 xmlPath = "./input.xml"
-
-# test distance
 raster_path = "/home/noah/FLW_Missouri Mission Folder/RASTER/DEM_CMB_ELV_SRTMVF2.tif"
-raster = gdal.Open(raster_path)
-raster_array = raster.ReadAsArray()
-%matplotlib inline
-plt.imshow(raster_array)
-vector_path = "/home/noah/FLW_Missouri Mission Folder/VECTOR/TransportationGroundCrv.shp"
-driver = ogr.GetDriverByName('ESRI Shapefile')
-lines = driver.Open(vector_path,0)
-linesLayer = lines.GetLayer()
-
-# rasterize the vector
-# https://github.com/mapplus/qgis-scripts/blob/master/scripts/Raster%20Euclidean%20Distance%20Analysis.py
-
-
-rasterizedLinesLayer = gdal.RasterizeLayer(linesLayer)
-
-
-lat_min="-4.50181532782252"
-lon_min="39.315948486328125"
-lat_max="-4.2738327000745"
-lon_max="39.5452880859375"
-qafCellSize="30"
-
-numberXCells = np.ceiling((ux-lx)/qafCellSize)
-numberYCells = np.ceiling((uy-ly)/qafCellSize)
-
-newUX = lx + (numberXCells * qafCellSize)
-newUY = ly + (numberYCells * qafCellSize)
-
-qafMatrix = np.empty([numberXCells,numberYCells])
-driver = gdal.GetDriverByName("GTiff")
-dst_ds = driver.Create("./tmp/emtpyRaster.tif",numberXCells,numberYCells,0,gdal.GDT_Byte)
-pixel_width,pixel_height = qafCellSize
-topLeftX = lx
-topLeftY = newUY
-dst_ds.SetGeoTransform([topLeftX,pixel_width,0,topLeftY,0,-pixel_height])
-srs = osr.SpatialReference()
-srs.ImportFromEPSG(crs)
-dst_ds.SetProjection(srs.ExportToWkt())
-
-
-
-# shapely distances
-import fiona
-import shapely.geometry
-vct = fiona.open(vector_path)
-
-
-# https://stackoverflow.com/questions/30740046/calculate-distance-to-nearest-feature-with-geopandas
-%matplotlib inline
-import matplotlib.pyplot as plt
-import shapely.geometry as geom
-import numpy as np
-import pandas as pd
-import geopandas as gpd
-
-lines = gpd.GeoSeries(
-    [geom.LineString(((1.4, 3), (0, 0))),
-        geom.LineString(((1.1, 2.), (0.1, 0.4))),
-        geom.LineString(((-0.1, 3.), (1, 2.)))])
-
-# 10 points
-n  = 10
-points = gpd.GeoSeries([geom.Point(x, y) for x, y in np.random.uniform(0, 3, (n, 2))])
-
-# Put the points in a dataframe, with some other random column
-df_points = gpd.GeoDataFrame(np.array([points, np.random.randn(n)]).T)
-df_points.columns = ['geometry', 'Property1']
-
-points.plot()
-lines.plot()
-min_dist = np.empty(n)
-for i, point in enumerate(points):
-    min_dist[i] = np.min([point.distance(line) for line in lines])
-df_points['min_dist_to_lines'] = min_dist
-df_points.head(3)
-
-def min_distance(point, lines):
-    return lines.distance(point).min()
-df_lines = gpd.GeoDataFrame(lines)
-df_lines.columns = ['geometry']
-min_distance(df_points.geometry[0],df_lines)
-
-df_points['min_dist_to_lines'] = df_points.geometry.apply(min_distance, df_lines)
-df_points.head()
-
-road_df = gpd.read_file(vector_path)
-
+vector_path = "./test_data/UtilityInfrastructureCrv_3.shp"
 
 # FIRST PASS IMPLEMENTATION
 df = gpd.read_file('./test_data/MO_2016_TIGER_Counties_shp/MO_2016_TIGER_Counties_shp.shp')
@@ -271,9 +197,6 @@ aoiWKT = df_proj['geometry'][0].to_wkt()
 aoiLoaded = loads(aoiWKT)
 
 
-
-
-vector_path = "./test_data/UtilityInfrastructureCrv_3.shp"
 roadsDF = gpd.read_file(vector_path)
 roadsDF.crs
 roadsDF.plot()
