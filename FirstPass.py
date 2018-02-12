@@ -190,12 +190,10 @@ aoiJSON = df['geometry'][0].to_wkt()
 aoiJSON
 df.CRS = {'init':'epsg:4326'}
 df_proj = df.to_crs({'init':'epsg:3857'})feat.project({"init":"EPSG:4326"})
-df_proj.head()
+df_proj[df_proj["NAME"] == "Pulaski"]
 df_proj.plot(column="NAME")
-
-aoiWKT = df_proj['geometry'][0].to_wkt()
+aoiWKT = df_proj[df_proj["NAME"] == "Pulaski"].geometry.values[0].to_wkt()
 aoiLoaded = loads(aoiWKT)
-
 
 roadsDF = gpd.read_file(vector_path)
 roadsDF.crs
