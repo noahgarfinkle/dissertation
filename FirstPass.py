@@ -184,25 +184,17 @@ vector_path = "./test_data/UtilityInfrastructureCrv_3.shp"
 
 # FIRST PASS IMPLEMENTATION
 df = gpd.read_file('./test_data/MO_2016_TIGER_Counties_shp/MO_2016_TIGER_Counties_shp.shp')
-df.head()
-df.plot(column="NAME")
-aoiJSON = df['geometry'][0].to_wkt()
-aoiJSON
 df.CRS = {'init':'epsg:4326'}
-df_proj = df.to_crs({'init':'epsg:3857'})feat.project({"init":"EPSG:4326"})
-df_proj[df_proj["NAME"] == "Pulaski"]
-df_proj.plot(column="NAME")
+df_proj = df.to_crs({'init':'epsg:3857'})
 aoiWKT = df_proj[df_proj["NAME"] == "Pulaski"].geometry.values[0].to_wkt()
 aoiLoaded = loads(aoiWKT)
 
 roadsDF = gpd.read_file(vector_path)
 roadsDF.crs
-roadsDF.plot()
 roadsDF = roadsDF.to_crs({'init':'epsg:3857'})
 
 lx,ly,ux,uy = df_proj['geometry'][4].envelope.bounds
 filteredRoads = filterDataFrameByBounds(roadsDF,lx,ly,ux,uy)
-filteredRoads.plot()
 filteredCounties = filterDataFrameByBounds(df_proj,lx,ly,ux,uy)
 filteredCounties.plot(ax=filteredRoads.plot(facecolor='red'),facecolor='Green')
 
@@ -212,13 +204,9 @@ filteredCounties.plot(ax=filteredRoads.plot(facecolor='red'),facecolor='Green')
 createEmptyRaster("./results/testemptyraster3.tif",lx,uy,30,100,100,3857)
 ds = gdal.Open('./results/testemptyraster3.tif')
 data = ds.ReadAsArray()
-data = np.flipud(data)
 plt.imshow(data)
 
 
 
 point = Point(ux,uy)
-lx
-uy
 roadsDF.distance(point).min()
-roadsDF.plot()
