@@ -10,15 +10,10 @@ import matplotlib as mpl
 import matplotlib.font_manager as font_manager
 from descartes import PolygonPatch
 import SpatialIO as io
-import folium
 import fiona
 import geopandas as gpd
 
 # https://gis.stackexchange.com/questions/113799/how-to-read-a-shapefile-in-python
-shape = fiona.open('./test_data/S_HUC_Ar.shp')
-feature = shape.shapeRecords()[0]
-first = feature.shape.__geo_interface__
-shp_geom = shape(first['geometry']
 
 df = gpd.read_file('./test_data/S_HUC_Ar.shp')
 %matplotlib inline
@@ -70,7 +65,7 @@ def RegularGridSampler(PolygonPointSampler):
                 if p.within(self.polygon):
                     self.samples.append(p)
 
-a = RegularGridSampler(polygon=df)
+a = RegularGridSampler(df)
 df.bounds
 df.bounds.min()
 df.bounds.max()
@@ -79,14 +74,12 @@ subset = df[:1]
 subset.plot()
 bounds = subset.bounds
 
-def generatePointsList(subset,distance):
-    ptList = []
-    for x in floatrange(bounds['minx'][0],bounds['maxx'][0],0.1):
-        for y in floatrange(bounds['miny'][0],bounds['maxy'][0],0.1):
-            point = Point(x,y)
-            if subset.contains(point)[0]:
-                ptList.append(point)
-    return ptList
+ptList = []
+for x in floatrange(bounds['minx'][0],bounds['maxx'][0],0.1):
+    for y in floatrange(bounds['miny'][0],bounds['maxy'][0],0.1):
+        point = Point(x,y)
+        if subset.contains(point)[0]:
+            ptList.append(point)
 
 
 df2 = gpd.GeoDataFrame(ptList)
@@ -98,22 +91,73 @@ df2.plot()
 # http://geopandas.org/mapping.html
 base = subset.plot()
 df2.plot(ax=base)
-fig,ax = plt.subplots()
-ax.set_aspect('equal')
-subset.plot(ax=ax,color='white',edgecolor='black')
-df2.plot(ax=ax,marker='.',color='red',markersize=5)
-plt.show()
-plt
-df2.plot()
-subset.plot()
-map = io.Map()
-vl = io.VectorLayer()
-vl.df = subset
 
+# create a grid
+# https://gis.stackexchange.com/questions/54119/creating-square-grid-polygon-shapefile-with-python
+from math import ceil
+def main(outputGridfn,xmin,xmax,ymin,ymax,gridHeight,gridWidth):
 
-vl2 = io.VectorLayer()
-vl2.df = df2
+    # convert sys.argv to float
+    xmin = float(xmin)
+    xmax = float(xmax)
+    ymin = float(ymin)
+    ymax = float(ymax)
+    gridWidth = float(gridWidth)
+    gridHeight = float(gridHeight)
 
-map.addVectorLayerAsOverlay(vl)
-map.addVectorLayerAsOverlay(vl2)
-map.save("./results/grid.html")
+    # get rows
+    rows = ceil((ymax-ymin)/gridHeight)
+    # get columns
+    cols = ceil((xmax-xmin)/gridWidth)
+
+    # start grid cell envelope
+    ringXleftOrigin = xmin
+    ringXrightOrigin = xmin + gridWidth
+    ringYtopOrigin = ymax
+    ringYbottomOrigin = ymax-gridHeight
+
+    # create output file
+    outDriver = ogr.GetDriverByName('ESRI Shapefile')
+    if os.path.exists(outputGridfn):
+        os.remove(outputGridfn)
+    outDataSource = outDriver.CreateDataSource(outputGridfn)
+    outLayer = outDataSource.CreateLayer(outputGridfn,geom_type=ogr.wkbPolygon )
+    featureDefn = outLayer.GetLayerDefn()
+
+    # create grid cells
+    countcols = 0
+    while countcols < cols:
+        countcols += 1
+
+        # reset envelope for rows
+        ringYtop = ringYtopOrigin
+        ringYbottom =ringYbottomOrigin
+        countrows = 0
+
+        while countrows < rows:
+            countrows += 1
+            ring = ogr.Geometry(ogr.wkbLinearRing)
+            ring.AddPoint(ringXleftOrigin, ringYtop)
+            ring.AddPoint(ringXrightOrigin, ringYtop)
+            ring.AddPoint(ringXrightOrigin, ringYbottom)
+            ring.AddPoint(ringXleftOrigin, ringYbottom)
+            ring.AddPoint(ringXleftOrigin, ringYtop)
+            poly = ogr.Geometry(ogr.wkbPolygon)
+            poly.AddGeometry(ring)
+
+            # add new geom to layer
+            outFeature = ogr.Feature(featureDefn)
+            outFeature.SetGeometry(poly)
+            outLayer.CreateFeature(outFeature)
+            outFeature.Destroy
+
+            # new envelope for next poly
+            ringYtop = ringYtop - gridHeight
+            ringYbottom = ringYbottom - gridHeight
+
+        # new envelope for next poly
+        ringXleftOrigin = ringXleftOrigin + gridWidth
+        ringXrightOrigin = ringXrightOrigin + gridWidth
+
+    # Close DataSources
+    outDataSource.Destroy()

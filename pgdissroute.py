@@ -6,6 +6,10 @@ import folium.plugins as plugins
 
 %matplotlib inline
 
+connString = "dbname='routing' user='postgres' host='localhost' password='postgres'"
+conn = psycopg2.connect(connString)
+cur = conn.cursor()
+
 def get_nearest_node(lon,lat):
     sql_CreateFunction = """CREATE OR REPLACE FUNCTION get_nearest_node
         (IN x_long double precision, IN y_lat double precision) -- input parameters
@@ -148,7 +152,7 @@ df2
 df2.plot()
 map = folium.Map( tiles='stamentoner', zoom_start=6)
 # https://ocefpaf.github.io/python4oceanographers/blog/2015/12/14/geopandas_folium/
-df2.crs = {'init':'epsg:4326'}
+df2.crs = {'init':'epsg:4326'browser}
 gjson = df2.to_crs(epsg='4326').to_json()
 lines = folium.features.GeoJson(gjson)
 map.add_child(lines)
@@ -169,8 +173,31 @@ map.save('./results/mapwithrouteandpopups.html')
 def createCustomCost():
     return 0
 
-def routeWithAvoidance(linkIDsToAvoid=[]):
-    return 0
+def routeWithAvoidance(startLon,startLat,endLon,endLat,linkIDsToAvoid=[]):
+    startNode = int(get_nearest_node(startLon,startLat)["node_id"])
+    endNode = int(get_nearest_node(endLon,endLat)["node_id"])
+    linkIDsToAvoid = [str(x) for x in linkIDsToAvoid]
+    linksToAvoidString = ','.join(linkIDsToAvoid)  # https://stackoverflow.com/questions/44778/how-would-you-make-a-comma-separated-string-from-a-list
+    sql = "select * from pgr_dijkstra('select id, source, target, cost, reverse_cost FROM ways WHERE id NOT IN (%s)',%s,%s);" %(linksToAvoidString,startNode,endNode)
+    cur.execute(sql)
+    rows = cur.fetchall()
+    df = pd.read_sql_query(sql,con=conn)
+    edges = list(df['edge'])
+    edges = [str(edge) for edge in edges]
+    sql2 = "select * from ways where id in (%s)" %(",".join(edges))
+    df2 = gpd.read_postgis(sql2,con=conn,geom_col="the_geom")
+    map = folium.Map( tiles='stamentoner', zoom_start=6)
+    # https://ocefpaf.github.io/python4oceanographers/blog/2015/12/14/geopandas_folium/
+    df2.crs = {'init':'epsg:4326'}
+    gjson = df2.to_crs(epsg='4326').to_json()
+    lines = folium.features.GeoJson(gjson)
+    map.add_child(lines)
+    map.save('./results/mapwithrouteavoidance.html')
+    return df2
+
+avoidanceIDs = [690751,690752,1302738,702378,709829]
+df2 = routeWithAvoidance(-92.068859,37.846720,-92.142373,37.557935,avoidanceIDs)
+df2.sort_values(by='length',ascending=False)
 
 def queryRoadAndPutMarkerOnMidPoint(roadID):
     return 0

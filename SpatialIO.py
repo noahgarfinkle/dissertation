@@ -28,7 +28,6 @@ import folium.plugins as plugins
 import numpy as np
 import geopandas as gpd
 from datetime import datetime, timedelta
-from shapely.geometry import Point
 import psycopg2
 from shapely.geometry import Point, Polygon
 from enum import Enum
@@ -251,13 +250,19 @@ class Map:
              # icon=folium.Icon(color='red',icon='bicycle', prefix='fa')
         self.map.add_child(coolIcon)
 
+    def generateRandomLatLonPair(self,latMin,latMax,lonMin,lonMax):
+        lat = np.random.uniform(latMin,latMax)
+        lon = np.random.uniform(lonMin,lonMax)
+        return lat,lon
+
     def addTimeSeriesHeatMap(self):
         heat_data = []
         for gen in range(0,5):
             gen = []
-            for i in range(0,21):
-                lat = np.random.randint(35,50)
-                lon = np.random.randint(-90,-80)
+            for i in range(0,1001):
+                lat,lon = self.generateRandomLatLonPair(35,50,-90,-80)
+                #lat = np.random.randint(35,50)
+                #lon = np.random.randint(-90,-80)
                 val = [lat,lon]
                 gen.append(val)
             heat_data.append(gen)
