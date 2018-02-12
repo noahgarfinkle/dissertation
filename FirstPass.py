@@ -26,6 +26,7 @@ import fiona
 import pyproj
 import rasterio
 import numpy as np
+import numpy.ma as ma
 import math
 import shapely
 from shapely.geometry import Point, Polygon
@@ -221,17 +222,34 @@ def queryRasterValueForPoint(x,y,raster_path,pointCRS=None,rasterCRS=None):
 # CURRENT TEST
 # http://pythonhosted.org/rasterstats/manual.html#zonal-statistics
 def rasterStatCroppedRaster(df,raster_path):
-    raster = zonal_stats(df['geometry'],raster_path,raster_out=True)
-    return raster
+    rasterSource = zonal_stats(df['geometry'],raster_path,all_touched=True,raster_out=True)
+    rasterDF = pd.DataFrame(rasterSource)
+    return rasterDF
 
-raster = zonal_stats(df['geometry'][1],raster_path,all_touched=True,raster_out=True)
+def test_rasterStatCroppedRaster(index = 40):
+    df_subset = df[index:index + 1]
+    rasterDF = rasterStatCroppedRaster(df,raster_path)
+    masked_array = rasterDF['mini_raster_array'][0]
+    masked_array_np_masked = ma.masked_array(masked_array)
+    masked_array_np = np.array(masked_array)
+    plt.imshow(masked_array_np_masked)
+    plt.imshow(masked_array_np)
+    print "Mean Unmasked: %s, Mean Masked: %s" %(np.mean(masked_array_np),np.mean(masked_array_np_masked))
+    np.mean(masked_array_np)
+    np.mean(masked_array_np_masked)
+    return df['geometry'][index]
+
+returnedGeom = test_rasterStatCroppedRaster()
+raster = zonal_stats(df['geometry'][40],raster_path,all_touched=True,raster_out=True)
 testDF = pd.DataFrame(raster)
-masked_array = testDF['mini_raster_array'][1]
+masked_array_np_masked = ma.masked_array(masked_array)
 masked_array_np = np.array(masked_array)
-masked_array_np
-plt.imshow(masked_array_np)
+plt.imshow(masked_array_np_masked)
 
 plt.imshow(masked_array_np)
+np.mean(masked_array_np)
+np.mean(masked_array_np_masked)
+df['geometry'][40]
 
 
 # https://gis.stackexchange.com/questions/16657/clipping-raster-with-vector-layer-using-gdal
