@@ -39,6 +39,7 @@ https://mapbox.s3.amazonaws.com/playground/perrygeo/rasterio-docs/cookbook.html#
 http://skipperkongen.dk/2012/03/06/hello-world-of-raster-creation-with-gdal-and-python/
 https://github.com/mapplus/qgis-scripts/blob/master/scripts/Raster%20Euclidean%20Distance%20Analysis.py
 https://stackoverflow.com/questions/30740046/calculate-distance-to-nearest-feature-with-geopandas
+http://portolan.leaffan.net/creating-sample-points-with-ogr-and-shapely-pt-2-regular-grid-sampling/
 """
 
 """ REFERENCE CODE
