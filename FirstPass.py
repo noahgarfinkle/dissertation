@@ -302,6 +302,13 @@ data = ds.ReadAsArray()
 data = np.flipud(data)
 plt.imshow(data)
 
+def minimumDistanceFromPointToDataFrameFeatures(x,y,crs,df):
+    point = Point(x,y)
+    return df.distance(point).min()
+
+def projectWKT(wkt,from_epsg,to_epsg):
+    return 0
+
 point = Point(ux,uy)
 lx
 uy
