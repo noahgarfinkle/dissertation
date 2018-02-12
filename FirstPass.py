@@ -30,6 +30,7 @@ import shapely
 from shapely.geometry import Point, Polygon
 from shapely.wkt import loads
 import shapely.geometry as geom
+import rasterstats
 from rasterstats import zonal_stats
 import matplotlib.pyplot as plt
 %matplotlib inline
@@ -334,7 +335,12 @@ df['mean'] = gpd.GeoDataFrame(zonal_stats(vectors=df['geometry'],raster=raster_p
 df.head()
 
 # http://www.perrygeo.com/python-rasterstats.html
-
+from rasterstats import raster_stats
+veg_stats = raster_stats(df['geometry'], raster_path,
+    stats="count majority minority unique",
+    copy_properties=True,
+    nodata_value=0,
+    categorical=True)
 
 
 # TESTS
