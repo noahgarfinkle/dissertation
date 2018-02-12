@@ -56,8 +56,8 @@ class SiteSuitabilityCriteria:
     def __init__(self):
         return None
 
-class SiteSuitabilityCriteriaEvaluahttps://mapbox.s3.amazonaws.com/playground/perrygeo/rasterio-docs/cookbook.html#rasterizing-geojson-featurestion:
-    def __init__(self):EvalFallBack
+class SiteSuitabilityCriteria:
+    def __init__(self):
         return None
 
 class SiteRelationalConstraint:
@@ -98,7 +98,6 @@ class Input:
 # SPATIAL FUNCTIONS
 def distance():
     distances = gdal.distances()
-qafCellSize
     return None
 
 def creatQAFRaster(crs,lx,ly,ux,uy,qafCellSize):
@@ -213,7 +212,6 @@ lx,ly,ux,uy = df_proj['geometry'][4].envelope.bounds
 filteredRoads = filterDataFrameByBounds(roadsDF,lx,ly,ux,uy)
 filteredCounties = filterDataFrameByBounds(df_proj,lx,ly,ux,uy)
 filteredCounties.plot(ax=filteredRoads.plot(facecolor='red'),facecolor='Green')
-
 
 
 
