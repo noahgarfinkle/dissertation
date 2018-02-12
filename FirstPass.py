@@ -30,8 +30,7 @@ import shapely
 from shapely.geometry import Point, Polygon
 from shapely.wkt import loads
 import shapely.geometry as geom
-import rasterstats
-from rasterstats import zonal_stats
+from rasterstats import zonal_stats, raster_stats, point_query
 import matplotlib.pyplot as plt
 %matplotlib inline
 
@@ -42,6 +41,8 @@ http://skipperkongen.dk/2012/03/06/hello-world-of-raster-creation-with-gdal-and-
 https://github.com/mapplus/qgis-scripts/blob/master/scripts/Raster%20Euclidean%20Distance%20Analysis.py
 https://stackoverflow.com/questions/30740046/calculate-distance-to-nearest-feature-with-geopandas
 http://portolan.leaffan.net/creating-sample-points-with-ogr-and-shapely-pt-2-regular-grid-sampling/
+https://gis.stackexchange.com/questions/159624/converting-large-rasters-to-numpy
+https://gis.stackexchange.com/questions/264793/crop-raster-in-memory-with-python-gdal-bindings
 """
 
 """ REFERENCE CODE
@@ -188,145 +189,30 @@ def generateEvaluationGridDataFrame(polygon,gridSpacing):
     evaluationGridDataFrame.columns = ['geometry']
     return evaluationGridDataFrame
 
+def convertRasterToNumpyArray(raster_path):
+    raster_path = "./test_data/testelevunproj.tif"
+
+    dataset = gdal.Open(raster_path)
+    band = dataset.GetRasterBand(1)
+    geotransform = dataset.GetGeoTransform()
+    xinit = geotransform[0]
+    yinit = geotransform[3]
+
+    xsize = geotransform[1]
+    ysize = geotransform[5]
+    data = band.ReadAsArray() # whole band
+    # data = band.ReadAsArray(col1, row1, col2 - col1 + 1, row2 - row1 + 1) # partial band
+    print data.shape
+    print np.mean(data)
 
 # CURRENT TEST
-# extracting raster by extents to numpy array
-r = gdal.Open(raster_path)
-tmpPath = "./tmp/smallRaster.tif"
-extents = aoiLoaded.bounds
-extents
-r = gdal.Translate(tmpPath,r,projWin=extents)
-
-#https://gis.stackexchange.com/questions/159624/converting-large-rasters-to-numpy
-import scipy
-from scipy import misc
-raster = misc.imread(raster_path)
-
-
-# https://gis.stackexchange.com/questions/264793/crop-raster-in-memory-with-python-gdal-bindings
-dataset = gdal.Open(raster_path)
-band = dataset.GetRasterBand(1)
-geotransform = dataset.GetGeoTransform()
-xinit = geotransform[0]
-yinit = geotransform[3]
-
-xsize = geotransform[1]
-ysize = geotransform[5]
-#p1 = point upper left of bounding box
-#p2 = point bottom right of bounding box
-countyBounds = aoiLoaded.bounds
-countyBounds
-p1 = (-10287442.575418131, 4523429.485052726) #(6, 5)
-p2 = (-10287342.575418131, 4523329.485052726) #(12, 14)
-row1 = int((p1[1] - yinit)/ysize)
-col1 = int((p1[0] - xinit)/xsize)
-
-row2 = int((p2[1] - yinit)/ysize)
-col2 = int((p2[0] - xinit)/xsize)
-
-print "row1:%s,col1:%s,row2:%s,col2:%s" %(row1,col1,row2,col2)
-data = band.ReadAsArray()
-data.shape
-# data = band.ReadAsArray(col1, row1, col2 - col1 + 1, row2 - row1 + 1)
-
-#perform come calculations with ...
-mean = np.mean(data)
+raster_path = "./test_data/testelevunproj.tif"
 
 # zonal stats
-#https://pcjericks.github.io/py-gdalogr-cookbook/raster_layers.html
-def zonal_stats(feat, input_zone_polygon, input_value_raster):
-
-    # Open data
-    raster = gdal.Open(input_value_raster)
-    shp = ogr.Open(input_zone_polygon)
-    lyr = shp.GetLayer()
-
-    # Get raster georeference info
-    transform = raster.GetGeoTransform()
-    xOrigin = transform[0]
-    yOrigin = transform[3]
-    pixelWidth = transform[1]
-    pixelHeight = transform[5]
-
-    # Reproject vector geometry to same projection as raster
-    sourceSR = lyr.GetSpatialRef()
-    targetSR = osr.SpatialReference()
-    targetSR.ImportFromWkt(raster.GetProjectionRef())
-    coordTrans = osr.CoordinateTransformation(sourceSR,targetSR)
-    feat = lyr.GetNextFeature()
-    geom = feat.GetGeometryRef()
-    geom.Transform(coordTrans)
-
-    # Get extent of feat
-    geom = feat.GetGeometryRef()
-    if (geom.GetGeometryName() == 'MULTIPOLYGON'):
-        count = 0
-        pointsX = []; pointsY = []
-        for polygon in geom:
-            geomInner = geom.GetGeometryRef(count)
-            ring = geomInner.GetGeometryRef(0)
-            numpoints = ring.GetPointCount()
-            for p in range(numpoints):
-                    lon, lat, z = ring.GetPoint(p)
-                    pointsX.append(lon)
-                    pointsY.append(lat)
-            count += 1
-    elif (geom.GetGeometryName() == 'POLYGON'):
-        ring = geom.GetGeometryRef(0)
-        numpoints = ring.GetPointCount()
-        pointsX = []; pointsY = []
-        for p in range(numpoints):
-                lon, lat, z = ring.GetPoint(p)
-                pointsX.append(lon)
-                pointsY.append(lat)
-
-    else:
-        sys.exit("ERROR: Geometry needs to be either Polygon or Multipolygon")
-
-    xmin = min(pointsX)
-    xmax = max(pointsX)
-    ymin = min(pointsY)
-    ymax = max(pointsY)
-
-    # Specify offset and rows and columns to read
-    xoff = int((xmin - xOrigin)/pixelWidth)
-    yoff = int((yOrigin - ymax)/pixelWidth)
-    xcount = int((xmax - xmin)/pixelWidth)+1
-    ycount = int((ymax - ymin)/pixelWidth)+1
-
-    # Create memory target raster
-    target_ds = gdal.GetDriverByName('MEM').Create('', xcount, ycount, 1, gdal.GDT_Byte)
-    target_ds.SetGeoTransform((
-        xmin, pixelWidth, 0,
-        ymax, 0, pixelHeight,
-    ))
-
-    # Create for target raster the same projection as for the value raster
-    raster_srs = osr.SpatialReference()
-    raster_srs.ImportFromWkt(raster.GetProjectionRef())
-    target_ds.SetProjection(raster_srs.ExportToWkt())
-
-    # Rasterize zone polygon to raster
-    gdal.RasterizeLayer(target_ds, [1], lyr, burn_values=[1])
-
-    # Read raster as arrays
-    banddataraster = raster.GetRasterBand(1)
-    dataraster = banddataraster.ReadAsArray(xoff, yoff, xcount, ycount).astype(numpy.float)
-
-    bandmask = target_ds.GetRasterBand(1)
-    datamask = bandmask.ReadAsArray(0, 0, xcount, ycount).astype(numpy.float)
-
-    # Mask zone of raster
-    zoneraster = numpy.ma.masked_array(dataraster,  numpy.logical_not(datamask))
-
-    # Calculate statistics of zonal raster
-    return numpy.average(zoneraster),numpy.mean(zoneraster),numpy.median(zoneraster),numpy.std(zoneraster),numpy.var(zoneraster)
 
 # https://github.com/perrygeo/python-rasterstats
-from rasterstats import zonal_stats
 stats = zonal_stats('./test_data/MO_2016_TIGER_Counties_shp/MO_2016_TIGER_Counties_shp.shp',raster_path)
 
-from rasterstats import point_query
 point = "POINT(-10287442.575418131 4523429.485052726)"
 point_query(point,raster_path)
 
