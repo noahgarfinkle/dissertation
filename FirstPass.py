@@ -212,10 +212,14 @@ def generateRasterStatisticsForDataFrame(df,raster_Path,stats="count majority mi
     newDF = gpd.GeoDataFrame(pd.concat([df,row_stats_df],axis=1))
     return newDF
 
+# Note: Requires point in same coordinate system as raster, I assume
+# todo: implement projections
+def queryRasterValueForPoint(x,y,raster_path,pointCRS=None,rasterCRS=None):
+    point = "POINT(%s %s)" %(x,y)
+    return point_query(point,raster_path)
 
 # CURRENT TEST
-point = "POINT(-10287442.575418131 4523429.485052726)"
-point_query(point,raster_path)
+
 
 
 
