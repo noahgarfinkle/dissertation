@@ -214,25 +214,12 @@ def generateRasterStatisticsForDataFrame(df,raster_Path,stats="count majority mi
 
 
 # CURRENT TEST
-raster_path = "./test_data/testelevunproj.tif"
-
-
-stats = zonal_stats('./test_data/MO_2016_TIGER_Counties_shp/MO_2016_TIGER_Counties_shp.shp',raster_path)
-stats
 point = "POINT(-10287442.575418131 4523429.485052726)"
 point_query(point,raster_path)
 
-# https://gis.stackexchange.com/questions/177035/geopandas-and-zonal-statistic-error
-df['mean'] = gpd.GeoDataFrame(zonal_stats(vectors=df['geometry'],raster=raster_path,stats='mean'))['mean']
-df.head()
 
-dfStatsCategorical = generateRasterStatisticsForDataFrame(df,raster_path,isCategorical=True)
-dfStatsCategorical.head()
-dfStatsCategorical.plot(column="mean")
 
-dfStatsNonCategorical = generateRasterStatisticsForDataFrame(df,raster_path,isCategorical=False)
-dfStatsNonCategorical.head()
-dfStatsNonCategorical.plot(column='majority')
+
 
 # TESTS
 # paths
@@ -272,3 +259,13 @@ roadsDF.distance(point).min()
 aoiLoaded = loads(aoiWKT)
 testList = generateEvaluationGridDataFrame(aoiLoaded,3200)
 testList.plot()
+
+# test.zonal_stats
+raster_path = "./test_data/testelevunproj.tif"
+dfStatsCategorical = generateRasterStatisticsForDataFrame(df,raster_path,isCategorical=True)
+dfStatsCategorical.head()
+dfStatsCategorical.plot(column="mean")
+
+dfStatsNonCategorical = generateRasterStatisticsForDataFrame(df,raster_path,isCategorical=False)
+dfStatsNonCategorical.head()
+dfStatsNonCategorical.plot(column='majority')
