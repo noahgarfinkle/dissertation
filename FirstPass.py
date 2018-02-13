@@ -49,6 +49,7 @@ https://gis.stackexchange.com/questions/264793/crop-raster-in-memory-with-python
 http://pythonhosted.org/rasterstats/manual.html#zonal-statistics -> can define custom statistics!!!
 https://github.com/perrygeo/python-rasterstats/blob/master/src/rasterstats/main.py
 https://github.com/perrygeo/python-rasterstats/blob/master/src/rasterstats/utils.py
+https://github.com/SALib/SALib -> Sensitivity analysis software
 """
 
 """ REFERENCE CODE
