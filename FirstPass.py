@@ -47,6 +47,8 @@ http://portolan.leaffan.net/creating-sample-points-with-ogr-and-shapely-pt-2-reg
 https://gis.stackexchange.com/questions/159624/converting-large-rasters-to-numpy
 https://gis.stackexchange.com/questions/264793/crop-raster-in-memory-with-python-gdal-bindings
 http://pythonhosted.org/rasterstats/manual.html#zonal-statistics
+https://github.com/perrygeo/python-rasterstats/blob/master/src/rasterstats/main.py
+https://github.com/perrygeo/python-rasterstats/blob/master/src/rasterstats/utils.py
 """
 
 """ REFERENCE CODE
@@ -226,8 +228,6 @@ def rasterStatCroppedRaster(df,raster_path):
     rasterDF = pd.DataFrame(rasterSource)
     return rasterDF
 
-# CURRENT TEST
-# https://gis.stackexchange.com/questions/16657/clipping-raster-with-vector-layer-using-gdal
 #finalElevation must either be number or string from validStats
 def calculateCutFill(df,dem_path,finalElevation='mean',rasterResolution=30):
     croppedRasterDF = rasterStatCroppedRaster(df,dem_path)
@@ -236,14 +236,15 @@ def calculateCutFill(df,dem_path,finalElevation='mean',rasterResolution=30):
     totalRequiredHeightChanges = []
     totalCutFillVolumes = []
     for i,row in appendedDF.iterrows():
-        maskedRaster = row['mini_raster_array'][0]
+        maskedRaster = row['mini_raster_array']
         maskedRaster_Array = ma.masked_array(maskedRaster)
         targetElevation = -999
         if isinstance(finalElevation,basestring):
+            print row[finalElevation]
             targetElevation = row[finalElevation]
         else:
             targetElevation = finalElevation
-        requiredHeightChange = maskedRaster_Array - targetElevation
+        requiredHeightChange = np.subtract(maskedRaster_Array,targetElevation)
         totalRequiredHeightChange = np.sum(np.abs(requiredHeightChange))
         totalCutFillVolume = totalRequiredHeightChange * rasterResolution * rasterResolution
         elevationChangeArrays.append(requiredHeightChange)
@@ -252,20 +253,10 @@ def calculateCutFill(df,dem_path,finalElevation='mean',rasterResolution=30):
     appendedDF['totalCutFillVolume'] = totalCutFillVolumes
     return appendedDF
 
+# CURRENT TEST
 
 
 
-index = 40
-df_subset = df[index:index + 1]
-df_subset = df_subset.reset_index()
-dem_path = raster_path
-finalElevation = 'mean'
-appendedDF = calculateCutFill(df_subset,raster_path)
-plt.imshow(appendedDF['elevationChangeArray'][0])
-
-
-# https://github.com/perrygeo/python-rasterstats/blob/master/src/rasterstats/main.py
-# https://github.com/perrygeo/python-rasterstats/blob/master/src/rasterstats/utils.py
 
 # TESTS
 # paths
@@ -335,3 +326,16 @@ def test_rasterStatCroppedRaster(index = 40):
 rdf = rasterStatCroppedRaster(df[40:41],raster_path)
 returnedGeom = test_rasterStatCroppedRaster()
 returnedGeom
+
+
+# cut fill tests
+index = 40
+df_subset = df[index:index + 2]
+df_subset = df_subset.reset_index()
+dem_path = raster_path
+finalElevation = 'mean'
+
+appendedDF = calculateCutFill(df_subset,raster_path)
+appendedDF
+appendedDF.plot()
+plt.imshow(appendedDF['elevationChangeArray'][1])
