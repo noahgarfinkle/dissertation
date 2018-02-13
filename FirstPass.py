@@ -35,6 +35,7 @@ import shapely.geometry as geom
 from rasterstats import zonal_stats, raster_stats, point_query, utils
 import matplotlib.pyplot as plt
 %matplotlib inline
+pd.options.display.max_columns = 300
 
 """ REFERENCES
 http://lxml.de/tutorial.html
@@ -45,6 +46,7 @@ https://stackoverflow.com/questions/30740046/calculate-distance-to-nearest-featu
 http://portolan.leaffan.net/creating-sample-points-with-ogr-and-shapely-pt-2-regular-grid-sampling/
 https://gis.stackexchange.com/questions/159624/converting-large-rasters-to-numpy
 https://gis.stackexchange.com/questions/264793/crop-raster-in-memory-with-python-gdal-bindings
+http://pythonhosted.org/rasterstats/manual.html#zonal-statistics
 """
 
 """ REFERENCE CODE
@@ -219,41 +221,60 @@ def queryRasterValueForPoint(x,y,raster_path,pointCRS=None,rasterCRS=None):
     point = "POINT(%s %s)" %(x,y)
     return point_query(point,raster_path)
 
-# CURRENT TEST
-# http://pythonhosted.org/rasterstats/manual.html#zonal-statistics
 def rasterStatCroppedRaster(df,raster_path):
     rasterSource = zonal_stats(df['geometry'],raster_path,all_touched=True,raster_out=True)
     rasterDF = pd.DataFrame(rasterSource)
     return rasterDF
 
-def test_rasterStatCroppedRaster(index = 40):
-    df_subset = df[index:index + 1]
-    rasterDF = rasterStatCroppedRaster(df_subset,raster_path)
-    masked_array = rasterDF['mini_raster_array'][0]
-    masked_array_np_masked = ma.masked_array(masked_array)
-    masked_array_np = np.array(masked_array)
-    plt.figure()
-    plt.imshow(masked_array_np_masked)
-    plt.figure()
-    plt.imshow(masked_array_np)
-    print "Mean Unmasked: %s, Mean Masked: %s" %(np.mean(masked_array_np),np.mean(masked_array_np_masked))
-    np.mean(masked_array_np)
-    np.mean(masked_array_np_masked)
-    return df['geometry'][index]
-
-returnedGeom = test_rasterStatCroppedRaster()
-returnedGeom
-
-
-
+# CURRENT TEST
 # https://gis.stackexchange.com/questions/16657/clipping-raster-with-vector-layer-using-gdal
 #finalElevation must either be number or string from validStats
 def calculateCutFill(df,dem_path,finalElevation='mean'):
+    croppedRasterDF = rasterStatCroppedRaster(df,dem_path)
+    appendedDF = gpd.GeoDataFrame(pd.concat([df,croppedRasterDF],axis=1))
+    for i,row in appendedDF.iterrows:
+        maskedRaster = row['mini_raster_array'][0]
+        maskedRaster_Array = ma.masked_array(maskedRaster)
+        targetElevation = -999
+        if isinstance(finalElevation,basestring):
+            targetElevation = row[finalElevation]
+        else:
+            targetElevation = finalElevation
+
+index = 40
+df_subset = df[index:index + 1]
+df_subset = df_subset.reset_index()
+dem_path = raster_path
+finalElevation = 'mean'
+croppedRasterDF = rasterStatCroppedRaster(df_subset,dem_path)
+appendedDF = gpd.GeoDataFrame(pd.concat([df_subset,croppedRasterDF],axis=1))
+
+row = appendedDF[0:1]
+maskedRaster = row['mini_raster_array'][0]
+maskedRaster_Array = ma.masked_array(maskedRaster)
+targetElevation = -999
+if isinstance(finalElevation,basestring):
+    targetElevation = row[finalElevation][0]
+else:
+    targetElevation = finalElevation
+
+cutFill = np.abs(maskedRaster_Array - targetElevation)
+plt.imshow(cutFill)
+totalCutFillHeight = np.sum(cutFill)
+rasterResolution = 30
+totalCutFillVolume = totalCutFillHeight * rasterResolution * rasterResolution
+plt.imshow(cutFill)
+
+for i,row in appendedDF.iterrows:
+    maskedRaster = row['mini_raster_array'][0]
+    maskedRaster_Array = ma.masked_array(maskedRaster)
+    targetElevation = -999
     if isinstance(finalElevation,basestring):
-        setElevationDF = generateRasterStatisticsForDataFrame(df,dem_path,stats=finalElevation)
-        for i,row in setElevationDF.iterrows:
-            print row
-    return None
+        targetElevation = row[finalElevation]
+    else:
+        targetElevation = finalElevation
+
+
 
 # https://github.com/perrygeo/python-rasterstats/blob/master/src/rasterstats/main.py
 # https://github.com/perrygeo/python-rasterstats/blob/master/src/rasterstats/utils.py
@@ -306,3 +327,23 @@ dfStatsCategorical.plot(column="mean")
 dfStatsNonCategorical = generateRasterStatisticsForDataFrame(df,raster_path,isCategorical=False)
 dfStatsNonCategorical.head()
 dfStatsNonCategorical.plot(column='majority')
+
+# raster tests
+def test_rasterStatCroppedRaster(index = 40):
+    df_subset = df[index:index + 1]
+    rasterDF = rasterStatCroppedRaster(df_subset,raster_path)
+    masked_array = rasterDF['mini_raster_array'][0]
+    masked_array_np_masked = ma.masked_array(masked_array)
+    masked_array_np = np.array(masked_array)
+    plt.figure()
+    plt.imshow(masked_array_np_masked)
+    plt.figure()
+    plt.imshow(masked_array_np)
+    print "Mean Unmasked: %s, Mean Masked: %s" %(np.mean(masked_array_np),np.mean(masked_array_np_masked))
+    np.mean(masked_array_np)
+    np.mean(masked_array_np_masked)
+    return df['geometry'][index]
+
+rdf = rasterStatCroppedRaster(df[40:41],raster_path)
+returnedGeom = test_rasterStatCroppedRaster()
+returnedGeom
