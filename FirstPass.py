@@ -229,10 +229,13 @@ def rasterStatCroppedRaster(df,raster_path):
 # CURRENT TEST
 # https://gis.stackexchange.com/questions/16657/clipping-raster-with-vector-layer-using-gdal
 #finalElevation must either be number or string from validStats
-def calculateCutFill(df,dem_path,finalElevation='mean'):
+def calculateCutFill(df,dem_path,finalElevation='mean',rasterResolution=30):
     croppedRasterDF = rasterStatCroppedRaster(df,dem_path)
     appendedDF = gpd.GeoDataFrame(pd.concat([df,croppedRasterDF],axis=1))
-    for i,row in appendedDF.iterrows:
+    elevationChangeArrays = []
+    totalRequiredHeightChanges = []
+    totalCutFillVolumes = []
+    for i,row in appendedDF.iterrows():
         maskedRaster = row['mini_raster_array'][0]
         maskedRaster_Array = ma.masked_array(maskedRaster)
         targetElevation = -999
@@ -240,44 +243,25 @@ def calculateCutFill(df,dem_path,finalElevation='mean'):
             targetElevation = row[finalElevation]
         else:
             targetElevation = finalElevation
+        requiredHeightChange = maskedRaster_Array - targetElevation
+        totalRequiredHeightChange = np.sum(np.abs(requiredHeightChange))
+        totalCutFillVolume = totalRequiredHeightChange * rasterResolution * rasterResolution
+        elevationChangeArrays.append(requiredHeightChange)
+        totalCutFillVolumes.append(totalCutFillVolume)
+    appendedDF['elevationChangeArray'] = elevationChangeArrays
+    appendedDF['totalCutFillVolume'] = totalCutFillVolumes
+    return appendedDF
+
+
+
 
 index = 40
 df_subset = df[index:index + 1]
 df_subset = df_subset.reset_index()
 dem_path = raster_path
 finalElevation = 'mean'
-croppedRasterDF = rasterStatCroppedRaster(df_subset,dem_path)
-appendedDF = gpd.GeoDataFrame(pd.concat([df_subset,croppedRasterDF],axis=1))
-
-row = appendedDF[0:1]
-maskedRaster = row['mini_raster_array'][0]
-maskedRaster_Array = ma.masked_array(maskedRaster)
-targetElevation = -999
-if isinstance(finalElevation,basestring):
-    targetElevation = row[finalElevation][0]
-else:
-    targetElevation = finalElevation
-
-cutFill = maskedRaster_Array - targetElevation
-(cutFill < 0).sum()
-(cutFill > 0).sum()
-cutFill.count()
-cutFill = np.abs(maskedRaster_Array - targetElevation)
-plt.imshow(cutFill)
-totalCutFillHeight = np.sum(cutFill)
-rasterResolution = 30
-totalCutFillVolume = totalCutFillHeight * rasterResolution * rasterResolution
-plt.imshow(cutFill)
-
-for i,row in appendedDF.iterrows:
-    maskedRaster = row['mini_raster_array'][0]
-    maskedRaster_Array = ma.masked_array(maskedRaster)
-    targetElevation = -999
-    if isinstance(finalElevation,basestring):
-        targetElevation = row[finalElevation]
-    else:
-        targetElevation = finalElevation
-
+appendedDF = calculateCutFill(df_subset,raster_path)
+plt.imshow(appendedDF['elevationChangeArray'][0])
 
 
 # https://github.com/perrygeo/python-rasterstats/blob/master/src/rasterstats/main.py
