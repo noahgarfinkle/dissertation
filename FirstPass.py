@@ -46,7 +46,7 @@ https://stackoverflow.com/questions/30740046/calculate-distance-to-nearest-featu
 http://portolan.leaffan.net/creating-sample-points-with-ogr-and-shapely-pt-2-regular-grid-sampling/
 https://gis.stackexchange.com/questions/159624/converting-large-rasters-to-numpy
 https://gis.stackexchange.com/questions/264793/crop-raster-in-memory-with-python-gdal-bindings
-http://pythonhosted.org/rasterstats/manual.html#zonal-statistics
+http://pythonhosted.org/rasterstats/manual.html#zonal-statistics -> can define custom statistics!!!
 https://github.com/perrygeo/python-rasterstats/blob/master/src/rasterstats/main.py
 https://github.com/perrygeo/python-rasterstats/blob/master/src/rasterstats/utils.py
 """
