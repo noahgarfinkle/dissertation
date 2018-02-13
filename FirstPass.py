@@ -258,6 +258,10 @@ if isinstance(finalElevation,basestring):
 else:
     targetElevation = finalElevation
 
+cutFill = maskedRaster_Array - targetElevation
+(cutFill < 0).sum()
+(cutFill > 0).sum()
+cutFill.count()
 cutFill = np.abs(maskedRaster_Array - targetElevation)
 plt.imshow(cutFill)
 totalCutFillHeight = np.sum(cutFill)
