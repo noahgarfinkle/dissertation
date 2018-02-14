@@ -241,19 +241,24 @@ aoiDF = aoiDF.to_crs({'init':'epsg:3857'})
 aoiPolygon = aoiDF.geometry[0]
 aoiPolygon
 
-gridSpacing = 30
-pointList = []
+gridSpacing = 300
+squareList = []
 bounds = aoiPolygon.bounds
 ll = bounds[:2]
 ur = bounds[2:]
+lowerConerX = ll[0]
+lowerCornerY = ll[1]
+# https://stackoverflow.com/questions/30457089/how-to-create-a-polygon-given-its-point-vertices
 for x in floatrange(ll[0],ur[0],gridSpacing):
     for y in floatrange(ll[1],ur[1],gridSpacing):
-        point = Point(x,y)
-        if point.within(aoiPolygon):
-            pointList.append(point)
-evaluationGridDataFrame = gpd.GeoDataFrame(pointList)
+        square = Polygon([[x,y],[x+gridSpacing,y],[x+gridSpacing,y+gridSpacing],[x,y+gridSpacing]])
+        if square.within(aoiPolygon):
+            squareList.append(square)
+
+
+evaluationGridDataFrame = gpd.GeoDataFrame(squareList)
 evaluationGridDataFrame.columns = ['geometry']
-evaluationGridDataFrame
+evaluationGridDataFrame.plot()
 
 df_cropped = evaluationGridDataFrame[0:1000]
 df_cropped.plot()
