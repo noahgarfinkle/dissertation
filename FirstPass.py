@@ -114,31 +114,6 @@ def distance():
     distances = gdal.distances()
     return None
 
-def creatQAFRaster(crs,lx,ly,ux,uy,qafCellSize):
-    numberXCells = np.ceiling((ux-lx)/qafCellSize)
-    numberYCells = np.ceiling((uy-ly)/qafCellSize)
-
-    newUX = lx + (numberXCells * qafCellSize)
-    newUY = ly + (numberYCells * qafCellSize)
-
-    qafMatrix = np.empty([numberXCells,numberYCells])
-    driver = gdal.GetDriverByName("GTiff")
-    dst_ds = driver.Create("./tmp/emtpyRaster.tif",numberXCells,numberYCells,0,gdal.GDT_Byte)
-    pixel_width,pixel_height = qafCellSize
-    topLeftX = lx
-    topLeftY = newUY
-    dst_ds.SetGeoTransform([topLeftX,pixel_width,0,topLeftY,0,-pixel_height])
-    srs = osr.SpatialReference()
-    srs.ImportFromEPSG(crs)
-    dst_ds.SetProjection(srs.ExportToWkt())
-
-def createQAFGridSurface():
-    return 0
-
-def buildEvaluationGridDataFrame(aoiJSON,exclusionJson,gridSpacing):
-    df = gpd.GeoDataFrame()
-    df.columns = ['geometry','total']
-
 def filterDataFrameByBounds(df,lx,ly,ux,uy):
     filteredDF = df.cx[lx:ux,ly:uy]
     return filteredDF
