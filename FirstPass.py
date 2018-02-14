@@ -265,8 +265,14 @@ import timeit
 timeit.timeit(generateRasterStatisticsForDataFrame(evaluationGridDataFrame,raster_path,stats="mean",isCategorical=False))
 result_DF = generateRasterStatisticsForDataFrame(evaluationGridDataFrame,raster_path,stats="mean",isCategorical=False)
 result_DF.plot(column='mean')
-
+import timeit
+import datetime
+start = datetime.datetime.now()
 cutFillDF = calculateCutFill(evaluationGridDataFrame,raster_path,finalElevation='mean',rasterResolution=30)
+end = datetime.datetime.now()
+elapsedTime = datetime.datetime.timedelta(start,end)
+nItems = len(cutFillDF.index)
+print "Evaluated %s features in %s seconds" %(nItems,elapsedTime.seconds)
 cutFillDF.plot(column="totalCutFillVolume")
 
 plt.hist(cutFillDF['totalCutFillVolume'])
