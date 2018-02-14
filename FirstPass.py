@@ -281,31 +281,32 @@ filteredCounties = filterDataFrameByBounds(df_proj,lx,ly,ux,uy)
 filteredCounties.plot(ax=filteredRoads.plot(facecolor='red'),facecolor='Green')
 
 
-
-createEmptyRaster("./results/testemptyraster3.tif",lx,uy,30,100,100,3857)
-ds = gdal.Open('./results/testemptyraster3.tif')
-data = ds.ReadAsArray()
-plt.imshow(data)
-
-
-
-point = Point(ux,uy)
-roadsDF.distance(point).min()
+def testCreatingEmptyRaster():
+    createEmptyRaster("./results/testemptyraster3.tif",lx,uy,30,100,100,3857)
+    ds = gdal.Open('./results/testemptyraster3.tif')
+    data = ds.ReadAsArray()
+    plt.imshow(data)
 
 
-aoiLoaded = loads(aoiWKT)
-testList = generateEvaluationGridDataFrame(aoiLoaded,3200)
-testList.plot()
+def testPointDistance():
+    point = Point(ux,uy)
+    print roadsDF.distance(point).min()
+
+def createTestGrid():
+    aoiLoaded = loads(aoiWKT)
+    testList = generateEvaluationGridDataFrame(aoiLoaded,3200)
+    testList.plot()
 
 # test.zonal_stats
-raster_path = "./test_data/testelevunproj.tif"
-dfStatsCategorical = generateRasterStatisticsForDataFrame(df,raster_path,isCategorical=True)
-dfStatsCategorical.head()
-dfStatsCategorical.plot(column="mean")
+def test_zonal_stats():
+    raster_path = "./test_data/testelevunproj.tif"
+    dfStatsCategorical = generateRasterStatisticsForDataFrame(df,raster_path,isCategorical=True)
+    dfStatsCategorical.head()
+    dfStatsCategorical.plot(column="mean")
 
-dfStatsNonCategorical = generateRasterStatisticsForDataFrame(df,raster_path,isCategorical=False)
-dfStatsNonCategorical.head()
-dfStatsNonCategorical.plot(column='majority')
+    dfStatsNonCategorical = generateRasterStatisticsForDataFrame(df,raster_path,isCategorical=False)
+    dfStatsNonCategorical.head()
+    dfStatsNonCategorical.plot(column='majority')
 
 # raster tests
 def test_rasterStatCroppedRaster(index = 40):
@@ -323,19 +324,17 @@ def test_rasterStatCroppedRaster(index = 40):
     np.mean(masked_array_np_masked)
     return df['geometry'][index]
 
-rdf = rasterStatCroppedRaster(df[40:41],raster_path)
-returnedGeom = test_rasterStatCroppedRaster()
-returnedGeom
 
 
 # cut fill tests
-index = 40
-df_subset = df[index:index + 2]
-df_subset = df_subset.reset_index()
-dem_path = raster_path
-finalElevation = 'mean'
+def testCutFill():
+    index = 40
+    df_subset = df[index:index + 2]
+    df_subset = df_subset.reset_index()
+    dem_path = raster_path
+    finalElevation = 'mean'
 
-appendedDF = calculateCutFill(df_subset,raster_path)
-appendedDF
-appendedDF.plot()
-plt.imshow(appendedDF['elevationChangeArray'][1])
+    appendedDF = calculateCutFill(df_subset,raster_path)
+    appendedDF
+    appendedDF.plot()
+    plt.imshow(appendedDF['elevationChangeArray'][1])
