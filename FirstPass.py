@@ -259,30 +259,27 @@ def calculateCutFill(df,dem_path,finalElevation='mean',rasterResolution=30):
     return appendedDF
 
 # CURRENT TEST
-import os
-os.getcwd()
 
-# TESTS
-# paths
-xmlPath = "./input.xml"
-raster_path = "../FLW_Missouri Mission Folder/RASTER/DEM_CMB_ELV_SRTMVF2.tif"
-vector_path = "./test_data/UtilityInfrastructureCrv_3.shp"
-
+## TESTS
 # FIRST PASS IMPLEMENTATION
-df = gpd.read_file('./test_data/MO_2016_TIGER_Counties_shp/MO_2016_TIGER_Counties_shp.shp')
-df.CRS = {'init':'epsg:4326'}
-df_proj = df.to_crs({'init':'epsg:3857'})
-aoiWKT = df_proj[df_proj["NAME"] == "Pulaski"].geometry.values[0].to_wkt()
-aoiLoaded = loads(aoiWKT)
+def testFirstPassImplementation():
+    xmlPath = "./input.xml"
+    raster_path = "../FLW_Missouri Mission Folder/RASTER/DEM_CMB_ELV_SRTMVF2.tif"
+    vector_path = "./test_data/UtilityInfrastructureCrv_3.shp"
+    df = gpd.read_file('./test_data/MO_2016_TIGER_Counties_shp/MO_2016_TIGER_Counties_shp.shp')
+    df.CRS = {'init':'epsg:4326'}
+    df_proj = df.to_crs({'init':'epsg:3857'})
+    aoiWKT = df_proj[df_proj["NAME"] == "Pulaski"].geometry.values[0].to_wkt()
+    aoiLoaded = loads(aoiWKT)
 
-roadsDF = gpd.read_file(vector_path)
-roadsDF.crs = {'init':'epsg:3857'}
-roadsDF = roadsDF.to_crs({'init':'epsg:3857'})
+    roadsDF = gpd.read_file(vector_path)
+    roadsDF.crs = {'init':'epsg:3857'}
+    roadsDF = roadsDF.to_crs({'init':'epsg:3857'})
 
-lx,ly,ux,uy = df_proj['geometry'][4].envelope.bounds
-filteredRoads = filterDataFrameByBounds(roadsDF,lx,ly,ux,uy)
-filteredCounties = filterDataFrameByBounds(df_proj,lx,ly,ux,uy)
-filteredCounties.plot(ax=filteredRoads.plot(facecolor='red'),facecolor='Green')
+    lx,ly,ux,uy = df_proj['geometry'][4].envelope.bounds
+    filteredRoads = filterDataFrameByBounds(roadsDF,lx,ly,ux,uy)
+    filteredCounties = filterDataFrameByBounds(df_proj,lx,ly,ux,uy)
+    filteredCounties.plot(ax=filteredRoads.plot(facecolor='red'),facecolor='Green')
 
 
 def testCreatingEmptyRaster():
