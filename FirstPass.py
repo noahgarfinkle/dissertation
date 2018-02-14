@@ -272,6 +272,7 @@ plt.figure()
 plt.suptitle("Plot of mean elevation for AOI")
 result_DF.plot(column='mean')
 plt.savefig("./results/meanelevationforAOI.png")
+evaluationGridDataFrame.plot()
 
 start = datetime.datetime.now()
 cutFillDF = calculateCutFill(evaluationGridDataFrame,raster_path,finalElevation='mean',rasterResolution=30)
@@ -281,11 +282,17 @@ nItems = len(cutFillDF.index)
 print "Evaluated %s features in %s seconds" %(nItems,elapsedTime.seconds)
 plt.figure()
 plt.suptitle("Cut fill for evaluation cells (m3) for AOI")
+array = cutFillDF['mini_raster_array'][0]
+array
+plt.imshow(array)
+cutFillDF.head()
 cutFillDF.plot(column="totalCutFillVolume")
 plt.savefig("./results/cutfillquantity.png")
 
 plt.figure()
 plt.suptitle("Cut fill for evaluation cells (m3) for AOI")
+plt.xlabel("Total volume cut/fill required (m3)")
+plt.ylabel("Number of evaluation sites")
 plt.hist(cutFillDF['totalCutFillVolume'])
 plt.savefig("./results/cutfillhistogram.png")
 
@@ -319,8 +326,11 @@ for i,row in evaluationDF.iterrows():
     minDistance = vectorDF_filtered.distance(row.geometry).min()
     minDistances.append(minDistance)
 evaluationDF['distance'] = minDistances
+plt.figure()
+f,ax = plt.subplots(1)
+f.suptitle("Minimum distance from infrastructure")
 evaluationDF.plot(column='distance',ax=vectorDF_filtered.plot())
-
+plt.savefig("./results/distancefrominfrastructure.png")
 
 
 
