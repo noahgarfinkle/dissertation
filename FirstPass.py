@@ -260,8 +260,14 @@ evaluationGridDataFrame = gpd.GeoDataFrame(squareList)
 evaluationGridDataFrame.columns = ['geometry']
 evaluationGridDataFrame.plot()
 
-df_cropped = evaluationGridDataFrame[0:1000]
+
+df_cropped = evaluationGridDataFrame[0:100]
 df_cropped.plot()
+
+raster_path = "../FLW_Missouri Mission Folder/RASTER/DEM_CMB_ELV_SRTMVF2_proj.tif"
+
+result_DF = generateRasterStatisticsForDataFrame(evaluationGridDataFrame,raster_path,stats="mean",isCategorical=False)
+result_DF.plot()
 
 ## TESTS
 # FIRST PASS IMPLEMENTATION
