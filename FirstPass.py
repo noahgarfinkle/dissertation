@@ -240,13 +240,11 @@ aoiDF = aoiDF.to_crs({'init':'epsg:3857'})
 aoiPolygon = aoiDF.geometry[0]
 aoiPolygon
 
-gridSpacing = 300
+gridSpacing = 3000
 squareList = []
 bounds = aoiPolygon.bounds
 ll = bounds[:2]
 ur = bounds[2:]
-lowerConerX = ll[0]
-lowerCornerY = ll[1]
 # https://stackoverflow.com/questions/30457089/how-to-create-a-polygon-given-its-point-vertices
 for x in floatrange(ll[0],ur[0],gridSpacing):
     for y in floatrange(ll[1],ur[1],gridSpacing):
@@ -258,7 +256,6 @@ for x in floatrange(ll[0],ur[0],gridSpacing):
 evaluationGridDataFrame = gpd.GeoDataFrame(squareList)
 evaluationGridDataFrame.columns = ['geometry']
 evaluationGridDataFrame.plot()
-
 
 df_cropped = evaluationGridDataFrame[0:100]
 df_cropped.plot()
@@ -274,6 +271,37 @@ cutFillDF.plot(column="totalCutFillVolume")
 
 meaninglessCategoricalDF = generateRasterStatisticsForDataFrame(df_subset,raster_path,isCategorical=True)
 meaninglessCategoricalDF
+
+# minimum distance from each raster cell to roads
+def minimumDistanceFromEvaluationToDataFrameFeatures(evaluationDF,vectorDF):
+    minDistances = []
+    for i,row in evaluationDF.iterrows():
+        minDistance = vectorDF.distance(row.geometry).min()
+        minDistances.append(minDistance)
+    evaluationDF['distance'] = minDistances
+    return evaluatioNDF
+
+vector_path = "./test_data/UtilityInfrastructureCrv_3.shp"
+roadsDF = gpd.read_file(vector_path)
+roadsDF.crs = {'init':'epsg:3857'}
+roadsDF = roadsDF.to_crs({'init':'epsg:3857'})
+evaluationDF = evaluationGridDataFrame
+vectorDF = roadsDF
+lx,ly,ux,uy = evaluationDF.total_bounds
+
+vectorDF_filtered = filterDataFrameByBounds(vectorDF,lx,ly,ux,uy)
+vectorDF_filtered.plot()
+
+minDistances = []
+for i,row in evaluationDF.iterrows():
+    minDistance = vectorDF_filtered.distance(row.geometry).min()
+    minDistances.append(minDistance)
+evaluationDF['distance'] = minDistances
+evaluationDF.plot(column='distance')
+
+
+
+
 ## TESTS
 # FIRST PASS IMPLEMENTATION
 def testFirstPassImplementation():
