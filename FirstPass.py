@@ -6,7 +6,7 @@ __author__ = "Noah W. Garfinkle"
 __copyright__ = "Copyright 2018, Noah W. Garfinkle"
 __credits__ = ["Dr. Ximing Cai", "Dr. George Calfas", "Thomas 'Max' Foltz",
                     "Juliana McMillan-Wilhoit", "Matthew Hiett",
-                    "Dylan Pasley"]
+                    "Dylan Pasley", "Marcus Voegle", "Eric Kreiger"]
 __license__ = "GPL"
 __version__ = "0.0.1"
 __version_dinosaur__ = "Apotosauras"
@@ -255,14 +255,13 @@ def calculateCutFill(df,dem_path,finalElevation='mean',rasterResolution=30):
     return appendedDF
 
 # CURRENT TEST
-
-
-
+import os
+os.getcwd()
 
 # TESTS
 # paths
 xmlPath = "./input.xml"
-raster_path = "/home/noah/FLW_Missouri Mission Folder/RASTER/DEM_CMB_ELV_SRTMVF2.tif"
+raster_path = "../FLW_Missouri Mission Folder/RASTER/DEM_CMB_ELV_SRTMVF2.tif"
 vector_path = "./test_data/UtilityInfrastructureCrv_3.shp"
 
 # FIRST PASS IMPLEMENTATION
@@ -273,7 +272,7 @@ aoiWKT = df_proj[df_proj["NAME"] == "Pulaski"].geometry.values[0].to_wkt()
 aoiLoaded = loads(aoiWKT)
 
 roadsDF = gpd.read_file(vector_path)
-roadsDF.crs
+roadsDF.crs = {'init':'epsg:3857'}
 roadsDF = roadsDF.to_crs({'init':'epsg:3857'})
 
 lx,ly,ux,uy = df_proj['geometry'][4].envelope.bounds
