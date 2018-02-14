@@ -270,7 +270,7 @@ timeit.timeit(generateRasterStatisticsForDataFrame(evaluationGridDataFrame,raste
 result_DF = generateRasterStatisticsForDataFrame(evaluationGridDataFrame,raster_path,stats="mean",isCategorical=False)
 result_DF.plot(column='mean')
 
-cutFillDF = calculateCutFill(result_DF,raster_path,finalElevation='mean',rasterResolution=30)
+cutFillDF = calculateCutFill(evaluationGridDataFrame,raster_path,finalElevation='mean',rasterResolution=30)
 
 
 ## TESTS
