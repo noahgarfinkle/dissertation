@@ -240,7 +240,7 @@ aoiDF = aoiDF.to_crs({'init':'epsg:3857'})
 aoiPolygon = aoiDF.geometry[0]
 aoiPolygon
 
-gridSpacing = 3000
+gridSpacing = 300
 squareList = []
 bounds = aoiPolygon.bounds
 ll = bounds[:2]
@@ -297,7 +297,7 @@ for i,row in evaluationDF.iterrows():
     minDistance = vectorDF_filtered.distance(row.geometry).min()
     minDistances.append(minDistance)
 evaluationDF['distance'] = minDistances
-evaluationDF.plot(column='distance')
+evaluationDF.plot(column='distance',ax=vectorDF_filtered.plot())
 
 
 
