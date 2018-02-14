@@ -239,19 +239,24 @@ aoiDF.CRS = {'init':'epsg:4326'}
 aoiDF = aoiDF.to_crs({'init':'epsg:3857'})
 aoiPolygon = aoiDF.geometry[0]
 aoiPolygon
-
+import datetime
 gridSpacing = 300
 squareList = []
 bounds = aoiPolygon.bounds
 ll = bounds[:2]
 ur = bounds[2:]
 # https://stackoverflow.com/questions/30457089/how-to-create-a-polygon-given-its-point-vertices
+start = datetime.datetime.now()
 for x in floatrange(ll[0],ur[0],gridSpacing):
     for y in floatrange(ll[1],ur[1],gridSpacing):
         square = Polygon([[x,y],[x+gridSpacing,y],[x+gridSpacing,y+gridSpacing],[x,y+gridSpacing]])
         if square.within(aoiPolygon):
             squareList.append(square)
-
+end = datetime.datetime.now()
+end - start
+timeElapsed = end - start
+nFeatures = len(squareList)
+print "Generated %s squares in %s seconds" %(nFeatures,timeElapsed.seconds)
 
 evaluationGridDataFrame = gpd.GeoDataFrame(squareList)
 evaluationGridDataFrame.columns = ['geometry']
@@ -261,20 +266,16 @@ df_cropped = evaluationGridDataFrame[0:100]
 df_cropped.plot()
 
 raster_path = "../FLW_Missouri Mission Folder/RASTER/DEM_CMB_ELV_SRTMVF2_proj.tif"
-import timeit
-timeit.timeit(generateRasterStatisticsForDataFrame(evaluationGridDataFrame,raster_path,stats="mean",isCategorical=False))
 result_DF = generateRasterStatisticsForDataFrame(evaluationGridDataFrame,raster_path,stats="mean",isCategorical=False)
 result_DF.plot(column='mean')
-import timeit
-import datetime
+
 start = datetime.datetime.now()
 cutFillDF = calculateCutFill(evaluationGridDataFrame,raster_path,finalElevation='mean',rasterResolution=30)
 end = datetime.datetime.now()
-elapsedTime = datetime.datetime.timedelta(start,end)
+elapsedTime = end - start
 nItems = len(cutFillDF.index)
 print "Evaluated %s features in %s seconds" %(nItems,elapsedTime.seconds)
 cutFillDF.plot(column="totalCutFillVolume")
-
 plt.hist(cutFillDF['totalCutFillVolume'])
 meaninglessCategoricalDF = generateRasterStatisticsForDataFrame(df_subset,raster_path,isCategorical=True)
 meaninglessCategoricalDF
