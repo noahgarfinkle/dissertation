@@ -266,8 +266,8 @@ df_cropped.plot()
 
 raster_path = "../FLW_Missouri Mission Folder/RASTER/DEM_CMB_ELV_SRTMVF2_proj.tif"
 
-result_DF = generateRasterStatisticsForDataFrame(evaluationGridDataFrame,raster_path,stats="mean",isCategorical=False)
-result_DF.plot()
+result_DF = generateRasterStatisticsForDataFrame(df_cropped,raster_path,stats="mean",isCategorical=False)
+result_DF
 
 ## TESTS
 # FIRST PASS IMPLEMENTATION
