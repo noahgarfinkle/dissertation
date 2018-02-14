@@ -45,7 +45,9 @@ import scipy
 import os
 from PIL import Image, ImageChops
 
-%matplotlib inline
+# HELPFUL FOR DEBUGGING
+# %matplotlib inline
+# pd.options.display.max_columns = 300
 
 ## Enumerations
 class CRS(Enum):
@@ -280,26 +282,26 @@ class GenerationalSolutions:
         self.dataFrame.addRow({'geometry':geom,'generation':generation,'score':score})
 
 # test composite
+def testComposite();
+    map = Map(name="test map")
+    map.addTimeSeriesHeatMap()
+    rl = RasterLayer(name="test raster")
+    #rl.from_file("/home/noah/GIT/dissertation/test_data/testelevunproj.tif")
+    rl.from_file("./test_data/testelevunproj.tif")
+    vl = VectorLayer(name="test vector")
+    rl.toPNG("./tmp/testout5.png")
+    rl.lx
+    rl.ux
+    rl.ly
+    rl.uy
+    map.addRasterLayerAsOverlay(rl,0.5)
+    map.addCoolIcon(38.878057,-90.28944,'bar-chart')
+    map.saveMap("./results/testHeatMapWithTime_worklaptop.html")
 
-map = Map(name="test map")
-map.addTimeSeriesHeatMap()
-rl = RasterLayer(name="test raster")
-#rl.from_file("/home/noah/GIT/dissertation/test_data/testelevunproj.tif")
-rl.from_file("C:/Users/Noah/Documents/GIT/dissertation/test_data/testelevunproj.tif")
-vl = VectorLayer(name="test vector")
-rl.toPNG("./tmp/testout5.png")
-rl.lx
-rl.ux
-rl.ly
-rl.uy
-map.addRasterLayerAsOverlay(rl,0.5)
-map.addCoolIcon(38.878057,-90.28944,'bar-chart')
-map.saveMap("./results/testHeatMapWithTime.html")
-
-g = GenerationalSolutions()
-g.addPoint(50,-93,1,1)
-g.dataFrame.df
-g.dataFrame.df.plot()
+    g = GenerationalSolutions()
+    g.addPoint(50,-93,1,1)
+    g.dataFrame.df
+    g.dataFrame.df.plot()
 
 """
 Manages all test functions for SpatialIO
@@ -309,14 +311,15 @@ def test():
 
 
 #def testGeoDataFrame():
-g = GeoDataFrame()
-g.createGeoDataFrame(CRS.WMAS,columns=['geometry','a'])
-g.addColumn('b')
-g.addRow({'geometry':Point(49,50),'a':1,'b':'c'})
-print g.crs
-g.plot()
-print g.to_json()
-g.to_shapefile("./results/test.shp")
-g.reproject(CRS.WGS84)
-g.plot()
-print g.crs
+def testGeoDataFrame():
+    g = GeoDataFrame()
+    g.createGeoDataFrame(CRS.WMAS,columns=['geometry','a'])
+    g.addColumn('b')
+    g.addRow({'geometry':Point(49,50),'a':1,'b':'c'})
+    print g.crs
+    g.plot()
+    print g.to_json()
+    g.to_shapefile("./results/test.shp")
+    g.reproject(CRS.WGS84)
+    g.plot()
+    print g.crs
