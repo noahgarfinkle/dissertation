@@ -260,14 +260,18 @@ print "Generated %s squares in %s seconds" %(nFeatures,timeElapsed.seconds)
 
 evaluationGridDataFrame = gpd.GeoDataFrame(squareList)
 evaluationGridDataFrame.columns = ['geometry']
+plt.figure()
 evaluationGridDataFrame.plot()
-
+plt.savefig("./results/aoidiscretization.png")
 df_cropped = evaluationGridDataFrame[0:100]
 df_cropped.plot()
 
 raster_path = "../FLW_Missouri Mission Folder/RASTER/DEM_CMB_ELV_SRTMVF2_proj.tif"
 result_DF = generateRasterStatisticsForDataFrame(evaluationGridDataFrame,raster_path,stats="mean",isCategorical=False)
+plt.figure()
+plt.suptitle("Plot of mean elevation for AOI")
 result_DF.plot(column='mean')
+plt.savefig("./results/meanelevationforAOI.png")
 
 start = datetime.datetime.now()
 cutFillDF = calculateCutFill(evaluationGridDataFrame,raster_path,finalElevation='mean',rasterResolution=30)
@@ -275,8 +279,18 @@ end = datetime.datetime.now()
 elapsedTime = end - start
 nItems = len(cutFillDF.index)
 print "Evaluated %s features in %s seconds" %(nItems,elapsedTime.seconds)
+plt.figure()
+plt.suptitle("Cut fill for evaluation cells (m3) for AOI")
 cutFillDF.plot(column="totalCutFillVolume")
+plt.savefig("./results/cutfillquantity.png")
+
+plt.figure()
+plt.suptitle("Cut fill for evaluation cells (m3) for AOI")
 plt.hist(cutFillDF['totalCutFillVolume'])
+plt.savefig("./results/cutfillhistogram.png")
+
+
+
 meaninglessCategoricalDF = generateRasterStatisticsForDataFrame(df_subset,raster_path,isCategorical=True)
 meaninglessCategoricalDF
 
