@@ -220,7 +220,6 @@ def calculateCutFill(df,dem_path,finalElevation='mean',rasterResolution=30):
         maskedRaster_Array = ma.masked_array(maskedRaster)
         targetElevation = -999
         if isinstance(finalElevation,basestring):
-            print row[finalElevation]
             targetElevation = row[finalElevation]
         else:
             targetElevation = finalElevation
@@ -271,7 +270,9 @@ result_DF = generateRasterStatisticsForDataFrame(evaluationGridDataFrame,raster_
 result_DF.plot(column='mean')
 
 cutFillDF = calculateCutFill(evaluationGridDataFrame,raster_path,finalElevation='mean',rasterResolution=30)
+cutFillDF.plot(column="totalCutFillVolume")
 
+meaninglessCategoricalDF
 
 ## TESTS
 # FIRST PASS IMPLEMENTATION
