@@ -272,8 +272,8 @@ result_DF.plot(column='mean')
 cutFillDF = calculateCutFill(evaluationGridDataFrame,raster_path,finalElevation='mean',rasterResolution=30)
 cutFillDF.plot(column="totalCutFillVolume")
 
+meaninglessCategoricalDF = generateRasterStatisticsForDataFrame(df_subset,raster_path,isCategorical=True)
 meaninglessCategoricalDF
-
 ## TESTS
 # FIRST PASS IMPLEMENTATION
 def testFirstPassImplementation():
