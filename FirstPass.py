@@ -265,9 +265,13 @@ df_cropped = evaluationGridDataFrame[0:100]
 df_cropped.plot()
 
 raster_path = "../FLW_Missouri Mission Folder/RASTER/DEM_CMB_ELV_SRTMVF2_proj.tif"
+import timeit
+timeit.timeit(generateRasterStatisticsForDataFrame(evaluationGridDataFrame,raster_path,stats="mean",isCategorical=False))
+result_DF = generateRasterStatisticsForDataFrame(evaluationGridDataFrame,raster_path,stats="mean",isCategorical=False)
+result_DF.plot(column='mean')
 
-result_DF = generateRasterStatisticsForDataFrame(df_cropped,raster_path,stats="mean",isCategorical=False)
-result_DF
+cutFillDF = calculateCutFill(result_DF,raster_path,finalElevation='mean',rasterResolution=30)
+
 
 ## TESTS
 # FIRST PASS IMPLEMENTATION
