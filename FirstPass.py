@@ -172,7 +172,7 @@ def generateEvaluationGridDataFrame(polygon,gridSpacing):
             if point.within(polygon):
                 pointList.append(point)
     evaluationGridDataFrame = gpd.GeoDataFrame(pointList)
-    evaluationGridDataFrame.columns = ['geometry']
+    evaluationGridDataFrame.columns = ['geometry',score]
     return evaluationGridDataFrame
 
 def convertRasterToNumpyArray(raster_path):
@@ -234,6 +234,29 @@ def calculateCutFill(df,dem_path,finalElevation='mean',rasterResolution=30):
     return appendedDF
 
 # CURRENT TEST
+# building the evaluation grid structure
+aoiDF = gpd.read_file("./test_data/geojson.json")
+aoiDF.CRS = {'init':'epsg:4326'}
+aoiDF = aoiDF.to_crs({'init':'epsg:3857'})
+aoiPolygon = aoiDF.geometry[0]
+aoiPolygon
+
+gridSpacing = 30
+pointList = []
+bounds = aoiPolygon.bounds
+ll = bounds[:2]
+ur = bounds[2:]
+for x in floatrange(ll[0],ur[0],gridSpacing):
+    for y in floatrange(ll[1],ur[1],gridSpacing):
+        point = Point(x,y)
+        if point.within(aoiPolygon):
+            pointList.append(point)
+evaluationGridDataFrame = gpd.GeoDataFrame(pointList)
+evaluationGridDataFrame.columns = ['geometry']
+evaluationGridDataFrame
+
+df_cropped = evaluationGridDataFrame[0:1000]
+df_cropped.plot()
 
 ## TESTS
 # FIRST PASS IMPLEMENTATION
