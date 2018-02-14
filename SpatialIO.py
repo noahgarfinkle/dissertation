@@ -282,7 +282,7 @@ class GenerationalSolutions:
         self.dataFrame.addRow({'geometry':geom,'generation':generation,'score':score})
 
 # test composite
-def testComposite();
+def testComposite():
     map = Map(name="test map")
     map.addTimeSeriesHeatMap()
     rl = RasterLayer(name="test raster")
