@@ -56,6 +56,15 @@ class CRS(Enum):
 
 ## CLASSES
 class PostGIS:
+    """ Summary of class
+
+        Longer class information
+
+        Attributes:
+            attr1 (str): The first attribute
+            attr2 (int): The second attribute
+    """
+
     def __init__(self,dbname,user='postgres',host='localhost',password='postgres'):
         connString = "dbname='%s' user='%s' host='%s' password='%s'" %(dbname,user,host,password)
         try:
@@ -65,6 +74,24 @@ class PostGIS:
             print "Unable to connect to database"
 
     def query(self,sql):
+        """ Summary line
+
+        Detailed description
+
+        Args:
+            param1 (int): The first parameter.
+            param1 (str): The second parameter.
+
+        Returns:
+            network (pandas dataframe): The return and how to interpret it
+
+        Raises:
+            IOError: An error occured accessing the database
+
+        Tests:
+            >>> get_nearest_node(-92.1647,37.7252)
+            node_id = 634267, dist = 124
+        """
         cur = self.conn.cursor()
         cur.execute(sql)
         rows = cur.fetchall()
