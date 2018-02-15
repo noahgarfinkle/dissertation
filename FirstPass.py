@@ -209,7 +209,7 @@ def rasterStatCroppedRaster(df,raster_path):
     return rasterDF
 
 #finalElevation must either be number or string from validStats
-def calculateCutFill(df,dem_path,finalElevation='mean',rasterResolution=30):
+def calculateCutFill(df,dem_path,finalElevation='mean',rasterResolution=10):
     croppedRasterDF = rasterStatCroppedRaster(df,dem_path)
     appendedDF = gpd.GeoDataFrame(pd.concat([df,croppedRasterDF],axis=1))
     elevationChangeArrays = []
