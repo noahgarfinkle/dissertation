@@ -29,6 +29,8 @@ from folium.plugins import MarkerCluster
 # pd.options.display.max_columns = 300
 
 """REFERENCES
+https://ocefpaf.github.io/python4oceanographers/blog/2015/12/14/geopandas_folium/
+https://stackoverflow.com/questions/44778/how-would-you-make-a-comma-separated-string-from-a-list
 
 """
 
@@ -96,7 +98,6 @@ def drivingDistance(startNode,distance):
     nodes_features = folium.features.GeoJson(nodes_gjson)
     edges_features = folium.features.GeoJson(edges_gjson)
     map2 = folium.Map( tiles='stamentoner', zoom_start=6)
-    # https://ocefpaf.github.io/python4oceanographers/blog/2015/12/14/geopandas_folium/
     #map2.add_child(nodes_features)
     map2.add_child(edges_features)
     map2.save('./results/mapwithdrivedistance.html')
@@ -111,7 +112,6 @@ def kMultipleRoutes(startNode,endNode,k):
     sql2 = "select * from ways where id in (%s)" %(",".join(edges))
     df2 = gpd.read_postgis(sql2,con=conn,geom_col="the_geom")
     map = folium.Map( tiles='stamentoner', zoom_start=6)
-    # https://ocefpaf.github.io/python4oceanographers/blog/2015/12/14/geopandas_folium/
     df2.crs = {'init':'epsg:4326'}
     gjson = df2.to_crs(epsg='4326').to_json()
     lines = folium.features.GeoJson(gjson)
@@ -129,7 +129,6 @@ def kMultipleRoutes_LatLon(startLon,startLat,endLon,endLat,k):
     sql2 = "select * from ways where id in (%s)" %(",".join(edges))
     df2 = gpd.read_postgis(sql2,con=conn,geom_col="the_geom")
     map = folium.Map( tiles='stamentoner', zoom_start=6)
-    # https://ocefpaf.github.io/python4oceanographers/blog/2015/12/14/geopandas_folium/
     df2.crs = {'init':'epsg:4326'}
     gjson = df2.to_crs(epsg='4326').to_json()
     lines = folium.features.GeoJson(gjson)
@@ -149,7 +148,6 @@ def route(startLon,startLat,endLon,endLat):
     sql2 = "select * from ways where id in (%s)" %(",".join(edges))
     df2 = gpd.read_postgis(sql2,con=conn,geom_col="the_geom")
     map = folium.Map( tiles='stamentoner', zoom_start=6)
-    # https://ocefpaf.github.io/python4oceanographers/blog/2015/12/14/geopandas_folium/
     df2.crs = {'init':'epsg:4326'}
     gjson = df2.to_crs(epsg='4326').to_json()
     lines = folium.features.GeoJson(gjson)
@@ -165,7 +163,7 @@ def routeWithAvoidance(startLon,startLat,endLon,endLat,linkIDsToAvoid=[]):
     startNode = int(get_nearest_node(startLon,startLat)["node_id"])
     endNode = int(get_nearest_node(endLon,endLat)["node_id"])
     linkIDsToAvoid = [str(x) for x in linkIDsToAvoid]
-    linksToAvoidString = ','.join(linkIDsToAvoid)  # https://stackoverflow.com/questions/44778/how-would-you-make-a-comma-separated-string-from-a-list
+    linksToAvoidString = ','.join(linkIDsToAvoid)
     sql = "select * from pgr_dijkstra('select id, source, target, cost, reverse_cost FROM ways WHERE id NOT IN (%s)',%s,%s);" %(linksToAvoidString,startNode,endNode)
     cur.execute(sql)
     rows = cur.fetchall()
@@ -175,7 +173,6 @@ def routeWithAvoidance(startLon,startLat,endLon,endLat,linkIDsToAvoid=[]):
     sql2 = "select * from ways where id in (%s)" %(",".join(edges))
     df2 = gpd.read_postgis(sql2,con=conn,geom_col="the_geom")
     map = folium.Map( tiles='stamentoner', zoom_start=6)
-    # https://ocefpaf.github.io/python4oceanographers/blog/2015/12/14/geopandas_folium/
     df2.crs = {'init':'epsg:4326'}
     gjson = df2.to_crs(epsg='4326').to_json()
     lines = folium.features.GeoJson(gjson)
@@ -229,7 +226,6 @@ def testMapWithRoute():
     df2
     df2.plot()
     map = folium.Map( tiles='stamentoner', zoom_start=6)
-    # https://ocefpaf.github.io/python4oceanographers/blog/2015/12/14/geopandas_folium/
     df2.crs = {'init':'epsg:4326'browser}
     gjson = df2.to_crs(epsg='4326').to_json()
     lines = folium.features.GeoJson(gjson)
