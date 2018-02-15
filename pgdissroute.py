@@ -93,12 +93,48 @@ def get_nearest_node(lon,lat):
 
 
 def shorterQueryWithoutDistance(lon,lat):
+    """ Summary line
+
+    Detailed description
+
+    Args:
+        param1 (int): The first parameter.
+        param1 (str): The second parameter.
+
+    Returns:
+        network (pandas dataframe): The return and how to interpret it
+
+    Raises:
+        IOError: An error occured accessing the database
+
+    Tests:
+        >>> get_nearest_node(-92.1647,37.7252)
+        node_id = 634267, dist = 124
+    """
     sql = "SELECT * FROM ways_vertices_pgr ORDER BY the_geom <-> ST_GeometryFromText('POINT(%s %s)',4326) LIMIT 1;" %(lon,lat)
     nearestNode = pd.read_sql_query(sql,con=conn)
     return nearestNode
 
 
 def drivingDistance(startNode,distance):
+    """ Summary line
+
+    Detailed description
+
+    Args:
+        param1 (int): The first parameter.
+        param1 (str): The second parameter.
+
+    Returns:
+        network (pandas dataframe): The return and how to interpret it
+
+    Raises:
+        IOError: An error occured accessing the database
+
+    Tests:
+        >>> get_nearest_node(-92.1647,37.7252)
+        node_id = 634267, dist = 124
+    """
     sql = "SELECT * FROM pgr_drivingDistance('SELECT id, source, target, cost, reverse_cost FROM ways',%s,%s);" %(startNode,distance)
     drivingDistance = pd.read_sql_query(sql,con=conn)
     nodes = list(drivingDistance['node'])
@@ -123,6 +159,24 @@ def drivingDistance(startNode,distance):
 
 
 def kMultipleRoutes(startNode,endNode,k):
+    """ Summary line
+
+    Detailed description
+
+    Args:
+        param1 (int): The first parameter.
+        param1 (str): The second parameter.
+
+    Returns:
+        network (pandas dataframe): The return and how to interpret it
+
+    Raises:
+        IOError: An error occured accessing the database
+
+    Tests:
+        >>> get_nearest_node(-92.1647,37.7252)
+        node_id = 634267, dist = 124
+    """
     sql = "SELECT * FROM pgr_ksp('SELECT id, source, target, cost, reverse_cost FROM ways',%s,%s,%s);" %(startNode,endNode,k)
     df = pd.read_sql_query(sql,con=conn)
     edges = list(df['edge'])
@@ -138,6 +192,24 @@ def kMultipleRoutes(startNode,endNode,k):
 
 
 def kMultipleRoutes_LatLon(startLon,startLat,endLon,endLat,k):
+    """ Summary line
+
+    Detailed description
+
+    Args:
+        param1 (int): The first parameter.
+        param1 (str): The second parameter.
+
+    Returns:
+        network (pandas dataframe): The return and how to interpret it
+
+    Raises:
+        IOError: An error occured accessing the database
+
+    Tests:
+        >>> get_nearest_node(-92.1647,37.7252)
+        node_id = 634267, dist = 124
+    """
     startNode = int(get_nearest_node(startLon,startLat)["node_id"])
     endNode = int(get_nearest_node(endLon,endLat)["node_id"])
     sql = "SELECT * FROM pgr_ksp('SELECT id, source, target, cost, reverse_cost FROM ways',%s,%s,%s);" %(startNode,endNode,k)
@@ -155,6 +227,24 @@ def kMultipleRoutes_LatLon(startLon,startLat,endLon,endLat,k):
 
 
 def route(startLon,startLat,endLon,endLat):
+    """ Summary line
+
+    Detailed description
+
+    Args:
+        param1 (int): The first parameter.
+        param1 (str): The second parameter.
+
+    Returns:
+        network (pandas dataframe): The return and how to interpret it
+
+    Raises:
+        IOError: An error occured accessing the database
+
+    Tests:
+        >>> get_nearest_node(-92.1647,37.7252)
+        node_id = 634267, dist = 124
+    """
     startNode = int(get_nearest_node(startLon,startLat)["node_id"])
     endNode = int(get_nearest_node(endLon,endLat)["node_id"])
     sql = "select * from pgr_dijkstra('select id, source, target, cost, reverse_cost FROM ways',%s,%s);" %(startNode,endNode)
@@ -174,10 +264,46 @@ def route(startLon,startLat,endLon,endLat):
 
 
 def createCustomCost():
+    """ Summary line
+
+    Detailed description
+
+    Args:
+        param1 (int): The first parameter.
+        param1 (str): The second parameter.
+
+    Returns:
+        network (pandas dataframe): The return and how to interpret it
+
+    Raises:
+        IOError: An error occured accessing the database
+
+    Tests:
+        >>> get_nearest_node(-92.1647,37.7252)
+        node_id = 634267, dist = 124
+    """
     return 0
 
 
 def routeWithAvoidance(startLon,startLat,endLon,endLat,linkIDsToAvoid=[]):
+    """ Summary line
+
+    Detailed description
+
+    Args:
+        param1 (int): The first parameter.
+        param1 (str): The second parameter.
+
+    Returns:
+        network (pandas dataframe): The return and how to interpret it
+
+    Raises:
+        IOError: An error occured accessing the database
+
+    Tests:
+        >>> get_nearest_node(-92.1647,37.7252)
+        node_id = 634267, dist = 124
+    """
     startNode = int(get_nearest_node(startLon,startLat)["node_id"])
     endNode = int(get_nearest_node(endLon,endLat)["node_id"])
     linkIDsToAvoid = [str(x) for x in linkIDsToAvoid]
@@ -200,6 +326,24 @@ def routeWithAvoidance(startLon,startLat,endLon,endLat,linkIDsToAvoid=[]):
 
 
 def queryRoadAndPutMarkerOnMidPoint(roadID):
+    """ Summary line
+
+    Detailed description
+
+    Args:
+        param1 (int): The first parameter.
+        param1 (str): The second parameter.
+
+    Returns:
+        network (pandas dataframe): The return and how to interpret it
+
+    Raises:
+        IOError: An error occured accessing the database
+
+    Tests:
+        >>> get_nearest_node(-92.1647,37.7252)
+        node_id = 634267, dist = 124
+    """
     return 0
 
 

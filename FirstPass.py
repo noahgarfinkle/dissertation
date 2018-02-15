@@ -41,6 +41,9 @@ import SpatialIO as io
 # %matplotlib inline
 # pd.options.display.max_columns = 300
 
+## SETUP
+validStats = utils.VALID_STATS
+
 """ REFERENCES
 http://lxml.de/tutorial.html
 https://mapbox.s3.amazonaws.com/playground/perrygeo/rasterio-docs/cookbook.html#rasterizing-geojson-features
@@ -62,23 +65,68 @@ setting up blank raster: dst_ds.SetGeoTransform([topLeftX,pixel_width,0,topLeftY
 
 ## CLASSES
 class SiteSearch:
+    """ Summary of class
+
+        Longer class information
+
+        Attributes:
+            attr1 (str): The first attribute
+            attr2 (int): The second attribute
+    """
+
     def __init__(self):
         self.crs = None
         self.AreaOfInterest = None
 
 class SiteSuitabilityCriteria:
+    """ Summary of class
+
+        Longer class information
+
+        Attributes:
+            attr1 (str): The first attribute
+            attr2 (int): The second attribute
+    """
+
     def __init__(self):
         return None
 
 class SiteSuitabilityCriteria:
+    """ Summary of class
+
+        Longer class information
+
+        Attributes:
+            attr1 (str): The first attribute
+            attr2 (int): The second attribute
+    """
+
     def __init__(self):
         return None
 
 class SiteRelationalConstraint:
+    """ Summary of class
+
+        Longer class information
+
+        Attributes:
+            attr1 (str): The first attribute
+            attr2 (int): The second attribute
+    """
+
     def __init__(self):
         return None
 
 class Input:
+    """ Summary of class
+
+        Longer class information
+
+        Attributes:
+            attr1 (str): The first attribute
+            attr2 (int): The second attribute
+    """
+
     def __init__(self,xmlPath):
         self.xmlPath = xmlPath
         self.tree = ET.parse(xmlPath)
@@ -92,6 +140,24 @@ class Input:
         print ET.tostring(self.root,pretty_print=True)
 
     def retrieveSiteSearches(self):
+        """ Summary line
+
+        Detailed description
+
+        Args:
+            param1 (int): The first parameter.
+            param1 (str): The second parameter.
+
+        Returns:
+            network (pandas dataframe): The return and how to interpret it
+
+        Raises:
+            IOError: An error occured accessing the database
+
+        Tests:
+            >>> get_nearest_node(-92.1647,37.7252)
+            node_id = 634267, dist = 124
+        """
         siteSearches = []
         siteSearchesElement = self.root[0]
         for siteSearchElement in siteSearchesElement:
@@ -103,6 +169,24 @@ class Input:
         return siteSearches
 
     def retrieveSiteRelationalConstraints(self):
+        """ Summary line
+
+        Detailed description
+
+        Args:
+            param1 (int): The first parameter.
+            param1 (str): The second parameter.
+
+        Returns:
+            network (pandas dataframe): The return and how to interpret it
+
+        Raises:
+            IOError: An error occured accessing the database
+
+        Tests:
+            >>> get_nearest_node(-92.1647,37.7252)
+            node_id = 634267, dist = 124
+        """
         siteRelationalConstraints = self.root[1]
         siteRelationalConstraint = SiteRelationalConstraint()
         siteSearchRelationalConstraints = []
@@ -111,22 +195,112 @@ class Input:
 
 ## FUNCTIONS
 def distance():
+    """ Summary line
+
+    Detailed description
+
+    Args:
+        param1 (int): The first parameter.
+        param1 (str): The second parameter.
+
+    Returns:
+        network (pandas dataframe): The return and how to interpret it
+
+    Raises:
+        IOError: An error occured accessing the database
+
+    Tests:
+        >>> get_nearest_node(-92.1647,37.7252)
+        node_id = 634267, dist = 124
+    """
     distances = gdal.distances()
     return None
 
 def filterDataFrameByBounds(df,lx,ly,ux,uy):
+    """ Summary line
+
+    Detailed description
+
+    Args:
+        param1 (int): The first parameter.
+        param1 (str): The second parameter.
+
+    Returns:
+        network (pandas dataframe): The return and how to interpret it
+
+    Raises:
+        IOError: An error occured accessing the database
+
+    Tests:
+        >>> get_nearest_node(-92.1647,37.7252)
+        node_id = 634267, dist = 124
+    """
     filteredDF = df.cx[lx:ux,ly:uy]
     return filteredDF
 
 def filterDataFrameByValue(df,column,argument):
+    """ Summary line
+
+    Detailed description
+
+    Args:
+        param1 (int): The first parameter.
+        param1 (str): The second parameter.
+
+    Returns:
+        network (pandas dataframe): The return and how to interpret it
+
+    Raises:
+        IOError: An error occured accessing the database
+
+    Tests:
+        >>> get_nearest_node(-92.1647,37.7252)
+        node_id = 634267, dist = 124
+    """
     filteredDF = df[df[column]==argument]
     return filteredDF
 
 def minimumDistanceFromPointToDataFrameFeatures(x,y,crs,df):
+    """ Summary line
+
+    Detailed description
+
+    Args:
+        param1 (int): The first parameter.
+        param1 (str): The second parameter.
+
+    Returns:
+        network (pandas dataframe): The return and how to interpret it
+
+    Raises:
+        IOError: An error occured accessing the database
+
+    Tests:
+        >>> get_nearest_node(-92.1647,37.7252)
+        node_id = 634267, dist = 124
+    """
     point = Point(x,y)
     return df.distance(point).min()
 
 def projectWKT(wkt,from_epsg,to_epsg):
+    """ Summary line
+
+    Detailed description
+
+    Args:
+        param1 (int): The first parameter.
+        param1 (str): The second parameter.
+
+    Returns:
+        network (pandas dataframe): The return and how to interpret it
+
+    Raises:
+        IOError: An error occured accessing the database
+
+    Tests:
+        >>> get_nearest_node(-92.1647,37.7252)
+        node_id = 634267, dist = 124
+    """
     feat = loads(wkt)
     df_to_project = gpd.GeoDataFrame([feat])
     df_to_project.columns = ['geometry']
@@ -135,6 +309,24 @@ def projectWKT(wkt,from_epsg,to_epsg):
     return df_to_project.geometry[0].to_wkt()
 
 def buildSearchGrid(aoiWKT,aoiWKTProjection=4326,gridSpacing=30,exclusionFeatures = []):
+    """ Summary line
+
+    Detailed description
+
+    Args:
+        param1 (int): The first parameter.
+        param1 (str): The second parameter.
+
+    Returns:
+        network (pandas dataframe): The return and how to interpret it
+
+    Raises:
+        IOError: An error occured accessing the database
+
+    Tests:
+        >>> get_nearest_node(-92.1647,37.7252)
+        node_id = 634267, dist = 124
+    """
     numberXCells = np.ceiling((ux-lx)/qafCellSize)
     numberYCells = np.ceiling((uy-ly)/qafCellSize)
 
@@ -144,6 +336,24 @@ def buildSearchGrid(aoiWKT,aoiWKTProjection=4326,gridSpacing=30,exclusionFeature
     qafMatrix = np.empty([numberXCells,numberYCells])
 
 def createEmptyRaster(rasterPath,topLeftX,topLeftY,cellSize,width,height,epsg):
+    """ Summary line
+
+    Detailed description
+
+    Args:
+        param1 (int): The first parameter.
+        param1 (str): The second parameter.
+
+    Returns:
+        network (pandas dataframe): The return and how to interpret it
+
+    Raises:
+        IOError: An error occured accessing the database
+
+    Tests:
+        >>> get_nearest_node(-92.1647,37.7252)
+        node_id = 634267, dist = 124
+    """
     geotransform = [topLeftX,cellSize,0,topLeftY,0,-cellSize]
     driver = gdal.GetDriverByName("GTiff")
     dst_ds = driver.Create(rasterPath, width, height, 1, gdal.GDT_Byte )
@@ -157,11 +367,47 @@ def createEmptyRaster(rasterPath,topLeftX,topLeftY,cellSize,width,height,epsg):
 
 
 def floatrange(start, stop, step):
+    """ Summary line
+
+    Detailed description
+
+    Args:
+        param1 (int): The first parameter.
+        param1 (str): The second parameter.
+
+    Returns:
+        network (pandas dataframe): The return and how to interpret it
+
+    Raises:
+        IOError: An error occured accessing the database
+
+    Tests:
+        >>> get_nearest_node(-92.1647,37.7252)
+        node_id = 634267, dist = 124
+    """
     while start < stop:
         yield start
         start += step
 
 def generateEvaluationGridDataFrame(polygon,gridSpacing):
+    """ Summary line
+
+    Detailed description
+
+    Args:
+        param1 (int): The first parameter.
+        param1 (str): The second parameter.
+
+    Returns:
+        network (pandas dataframe): The return and how to interpret it
+
+    Raises:
+        IOError: An error occured accessing the database
+
+    Tests:
+        >>> get_nearest_node(-92.1647,37.7252)
+        node_id = 634267, dist = 124
+    """
     pointList = []
     bounds = polygon.bounds
     ll = bounds[:2]
@@ -176,6 +422,24 @@ def generateEvaluationGridDataFrame(polygon,gridSpacing):
     return evaluationGridDataFrame
 
 def convertRasterToNumpyArray(raster_path):
+    """ Summary line
+
+    Detailed description
+
+    Args:
+        param1 (int): The first parameter.
+        param1 (str): The second parameter.
+
+    Returns:
+        network (pandas dataframe): The return and how to interpret it
+
+    Raises:
+        IOError: An error occured accessing the database
+
+    Tests:
+        >>> get_nearest_node(-92.1647,37.7252)
+        node_id = 634267, dist = 124
+    """
     raster_path = "./test_data/testelevunproj.tif"
 
     dataset = gdal.Open(raster_path)
@@ -191,8 +455,25 @@ def convertRasterToNumpyArray(raster_path):
     print data.shape
     print np.mean(data)
 
-validStats = utils.VALID_STATS
 def generateRasterStatisticsForDataFrame(df,raster_Path,stats="count majority minority unique mean",isCategorical=False):
+    """ Summary line
+
+    Detailed description
+
+    Args:
+        param1 (int): The first parameter.
+        param1 (str): The second parameter.
+
+    Returns:
+        network (pandas dataframe): The return and how to interpret it
+
+    Raises:
+        IOError: An error occured accessing the database
+
+    Tests:
+        >>> get_nearest_node(-92.1647,37.7252)
+        node_id = 634267, dist = 124
+    """
     row_stats_df = gpd.GeoDataFrame(raster_stats(vectors=df['geometry'],raster=raster_path,stats=stats, copy_properties=True, nodata_value=0, categorical=isCategorical))
     newDF = gpd.GeoDataFrame(pd.concat([df,row_stats_df],axis=1))
     return newDF
@@ -200,16 +481,70 @@ def generateRasterStatisticsForDataFrame(df,raster_Path,stats="count majority mi
 # Note: Requires point in same coordinate system as raster, I assume
 # todo: implement projections
 def queryRasterValueForPoint(x,y,raster_path,pointCRS=None,rasterCRS=None):
+    """ Summary line
+
+    Detailed description
+
+    Args:
+        param1 (int): The first parameter.
+        param1 (str): The second parameter.
+
+    Returns:
+        network (pandas dataframe): The return and how to interpret it
+
+    Raises:
+        IOError: An error occured accessing the database
+
+    Tests:
+        >>> get_nearest_node(-92.1647,37.7252)
+        node_id = 634267, dist = 124
+    """
     point = "POINT(%s %s)" %(x,y)
     return point_query(point,raster_path)
 
 def rasterStatCroppedRaster(df,raster_path):
+    """ Summary line
+
+    Detailed description
+
+    Args:
+        param1 (int): The first parameter.
+        param1 (str): The second parameter.
+
+    Returns:
+        network (pandas dataframe): The return and how to interpret it
+
+    Raises:
+        IOError: An error occured accessing the database
+
+    Tests:
+        >>> get_nearest_node(-92.1647,37.7252)
+        node_id = 634267, dist = 124
+    """
     rasterSource = zonal_stats(df['geometry'],raster_path,all_touched=True,raster_out=True)
     rasterDF = pd.DataFrame(rasterSource)
     return rasterDF
 
 #finalElevation must either be number or string from validStats
 def calculateCutFill(df,dem_path,finalElevation='mean',rasterResolution=10):
+    """ Summary line
+
+    Detailed description
+
+    Args:
+        param1 (int): The first parameter.
+        param1 (str): The second parameter.
+
+    Returns:
+        network (pandas dataframe): The return and how to interpret it
+
+    Raises:
+        IOError: An error occured accessing the database
+
+    Tests:
+        >>> get_nearest_node(-92.1647,37.7252)
+        node_id = 634267, dist = 124
+    """
     croppedRasterDF = rasterStatCroppedRaster(df,dem_path)
     appendedDF = gpd.GeoDataFrame(pd.concat([df,croppedRasterDF],axis=1))
     elevationChangeArrays = []
