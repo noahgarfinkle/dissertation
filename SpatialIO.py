@@ -124,6 +124,7 @@ class PostGIS:
             None
 
         Tests:
+            None
         """
         try:
             df = gpd.read_postgis(sql,con=self.conn,geom_col=geom_col)
@@ -152,109 +153,113 @@ class GeoDataFrame:
         self.crs = None
 
     def createGeoDataFrame(self,crs,columns=['geometry']):
-        """ Summary line
-
-        Detailed description
+        """Creates an empty GeoDataFrame
 
         Args:
-            param1 (int): The first parameter.
-            param1 (str): The second parameter.
+            crs (ENUM CRS): The first parameter.
+            columns (list:str): The columns this database should include.  Should
+            include a 'geometry' column for spatial data
 
         Returns:
-            network (pandas dataframe): The return and how to interpret it
+            None: Sets the classes dataframe and crs
 
         Raises:
-            IOError: An error occured accessing the database
+            None
 
         Tests:
-            >>> get_nearest_node(-92.1647,37.7252)
-            node_id = 634267, dist = 124
+            None
         """
         crsDict = {'init':'epsg:%s' %(crs.value)}
         self.df = gpd.GeoDataFrame(crs=crsDict,columns=columns)
         self.crs = crs
 
     def from_shapefile(self,filePath):
-        """ Summary line
-
-        Detailed description
+        """ Creates the GeoDataFrame from the path to a shapefile
 
         Args:
-            param1 (int): The first parameter.
-            param1 (str): The second parameter.
+            filePath (str): The full path, without backslashes, to the .shp portion
+                of a shapefile
 
         Returns:
-            network (pandas dataframe): The return and how to interpret it
+            None: Sets the classes dataframe and crs
 
         Raises:
-            IOError: An error occured accessing the database
+            None
 
         Tests:
-            >>> get_nearest_node(-92.1647,37.7252)
-            node_id = 634267, dist = 124
+            None
         """
         return None
 
-    def from_json(self,json):
-        """ Summary line
-
-        Detailed description
+    def from_json_file(self,json):
+        """ Creates the GeoDataFrame from the path to a json file
 
         Args:
-            param1 (int): The first parameter.
-            param1 (str): The second parameter.
+            filePath (str): The full path, without backslashes, to a GeoJSON file
 
         Returns:
-            network (pandas dataframe): The return and how to interpret it
+            None: Sets the classes dataframe and crs
 
         Raises:
-            IOError: An error occured accessing the database
+            None
 
         Tests:
-            >>> get_nearest_node(-92.1647,37.7252)
-            node_id = 634267, dist = 124
+            None
+        """
+        return None
+
+    def from_json_str(self,json):
+        """ Creates the GeoDataFrame from a GeoJSON string
+
+        Args:
+            filePath (str): A properly formatted GeoJSON string
+
+        Returns:
+            None: Sets the classes dataframe and crs
+
+        Raises:
+            None
+
+        Tests:
+            None
         """
         return None
 
     def from_postgis(self,postgis,query):
-        """ Summary line
-
-        Detailed description
+        """ Creates the GeoDataFrame from a PostGIS query
 
         Args:
-            param1 (int): The first parameter.
-            param1 (str): The second parameter.
+            postgis (PostGIS): A object of type PostGIS, already properly configured
+            query (str): A sql string to be passed to the postgis object queryToDF
+                function
 
         Returns:
-            network (pandas dataframe): The return and how to interpret it
+            None: Sets the classes dataframe and crs
 
         Raises:
-            IOError: An error occured accessing the database
+            None
 
         Tests:
-            >>> get_nearest_node(-92.1647,37.7252)
-            node_id = 634267, dist = 124
+            None
         """
         return None
 
     def addColumn(self,colName):
-        """ Summary line
+        """ Adds an empty column to the dataframe
 
-        Detailed description
+        Requires that a dataframe has already been instantiated
 
         Args:
-            param1 (int): The first parameter.
-            param1 (str): The second parameter.
+            colName (str): The name of the column in the revised dataframe
 
         Returns:
-            network (pandas dataframe): The return and how to interpret it
+            None
 
         Raises:
-            IOError: An error occured accessing the database
+            None
 
         Tests:
-            >>> get_nearest_node(-92.1647,37.7252)
-            node_id = 634267, dist = 124
+            None
         """
         self.df[colName] = None
 
