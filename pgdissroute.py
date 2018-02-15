@@ -70,16 +70,14 @@ def get_nearest_node(lon,lat):
     nearestNode = pd.read_sql_query(sql_queryNode,con=conn)
     return nearestNode
 
-nearestNode = get_nearest_node(-92.1647,37.7252) # Fort Leonard Wood, the negative is really important!
-nearestNode
+
 
 def shorterQueryWithoutDistance(lon,lat):
     sql = "SELECT * FROM ways_vertices_pgr ORDER BY the_geom <-> ST_GeometryFromText('POINT(%s %s)',4326) LIMIT 1;" %(lon,lat)
     nearestNode = pd.read_sql_query(sql,con=conn)
     return nearestNode
 
-nearestNode = shorterQueryWithoutDistance(-92.1647,37.7252) # Fort Leonard Wood, the negative is really important!
-nearestNode
+
 
 
 def drivingDistance(startNode,distance):
@@ -106,7 +104,6 @@ def drivingDistance(startNode,distance):
     map2.save('./results/mapwithdrivedistance.html')
     return nodes_features, edges_features
 
-nodes_features, edges_features = drivingDistance(634267,0.1)
 
 
 def kMultipleRoutes(startNode,endNode,k):
@@ -124,7 +121,6 @@ def kMultipleRoutes(startNode,endNode,k):
     map.add_child(lines)
     map.save('./results/mapwithmultipleroutes.html')
 
-kMultipleRoutes(634267,3,2)
 
 def kMultipleRoutes_LatLon(startLon,startLat,endLon,endLat,k):
     startNode = int(get_nearest_node(startLon,startLat)["node_id"])
@@ -143,7 +139,7 @@ def kMultipleRoutes_LatLon(startLon,startLat,endLon,endLat,k):
     map.add_child(lines)
     map.save('./results/mapwithmultipleroutes.html')
 
-kMultipleRoutes_LatLon(-92.068859,37.846720,-92.142373,37.557935,100)
+
 
 def route(startLon,startLat,endLon,endLat):
     startNode = int(get_nearest_node(startLon,startLat)["node_id"])
@@ -164,7 +160,7 @@ def route(startLon,startLat,endLon,endLat):
     map.add_child(lines)
     map.save('./results/mapwithroute.html')
 
-route(-92.068859,37.846720,-92.142373,37.557935)
+
 
 connString = "dbname='routing' user='postgres' host='localhost' password='postgres'"
 conn = psycopg2.connect(connString)
@@ -236,3 +232,24 @@ def queryRoadAndPutMarkerOnMidPoint(roadID):
 ## CURRENT TEST
 
 ## TESTS
+def testGetNearestNode():
+    nearestNode = get_nearest_node(-92.1647,37.7252) # Fort Leonard Wood, the negative is really important!
+    return nearestNode
+
+def testShorterQueryWithoutDistance:
+    nearestNode = shorterQueryWithoutDistance(-92.1647,37.7252) # Fort Leonard Wood, the negative is really important!
+    nearestNode
+
+
+def testDrivingDistance():
+    nodes_features, edges_features = drivingDistance(634267,0.1)
+    return nodes_features, edges_features
+
+def testKMultipleRoutes():
+    kMultipleRoutes(634267,3,2)
+
+def testKMultipleRoutes_LatLon():
+    kMultipleRoutes_LatLon(-92.068859,37.846720,-92.142373,37.557935,100)
+
+def test_route():
+    route(-92.068859,37.846720,-92.142373,37.557935)
