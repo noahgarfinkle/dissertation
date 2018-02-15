@@ -74,9 +74,9 @@ Noah W. Garfinkle
 ## Tasks
 - [x] set up a repo
 - [ ] convert all current functions from R to Python
-- [ ] Read in and manipulate rasters
-- [ ] Computer Euclidean distance
-- [ ] Compute routing distance
+- [x] Read in and manipulate rasters
+- [x] Computer Euclidean distance
+- [x] Compute routing distance
 - [x] Set up pgrouting
 - [x] test commiting using Atom
 
