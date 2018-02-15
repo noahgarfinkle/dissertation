@@ -1,16 +1,44 @@
+# -*- coding: utf-8 -*-
+"""Implements routing
+"""
+
+__author__ = "Noah W. Garfinkle"
+__copyright__ = "Copyright 2018, Noah W. Garfinkle"
+__credits__ = ["Dr. Ximing Cai", "Dr. George Calfas", "Thomas 'Max' Foltz",
+                    "Juliana McMillan-Wilhoit", "Matthew Hiett",
+                    "Dylan Pasley", "Marcus Voegle", "Eric Kreiger"]
+__license__ = "GPL"
+__version__ = "0.0.1"
+__version_dinosaur__ = "Apotosauras"
+__maintainer__ = "Noah Garfinkle"
+__email__ = "garfink2@illinois.edu"
+__status__ = "Development"
+__python_version__ = "2.7"
+__date_created__ = "21 January 2018"
+
+## IMPORTS
 import psycopg2
 import geopandas as gpd
 import pandas as pd
 import folium
 import folium.plugins as plugins
 
-# HELPFUL FOR DEBUGGING
+## HELPFUL FOR DEBUGGING
 # %matplotlib inline
 # pd.options.display.max_columns = 300
 
+"""REFERENCES
+
+"""
+
+## SETUP
 connString = "dbname='routing' user='postgres' host='localhost' password='postgres'"
 conn = psycopg2.connect(connString)
 cur = conn.cursor()
+
+## CLASSES
+
+
 
 def get_nearest_node(lon,lat):
     sql_CreateFunction = """CREATE OR REPLACE FUNCTION get_nearest_node
@@ -203,3 +231,8 @@ df2.sort_values(by='length',ascending=False)
 
 def queryRoadAndPutMarkerOnMidPoint(roadID):
     return 0
+
+
+## CURRENT TEST
+
+## TESTS
