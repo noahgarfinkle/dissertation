@@ -44,24 +44,23 @@ cur = conn.cursor()
 
 ## FUNCTIONS
 def get_nearest_node(lon,lat):
-    """
-    Summary line
+    """ Summary line
 
-    Parameters
-    ----------
-    filename : str
-    rm_nodes : array_like
-        A list, array, Index, or Series of node IDs that should *not*
-        be saved as part of the Network.
+    Detailed description
 
-    Returns
-    -------
-    network : pandana.Network
+    Args:
+        param1 (int): The first parameter.
+        param1 (str): The second parameter.
 
-    Tests
-    -------
-    >>> get_nearest_node(-92.1647,37.7252)
-    node_id = 634267, dist = 124
+    Returns:
+        network (pandas dataframe): The return and how to interpret it
+
+    Raises:
+        IOError: An error occured accessing the database
+
+    Tests:
+        >>> get_nearest_node(-92.1647,37.7252)
+        node_id = 634267, dist = 124
     """
     sql_CreateFunction = """CREATE OR REPLACE FUNCTION get_nearest_node
         (IN x_long double precision, IN y_lat double precision) -- input parameters
