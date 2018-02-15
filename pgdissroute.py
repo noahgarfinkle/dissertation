@@ -4,7 +4,9 @@ import pandas as pd
 import folium
 import folium.plugins as plugins
 
-%matplotlib inline
+# HELPFUL FOR DEBUGGING
+# %matplotlib inline
+# pd.options.display.max_columns = 300
 
 connString = "dbname='routing' user='postgres' host='localhost' password='postgres'"
 conn = psycopg2.connect(connString)
