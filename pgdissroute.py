@@ -39,7 +39,7 @@ cur = conn.cursor()
 ## CLASSES
 
 
-
+## FUNCTIONS
 def get_nearest_node(lon,lat):
     sql_CreateFunction = """CREATE OR REPLACE FUNCTION get_nearest_node
         (IN x_long double precision, IN y_lat double precision) -- input parameters

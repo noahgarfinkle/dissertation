@@ -45,7 +45,7 @@ import scipy
 import os
 from PIL import Image, ImageChops
 
-# HELPFUL FOR DEBUGGING
+## HELPFUL FOR DEBUGGING
 # %matplotlib inline
 # pd.options.display.max_columns = 300
 
@@ -54,7 +54,7 @@ class CRS(Enum):
     WGS84 = 4326
     WMAS = 3857
 
-## Data Structures
+## CLASSES
 class PostGIS:
     def __init__(self,dbname,user='postgres',host='localhost',password='postgres'):
         connString = "dbname='%s' user='%s' host='%s' password='%s'" %(dbname,user,host,password)
@@ -281,6 +281,10 @@ class GenerationalSolutions:
         geom = Point(lon,lat)
         self.dataFrame.addRow({'geometry':geom,'generation':generation,'score':score})
 
+
+## CURRENT TEST
+
+## TESTS
 # test composite
 def testComposite():
     map = Map(name="test map")
@@ -309,8 +313,6 @@ Manages all test functions for SpatialIO
 def test():
     doctest.testmod()
 
-
-#def testGeoDataFrame():
 def testGeoDataFrame():
     g = GeoDataFrame()
     g.createGeoDataFrame(CRS.WMAS,columns=['geometry','a'])

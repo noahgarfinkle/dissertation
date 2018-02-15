@@ -16,7 +16,7 @@ __status__ = "Development"
 __python_version__ = "2.7"
 __date_created__ = "10 FEBRUARY 2018"
 
-# IMPORTS
+## IMPORTS
 from lxml import etree as ET
 import gdaltools as gdt
 from osgeo import gdal, osr, ogr
@@ -37,7 +37,7 @@ import matplotlib.pyplot as plt
 
 import SpatialIO as io
 
-# HELPFUL FOR DEBUGGING
+## HELPFUL FOR DEBUGGING
 # %matplotlib inline
 # pd.options.display.max_columns = 300
 
@@ -60,7 +60,7 @@ https://github.com/SALib/SALib -> Sensitivity analysis software
 setting up blank raster: dst_ds.SetGeoTransform([topLeftX,pixel_width,0,topLeftY,0,-pixel_height])
 """
 
-# CLASSES
+## CLASSES
 class SiteSearch:
     def __init__(self):
         self.crs = None
@@ -109,7 +109,7 @@ class Input:
         siteRelationalConstraints.append(siteRelationalConstraint)
         return siteSearchRelationalConstraints
 
-# SPATIAL FUNCTIONS
+## FUNCTIONS
 def distance():
     distances = gdal.distances()
     return None
@@ -232,7 +232,7 @@ def calculateCutFill(df,dem_path,finalElevation='mean',rasterResolution=10):
     appendedDF['totalCutFillVolume'] = totalCutFillVolumes
     return appendedDF
 
-# CURRENT TEST
+## CURRENT TEST
 # building the evaluation grid structure
 aoiDF = gpd.read_file("./test_data/geojson.json")
 aoiDF.CRS = {'init':'epsg:4326'}
