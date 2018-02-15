@@ -57,18 +57,23 @@ from PIL import Image, ImageChops
 
 ## Enumerations
 class CRS(Enum):
+    """ Relates CRS to EPSG values to streamline projections
+    """
     WGS84 = 4326
     WMAS = 3857
 
 ## CLASSES
 class PostGIS:
-    """ Summary of class
+    """ Encapsulates onnections to PostGIS database
 
-        Longer class information
+        Will be used for connecting to ENSITE database, routing table, and allowing
+        access to other databases
 
         Attributes:
-            attr1 (str): The first attribute
-            attr2 (int): The second attribute
+            dbname (str): Name of the database
+            user (str): Postgres user name
+            host (str): Host path to the database, defaults localhost
+            password (str): Postgres password
     """
 
     def __init__(self,dbname,user='postgres',host='localhost',password='postgres'):
@@ -80,23 +85,20 @@ class PostGIS:
             print "Unable to connect to database"
 
     def query(self,sql):
-        """ Summary line
+        """ Submits a SQL query to the postgres connection and returns the result
 
-        Detailed description
 
         Args:
-            param1 (int): The first parameter.
-            param1 (str): The second parameter.
+            sql (str): A string containing the properly formated SQL expression for
+                Postgres
 
         Returns:
-            network (pandas dataframe): The return and how to interpret it
+            rows (cursor results): This is not the prefered query method, see queryToDF
 
         Raises:
-            IOError: An error occured accessing the database
+            None
 
         Tests:
-            >>> get_nearest_node(-92.1647,37.7252)
-            node_id = 634267, dist = 124
         """
         cur = self.conn.cursor()
         cur.execute(sql)
@@ -104,23 +106,24 @@ class PostGIS:
         return rows
 
     def queryToDF(self,sql,geom_col='geom'):
-        """ Summary line
+        """ Submits a SQL query to the postgres connection and returns a geopandas dataframe
 
-        Detailed description
+        Assumes that the query is seeking spatial information
 
         Args:
-            param1 (int): The first parameter.
-            param1 (str): The second parameter.
+            sql (str): A string containing the properly formated SQL expression for
+                Postgres
+            geom_col (str): The name of the column in Postgis which contains a valid
+                geometry, so that it can be translated into a GeoPandas geometry
 
         Returns:
-            network (pandas dataframe): The return and how to interpret it
+            df (GeoPandas dataframe): Geometry is collected from geom_col and contained
+                in 'geometry'
 
         Raises:
-            IOError: An error occured accessing the database
+            None
 
         Tests:
-            >>> get_nearest_node(-92.1647,37.7252)
-            node_id = 634267, dist = 124
         """
         try:
             df = gpd.read_postgis(sql,con=self.conn,geom_col=geom_col)
@@ -130,13 +133,16 @@ class PostGIS:
 
 
 class GeoDataFrame:
-    """ Summary of class
+    """ Wrapper for GeoPandas GeoDataFrame
 
-        Longer class information
+        Designed to make it more convenient to interact with certain workflows in
+        Geopandas
 
         Attributes:
-            attr1 (str): The first attribute
-            attr2 (int): The second attribute
+            df (GeoPandas GeoDataFrame):
+            name (str): The pretty-print name of the data being stored, for convenience
+            type (str): The datastructure being stored, for convenience
+            crs (ENUM CRS): The projection being stored, for convenience
     """
 
     def __init__(self):
