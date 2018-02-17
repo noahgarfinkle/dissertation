@@ -24,6 +24,7 @@ import pandas as pd
 import folium
 import folium.plugins as plugins
 from folium.plugins import MarkerCluster
+import doctest
 
 ## HELPFUL FOR DEBUGGING
 # %matplotlib inline
@@ -69,7 +70,7 @@ def get_nearest_node(lon,lat):
             or consume (x,y,crs)
 
     Tests:
-        >>> get_nearest_node(-92.1647,37.7252)
+        >>> get_nearest_node(-92.1647,37.7252) # Fort Leonard Wood, the negative is really important!
         node_id = 634267, dist = 124
     """
     sql_CreateFunction = """CREATE OR REPLACE FUNCTION get_nearest_node
@@ -127,7 +128,7 @@ def drivingDistance(startNode,distance,mapPath="./results/mapwithdrivedistance.h
         * implement drive time
 
     Tests:
-        None
+        >>> nodes_features, edges_features = drivingDistance(634267,0.1)
     """
     sql = "SELECT * FROM pgr_drivingDistance('SELECT id, source, target, cost, reverse_cost FROM ways',%s,%s);" %(startNode,distance)
     drivingDistance = pd.read_sql_query(sql,con=conn)
@@ -174,7 +175,7 @@ def kMultipleRoutes(startNode,endNode,k):
         * replace nodes with coordinates
 
     Tests:
-        None
+        >>> kMultipleRoutes(634267,3,2)
     """
     sql = "SELECT * FROM pgr_ksp('SELECT id, source, target, cost, reverse_cost FROM ways',%s,%s,%s);" %(startNode,endNode,k)
     df = pd.read_sql_query(sql,con=conn)
@@ -214,7 +215,7 @@ def kMultipleRoutes_LatLon(startLon,startLat,endLon,endLat,k):
         * return geodataframe(s)
 
     Tests:
-        None
+        >>> kMultipleRoutes_LatLon(-92.068859,37.846720,-92.142373,37.557935,100)
     """
     startNode = int(get_nearest_node(startLon,startLat)["node_id"])
     endNode = int(get_nearest_node(endLon,endLat)["node_id"])
@@ -256,7 +257,7 @@ def route(startLon,startLat,endLon,endLat):
         * return geodataframe(s)
 
     Tests:
-        None
+        >>> route(-92.068859,37.846720,-92.142373,37.557935)
     """
     startNode = int(get_nearest_node(startLon,startLat)["node_id"])
     endNode = int(get_nearest_node(endLon,endLat)["node_id"])
@@ -302,7 +303,9 @@ def routeWithAvoidance(startLon,startLat,endLon,endLat,linkIDsToAvoid=[]):
         * return geodataframe(s)
 
     Tests:
-        None
+        >>> avoidanceIDs = [690751,690752,1302738,702378,709829]
+        >>> df2 = routeWithAvoidance(-92.068859,37.846720,-92.142373,37.557935,avoidanceIDs)
+        >>> df2.sort_values(by='length',ascending=False)
     """
     startNode = int(get_nearest_node(startLon,startLat)["node_id"])
     endNode = int(get_nearest_node(endLon,endLat)["node_id"])
@@ -328,28 +331,6 @@ def routeWithAvoidance(startLon,startLat,endLon,endLat,linkIDsToAvoid=[]):
 ## CURRENT TEST
 
 ## TESTS
-def testGetNearestNode():
-    nearestNode = get_nearest_node(-92.1647,37.7252) # Fort Leonard Wood, the negative is really important!
-    return nearestNode
-
-def testShorterQueryWithoutDistance:
-    nearestNode = shorterQueryWithoutDistance(-92.1647,37.7252) # Fort Leonard Wood, the negative is really important!
-    nearestNode
-
-
-def testDrivingDistance():
-    nodes_features, edges_features = drivingDistance(634267,0.1)
-    return nodes_features, edges_features
-
-def testKMultipleRoutes():
-    kMultipleRoutes(634267,3,2)
-
-def testKMultipleRoutes_LatLon():
-    kMultipleRoutes_LatLon(-92.068859,37.846720,-92.142373,37.557935,100)
-
-def test_route():
-    route(-92.068859,37.846720,-92.142373,37.557935)
-
 def testMapWithRoute():
     connString = "dbname='routing' user='postgres' host='localhost' password='postgres'"
     conn = psycopg2.connect(connString)
@@ -383,9 +364,3 @@ def testRouteWithTurnsAndPopups():
     h.add_child(MarkerCluster(locations=locations,popups=popups))
     map.add_child(h)
     map.save('./results/mapwithrouteandpopups.html')
-
-def testRoutingWithAvoidances():
-    avoidanceIDs = [690751,690752,1302738,702378,709829]
-    df2 = routeWithAvoidance(-92.068859,37.846720,-92.142373,37.557935,avoidanceIDs)
-    df2.sort_values(by='length',ascending=False)
-    return df2
