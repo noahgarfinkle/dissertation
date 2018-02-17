@@ -58,6 +58,9 @@ from PIL import Image, ImageChops
 http://qingkaikong.blogspot.in/2016/06/using-folium-5-image-overlay-overlay.html
 http://nbviewer.jupyter.org/github/python-visualization/folium/blob/master/examples/ImageOverlay.ipynb
 http://nbviewer.jupyter.org/github/ocefpaf/folium_notebooks/blob/master/test_image_overlay_gulf_stream.ipynb
+https://ocefpaf.github.io/python4oceanographers/blog/2015/12/14/geopandas_folium/
+http://andrewgaidus.com/leaflet_webmaps_python/
+https://www.kaggle.com/daveianhickey/how-to-folium-for-maps-heatmaps-time-series
 """
 
 ## Enumerations
@@ -606,6 +609,9 @@ class Map:
         Raises:
             None
 
+        Todo:
+            * Verify if raster projection is correct
+
         Tests:
             None
         """
@@ -621,77 +627,81 @@ class Map:
         self.map.add_children(plugins.ImageOverlay(img,opacity=opacity,bounds=bounds))
 
     def addVectorLayerAsOverlay(self,vectorLayer):
-        """ Summary line
+        """ Adds a vector object to the map
 
-        Detailed description
+        Loads each vector feature from the GeoDataFrame and adds to map
 
         Args:
             vectorLayer (GeoDataFrame): A GeoDataFrame populated with vectors
 
         Returns:
-            network (pandas dataframe): The return and how to interpret it
+            None
 
         Raises:
-            IOError: An error occured accessing the database
+            None
 
         Tests:
-            >>> get_nearest_node(-92.1647,37.7252)
-            node_id = 634267, dist = 124
+            None
         """
-        # https://ocefpaf.github.io/python4oceanographers/blog/2015/12/14/geopandas_folium/
-        # http://andrewgaidus.com/leaflet_webmaps_python/
         gjson = vectorLayer.df.to_crs('3857').to_json()
         features = folium.features.GeoJson(gjson)
         self.map.add_children(features)
 
 
     def saveMap(self,filePath):
-        """ Summary line
+        """ Saves the map with all added data to an HTML file
 
-        Detailed description
+        This file appears to run nicely on Firefox, with no added dependencies.
+        Currently the basemap background is online, this should be investigated
+        overall.
 
         Args:
-            param1 (int): The first parameter.
-            param1 (str): The second parameter.
+            filePath (str): Filepath to save the file to, with .html extension
 
         Returns:
-            network (pandas dataframe): The return and how to interpret it
+            None (produces map html at filePath)
 
         Raises:
-            IOError: An error occured accessing the database
+            None
 
         Tests:
-            >>> get_nearest_node(-92.1647,37.7252)
-            node_id = 634267, dist = 124
+            None
         """
         self.map.save(filePath)
         print("Map saved to %s" %(filePath))
 
-    def addCoolIcon(self,lat,lon,icon):
-        """ Summary line
+    def addCoolIcon(self,lat,lon,icon='bar-chart',popup='East London',color='blue'):
+        """ Adds an icon from fontawesome.io
 
-        Detailed description
+        Test code to help me build support for adding custom icons.  Currently
+        reaches out to fontawesome.io for the icon, and requires a valid
+        icon name
 
         Args:
-            param1 (int): The first parameter.
-            param1 (str): The second parameter.
+            lat (float): Latitude of the marker
+            lon (float): Longitude of the marker
+            icon (str): A valid fontawesome.io icon type
+            popup (str): Popup text
+            color (str): The color of the popup, need to verify valid color values
 
         Returns:
-            network (pandas dataframe): The return and how to interpret it
+            None
 
         Raises:
-            IOError: An error occured accessing the database
+            None
 
+        Todo:
+            * Add support for projecting the point
+            * Allow the user to change the icon
+            * Allow the user to change the popup, for instance to HTML
+            * Make sure None popups do not crash it
         Tests:
-            >>> get_nearest_node(-92.1647,37.7252)
-            node_id = 634267, dist = 124
+            >>> addCoolIcon(35,-91,icon='bicycle',color='red')
         """
-        # https://www.kaggle.com/daveianhickey/how-to-folium-for-maps-heatmaps-time-series
-        coolIcon = folium.Marker([51.5183, 0.3206],
-              popup='East London',
-              icon=folium.Icon(color='blue',icon='bar-chart', prefix='fa')
+        coolIcon = folium.Marker([lat,lon],
+              popup=popup,
+              icon=folium.Icon(color=color,icon=icon, prefix='fa')
              )
-             # icon=folium.Icon(color='red',icon='bicycle', prefix='fa')
         self.map.add_child(coolIcon)
 
     def generateRandomLatLonPair(self,latMin,latMax,lonMin,lonMax):
