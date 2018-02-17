@@ -187,26 +187,30 @@ class Input:
         return siteSearchRelationalConstraints
 
 ## FUNCTIONS
-def filterDataFrameByBounds(df,lx,ly,ux,uy):
-    """ Summary line
+def filterDataFrameByBounds(df,lx,ly,ux,uy,bufferDistance=0):
+    """ Subsets a GeoPandas DataFrame by bounding box
 
-    Detailed description
+    Very useful for shrinking the number of features.  Currently assumes that the bounding
+    box and optional buffer distance is in the same projection as the dataframe.
 
     Args:
-        param1 (int): The first parameter.
-        param1 (str): The second parameter.
+        df (GeoPandas DataFrame): The dataframe to be filtered
+        lx (float): Lower left x coordinate of the bounding box
+        ly (float): Lower left y coordinate of the bounding box
+        ux (float): Upper right x coordinate of the bounding box
+        uy (float): Upper right y coordinate of the bounding box
+        bufferDistance (float): Optional distance for buffering the bounding box
 
     Returns:
-        network (pandas dataframe): The return and how to interpret it
+        filteredDF (GeoPandas DataFrame): A filtered copy of the original df
 
     Raises:
-        IOError: An error occured accessing the database
+        None
 
     Tests:
-        >>> get_nearest_node(-92.1647,37.7252)
-        node_id = 634267, dist = 124
+        None
     """
-    filteredDF = df.cx[lx:ux,ly:uy]
+    filteredDF = df.cx[lx-bufferDistance:ux+bufferDistance,ly-bufferDistance:uy+bufferDistance]
     return filteredDF
 
 def filterDataFrameByValue(df,column,argument):
