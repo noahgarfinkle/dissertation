@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 """
 Implements routing using pgrouting
+
+Todo:
+    * Implement custom costs
 """
 
 __author__ = "Noah W. Garfinkle"
@@ -30,13 +33,9 @@ import doctest
 # %matplotlib inline
 # pd.options.display.max_columns = 300
 
-## TODO
-# Implement custom costs
-
 """REFERENCES
 https://ocefpaf.github.io/python4oceanographers/blog/2015/12/14/geopandas_folium/
 https://stackoverflow.com/questions/44778/how-would-you-make-a-comma-separated-string-from-a-list
-
 """
 
 ## SETUP
