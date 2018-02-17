@@ -55,7 +55,9 @@ from PIL import Image, ImageChops
 ## SETUP
 
 """ REFERENCES
-
+http://qingkaikong.blogspot.in/2016/06/using-folium-5-image-overlay-overlay.html
+http://nbviewer.jupyter.org/github/python-visualization/folium/blob/master/examples/ImageOverlay.ipynb
+http://nbviewer.jupyter.org/github/ocefpaf/folium_notebooks/blob/master/test_image_overlay_gulf_stream.ipynb
 """
 
 ## Enumerations
@@ -591,34 +593,32 @@ class Map:
     def addRasterLayerAsOverlay(self,rasterLayer,opacity):
         """ Adds a raster object to the map
 
+        Creates a temporary PNG from the rasterLayer at a single PNG path which
+        is currently overwritten each time it is called
+
         Args:
-            rasterLayer (RasterLayer): The first parameter.
-            opacity (str): The second parameter.
+            rasterLayer (RasterLayer): The raster object to be added to the map
+            opacity (float): Allows transparency when producing the raster
 
         Returns:
-            network (pandas dataframe): The return and how to interpret it
+            None
 
         Raises:
-            IOError: An error occured accessing the database
+            None
 
         Tests:
-            >>> get_nearest_node(-92.1647,37.7252)
-            node_id = 634267, dist = 124
+            None
         """
-        # http://qingkaikong.blogspot.in/2016/06/using-folium-5-image-overlay-overlay.html
-        # http://nbviewer.jupyter.org/github/python-visualization/folium/blob/master/examples/ImageOverlay.ipynb
-        # http://nbviewer.jupyter.org/github/ocefpaf/folium_notebooks/blob/master/test_image_overlay_gulf_stream.ipynb
         # 1. get boundary of raster
         bounds =[[rasterLayer.ly,rasterLayer.lx], [rasterLayer.uy,rasterLayer.ux]]
 
         # 2. export raster to png
-        data = np.array(rasterLayer.raster.GetRasterBand(1).ReadAsArray())
         pngPath = "./tmp/temppng.png"
         rasterLayer.toPNG(pngPath)
         img = Image.open(pngPath)
 
         # 3. add ImageOverlay
-        self.map.add_children(plugins.ImageOverlay(data,opacity=opacity,bounds=bounds))
+        self.map.add_children(plugins.ImageOverlay(img,opacity=opacity,bounds=bounds))
 
     def addVectorLayerAsOverlay(self,vectorLayer):
         """ Summary line
