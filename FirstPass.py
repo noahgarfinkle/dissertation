@@ -350,36 +350,45 @@ def floatrange(start, stop, step):
         start += step
 
 def generateEvaluationGridDataFrame(polygon,gridSpacing):
-    """ Summary line
+    """ Produces a GeoPandas GeoDataFrame of squares within an AOI polygon
 
-    Detailed description
+    This produces the fundamental solution data structure of First Pass.  Should
+    implement an option isSquare or isPoint to allow for faster production of both
+    rasters and square Areas of Interest.  Additionally, should implement automatic
+    optimization of gridSpacing.
 
     Args:
-        param1 (int): The first parameter.
-        param1 (str): The second parameter.
+        polygon (Shapely Polygon): A representation of the area of interest
+        gridSpacing (float): The size of the area to discretize
 
     Returns:
-        network (pandas dataframe): The return and how to interpret it
+        squareList (GeoPandas GeoDataFrame): Each row represents a candidate site
+            for evaluation
 
     Raises:
-        IOError: An error occured accessing the database
+        None
 
     Tests:
-        >>> get_nearest_node(-92.1647,37.7252)
-        node_id = 634267, dist = 124
+        None
     """
-    pointList = []
-    bounds = polygon.bounds
+    squareList = []
+    bounds = poyglon.bounds
     ll = bounds[:2]
     ur = bounds[2:]
+    # https://stackoverflow.com/questions/30457089/how-to-create-a-polygon-given-its-point-vertices
+    start = datetime.datetime.now()
     for x in floatrange(ll[0],ur[0],gridSpacing):
         for y in floatrange(ll[1],ur[1],gridSpacing):
-            point = Point(x,y)
-            if point.within(polygon):
-                pointList.append(point)
-    evaluationGridDataFrame = gpd.GeoDataFrame(pointList)
-    evaluationGridDataFrame.columns = ['geometry',score]
-    return evaluationGridDataFrame
+            square = Polygon([[x,y],[x+gridSpacing,y],[x+gridSpacing,y+gridSpacing],[x,y+gridSpacing]])
+            if square.within(polygon):
+                squareList.append(square)
+    end = datetime.datetime.now()
+    end - start
+    timeElapsed = end - start
+    nFeatures = len(squareList)
+    print "Generated %s squares in %s seconds" %(nFeatures,timeElapsed.seconds)
+    return squareList
+
 
 def convertRasterToNumpyArray(raster_path):
     """ Summary line
@@ -501,7 +510,7 @@ def calculateCutFill(df,dem_path,finalElevation='mean',rasterResolution=10):
     Raises:
         IOError: An error occured accessing the database
 
-    Tests:
+    Tests:Summary line
         >>> get_nearest_node(-92.1647,37.7252)
         node_id = 634267, dist = 124
     """
@@ -529,7 +538,7 @@ def calculateCutFill(df,dem_path,finalElevation='mean',rasterResolution=10):
 
 ## CURRENT TEST
 # building the evaluation grid structure
-"""
+
 aoiDF = gpd.read_file("./test_data/geojson.json")
 aoiDF.CRS = {'init':'epsg:4326'}
 aoiDF = aoiDF.to_crs({'init':'epsg:3857'})
@@ -635,7 +644,7 @@ plt.savefig("./results/distancefrominfrastructure.png")
 a = evaluationDF[0:1]
 a
 a.to_html()
-"""
+
 
 ## TESTS
 # FIRST PASS IMPLEMENTATION
