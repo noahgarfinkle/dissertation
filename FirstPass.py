@@ -455,69 +455,90 @@ def generateRasterStatisticsForDataFrame(df,raster_path,stats="count majority mi
 # Note: Requires point in same coordinate system as raster, I assume
 # todo: implement projections
 def queryRasterValueForPoint(x,y,raster_path,pointCRS=None,rasterCRS=None):
-    """ Summary line
+    """ Returns the value of a GeoTiff at a specified point
 
-    Detailed description
+    pointCRS and rasterCRS are not yet implemented, and therefore both should
+    be in the same coordinate system
 
     Args:
-        param1 (int): The first parameter.
-        param1 (str): The second parameter.
+        x (float): The x-coordinate, in the same CRS as the raster
+        y (float): The y-coordinate, in the same CRS as the raster
+        raster_path (str): Filepath to a GeoTiff
+        pointCRS (ENUM CRS): Not implemented
+        rasterCRS (ENUM CRS): Not implemented
 
     Returns:
-        network (pandas dataframe): The return and how to interpret it
+        pointQuery (float): The value of the raster at location (x,y)
 
     Raises:
-        IOError: An error occured accessing the database
+        None
 
     Tests:
-        >>> get_nearest_node(-92.1647,37.7252)
-        node_id = 634267, dist = 124
+        None
     """
     point = "POINT(%s %s)" %(x,y)
-    return point_query(point,raster_path)
+    pointQuery = point_query(point,raster_path)
+    return pointQuery
 
 def rasterStatCroppedRaster(df,raster_path):
-    """ Summary line
+    """ Produces neighborhood statistics for a raster based on each feature in a
+        GeoPandas GeoDataFrame, also returning a column with the raster values for
+        each row
 
-    Detailed description
+    This implementation of zonal statistics is very useful for functions such as
+    cut-fill, returning numpy masked arrays of each subraster inside the
+    GeoDataFrame.  Note this function currently uses the default values for
+    zonal_stats, and should in the future be merged with rasterStat, with a flag
+    value parameter for returning the sub-rasters
 
     Args:
-        param1 (int): The first parameter.
-        param1 (str): The second parameter.
+        df (GeoPandas GeoDataFrame): Each row represents a polygon geometry to
+            generate neighborhood statistics for
+        raster_path (str): Filepath of a GeoTiff raster
 
     Returns:
-        network (pandas dataframe): The return and how to interpret it
+        newDF (GeoPandas GeoDataFrame): A data frame with each sub-raster contained
+        in the column 'mini_raster_array'
 
     Raises:
-        IOError: An error occured accessing the database
+        None
 
     Tests:
-        >>> get_nearest_node(-92.1647,37.7252)
-        node_id = 634267, dist = 124
+        None
     """
     rasterSource = zonal_stats(df['geometry'],raster_path,all_touched=True,raster_out=True)
     rasterDF = pd.DataFrame(rasterSource)
     return rasterDF
 
-#finalElevation must either be number or string from validStats
 def calculateCutFill(df,dem_path,finalElevation='mean',rasterResolution=10):
-    """ Summary line
+    """ Generates cut fill values based on a raster
 
-    Detailed description
+    Need to verify that this function calculates correctly. Additionally, should
+    determine raster resolution on it's own, rather than an input.  In the future,
+    should return cut and fill values separately.
 
     Args:
-        param1 (int): The first parameter.
-        param1 (str): The second parameter.
+        df (GeoPandas GeoDataFrame): Each row represents a polygon geometry to
+            generate cut/fill values for
+        raster_path (str): Filepath of a GeoTiff raster containing a digital
+        elevation model in the same coordinate system as the desired results
+        finalElevation (str/float): must either be number or string from validStats,
+            this represents the target elevation to determine cut/fill values for
+            at each pixel
+        rasterResolution (float): Cut/fill volume is determined by a height change
+            multiplied by the square of this number, representing the pixel cell
+            size in target units of the DEM
 
     Returns:
-        network (pandas dataframe): The return and how to interpret it
+        appendedDF (GeoPandas GeoDataFrame): A data frame with each sub-raster contained
+        in the column 'mini_raster_array', along with masked arrays of elevation change
+        in 'elevationChangeArray' and the total cut fill volume in totalCutFillVolume
 
     Raises:
-        IOError: An error occured accessing the database
+        None
 
     Tests:Summary line
-        >>> get_nearest_node(-92.1647,37.7252)
-        node_id = 634267, dist = 124
+        None
     """
     croppedRasterDF = rasterStatCroppedRaster(df,dem_path)
     appendedDF = gpd.GeoDataFrame(pd.concat([df,croppedRasterDF],axis=1))
