@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-"""Parses an XML file in order to evaluate sites
+"""
+Parses an XML file in order to evaluate sites
 """
 
 __author__ = "Noah W. Garfinkle"
@@ -35,7 +36,7 @@ import shapely.geometry as geom
 from rasterstats import zonal_stats, raster_stats, point_query, utils
 import matplotlib.pyplot as plt
 
-import SpatialIO as io
+#import SpatialIO as io
 
 ## HELPFUL FOR DEBUGGING
 # %matplotlib inline
@@ -261,30 +262,30 @@ def minimumDistanceFromPointToDataFrameFeatures(x,y,crs,df):
     return minDistance
 
 def projectWKT(wkt,from_epsg,to_epsg):
-    """ Summary line
+    """ Reprojects a string of well known text
 
-    Detailed description
 
     Args:
-        param1 (int): The first parameter.
-        param1 (str): The second parameter.
+        wkt (str): A string of well-known-text
+        from_epsg (int): The current projection of wkt
+        to_epsg (int): The desired projection of wkt
 
     Returns:
-        network (pandas dataframe): The return and how to interpret it
+        reprojectedWKT (str): well-known-text projected into to_epsg
 
     Raises:
-        IOError: An error occured accessing the database
+        None
 
     Tests:
-        >>> get_nearest_node(-92.1647,37.7252)
-        node_id = 634267, dist = 124
+        None
     """
     feat = loads(wkt)
     df_to_project = gpd.GeoDataFrame([feat])
     df_to_project.columns = ['geometry']
     df_to_project.crs = {'init':'EPSG:' + str(from_epsg)}
     df_to_project.to_crs({'init':'EPSG:' + str(to_epsg)})
-    return df_to_project.geometry[0].to_wkt()
+    reprojectedWKT = df_to_project.geometry[0].to_wkt()
+    return reprojectedWKT
 
 def buildSearchGrid(aoiWKT,aoiWKTProjection=4326,gridSpacing=30,exclusionFeatures = []):
     """ Summary line
@@ -547,6 +548,7 @@ def calculateCutFill(df,dem_path,finalElevation='mean',rasterResolution=10):
 
 ## CURRENT TEST
 # building the evaluation grid structure
+"""
 aoiDF = gpd.read_file("./test_data/geojson.json")
 aoiDF.CRS = {'init':'epsg:4326'}
 aoiDF = aoiDF.to_crs({'init':'epsg:3857'})
@@ -652,7 +654,7 @@ plt.savefig("./results/distancefrominfrastructure.png")
 a = evaluationDF[0:1]
 a
 a.to_html()
-
+"""
 
 ## TESTS
 # FIRST PASS IMPLEMENTATION
