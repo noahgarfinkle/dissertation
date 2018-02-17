@@ -192,7 +192,7 @@ class GeoDataFrame:
         Tests:
             None
         """
-        return None
+        self.df = gpd.read_file(filePath)
 
     def from_json_file(self,json):
         """ Creates the GeoDataFrame from the path to a json file
@@ -228,16 +228,24 @@ class GeoDataFrame:
         """
         return None
 
-    def from_postgis(self,postgis,query):
+    def from_postgis(self,postgis,query,geom_col='geom',crs=None,index_col=None,coerce_float=True,params=None):
         """ Creates the GeoDataFrame from a PostGIS query
 
         Args:
             postgis (PostGIS): A object of type PostGIS, already properly configured
             query (str): A sql string to be passed to the postgis object queryToDF
                 function
+                geom_col (str): The column of the returned query to be treated
+                    as a PostGIS geometry column
+                crs (ENUM CRS): The projection to store the data in
+                index_col (str): The column of the returned query to be treated
+                    as the index
+                corece_float (bool): Converts numbers to float if possible if True.
+                    Otherwise, if False, considers all values to be strings.
+                params (var): Not sure, I think this might be a dictionary
 
         Returns:
-            None: Sets the classes dataframe and crs
+            None: Sets the classes dataframe
 
         Raises:
             None
@@ -245,7 +253,7 @@ class GeoDataFrame:
         Tests:
             None
         """
-        return None
+        elf.df = gpd.read_postgis(sql,postgis.con,geom_col=geom_col,crs=crs,index_col=index_col,params=params)
 
     def addColumn(self,colName):
         """ Adds an empty column to the dataframe
@@ -377,6 +385,29 @@ class GeoDataFrame:
             None
         """
         print self.df.head()
+
+    def crop(self,lx,ly,ux,uy):
+        """ Crops the dataframe to a bounding box
+
+        Args:
+            lx (float): the x-coordiante of the lower-left
+            ly (float): the y-coordiante of the lower-left
+            ux (float): the x-coordiante of the upper-right
+            uy (float): the y-coordiante of the upper-right
+
+        Returns:
+            croppedDF (GeoPandas GeoDataFrame): A subset of the original df based
+                on a spatial bounding box
+
+        Raises:
+            None
+
+        Tests:
+            None
+        """
+        croppedDF = self.df.cx[lx:ux,ly:uy]
+        return croppedDF
+
 
 
 class RasterLayer:
@@ -541,86 +572,6 @@ class RasterLayer:
         os.system(cdArgument)
         os.system(argument)
         return argument
-
-
-
-class VectorLayer:
-    """ Summary of class
-
-        Longer class information
-
-        Attributes:
-            attr1 (str): The first attribute
-            attr2 (int): The second attribute
-    """
-
-    def __init__(self,name="Not set"):
-        self.df = None
-        self.name = name
-
-    def loadFeatureLayerFromFile(self,filePath):
-        """ Summary line
-
-        Detailed description
-
-        Args:
-            param1 (int): The first parameter.
-            param1 (str): The second parameter.
-
-        Returns:
-            network (pandas dataframe): The return and how to interpret it
-
-        Raises:
-            IOError: An error occured accessing the database
-
-        Tests:
-            >>> get_nearest_node(-92.1647,37.7252)
-            node_id = 634267, dist = 124
-        """
-        #Support shapefile, geojson
-        self.df = gpd.read_file(filePath)
-
-    def crop(self,lx,ly,ux,uy):
-        """ Summary line
-
-        Detailed description
-
-        Args:
-            param1 (int): The first parameter.
-            param1 (str): The second parameter.
-
-        Returns:
-            network (pandas dataframe): The return and how to interpret it
-
-        Raises:
-            IOError: An error occured accessing the database
-
-        Tests:
-            >>> get_nearest_node(-92.1647,37.7252)
-            node_id = 634267, dist = 124
-        """
-        return 0
-
-    def loadFeatureLayerFromPostGIS(self,con,sql,geom_col='geom',crs=None,index_col=None,coerce_float=True,params=None):
-        """ Summary line
-
-        Detailed description
-
-        Args:
-            param1 (int): The first parameter.
-            param1 (str): The second parameter.
-
-        Returns:
-            network (pandas dataframe): The return and how to interpret it
-
-        Raises:
-            IOError: An error occured accessing the database
-
-        Tests:
-            >>> get_nearest_node(-92.1647,37.7252)
-            node_id = 634267, dist = 124
-        """
-        self.df = gpd.read_postgis(sql,con,geom_col=geom_col,crs=crs,index_col=index_col,params=params)
 
 
 class Map:
