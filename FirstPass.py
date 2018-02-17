@@ -65,12 +65,12 @@ setting up blank raster: dst_ds.SetGeoTransform([topLeftX,pixel_width,0,topLeftY
 
 ## CLASSES
 class SiteSearch:
-    """ Summary of class
+    """ Stores the individual study objective
 
-        Longer class information
+        Corresponds to a study objective in ENSITE
 
         Attributes:
-            attr1 (str): The first attribute
+            crs (Enum): The projection for the study
             attr2 (int): The second attribute
     """
 

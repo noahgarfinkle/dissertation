@@ -1,4 +1,4 @@
-<Input resultDir="" studyObjectiveID="">
+<Input resultDir="" studyObjectiveID="" EPSG="3857">
   <SiteSearches>
     <SiteSearch Type="Contingency Base" studyObjectiveID="0">
       <AreaOfInterest CRS="3857" GeoJson=""/>
