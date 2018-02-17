@@ -67,11 +67,12 @@ setting up blank raster: dst_ds.SetGeoTransform([topLeftX,pixel_width,0,topLeftY
 class SiteSearch:
     """ Stores the individual study objective
 
-        Corresponds to a study objective in ENSITE
+        Corresponds to a study objective in ENSITE, such as a contingency base or an
+        airfield
 
         Attributes:
             crs (Enum): The projection for the study
-            attr2 (int): The second attribute
+            AreaOfInterest (Shapely polygon): The area of the overall study objective
     """
 
     def __init__(self):
@@ -79,52 +80,47 @@ class SiteSearch:
         self.AreaOfInterest = None
 
 class SiteSuitabilityCriteria:
-    """ Summary of class
+    """ An individual geospatial evaluation
 
-        Longer class information
+        Sets of site suitability criteria and scores comprise a site search
 
         Attributes:
-            attr1 (str): The first attribute
-            attr2 (int): The second attribute
+            None
     """
 
     def __init__(self):
         return None
 
-class SiteSuitabilityCriteria:
-    """ Summary of class
-
-        Longer class information
-
-        Attributes:
-            attr1 (str): The first attribute
-            attr2 (int): The second attribute
-    """
-
-    def __init__(self):
-        return None
 
 class SiteRelationalConstraint:
-    """ Summary of class
+    """ Encodes the relationship between two study objectives
 
-        Longer class information
+        For instance, routing distance or topological relationships between study
+        objectives
 
         Attributes:
-            attr1 (str): The first attribute
-            attr2 (int): The second attribute
+            None
     """
 
     def __init__(self):
         return None
 
 class Input:
-    """ Summary of class
+    """ Python data structure for parsing the XML data structure
 
-        Longer class information
+        Attributes and methods for parsing the XML input file, ensuring that first
+        pass is usable across a range of applications
 
         Attributes:
-            attr1 (str): The first attribute
-            attr2 (int): The second attribute
+            xmlPath (str): Path to the XML file
+            tree (XML tree): Python representation of the XML file using lxml etree
+            root (XML tree element): Root node of the lxml etree
+            siteSearches (list: SiteSearch): The study objectives
+            siteRelationalConstraints (list: SiteRelationalConstraint): The relationships
+                between the study objectives
+            resultDir (str): Base path for writing results to
+            studyObjectiveID (long): Study objectiveve for reference to PostGIS database
+                object
     """
 
     def __init__(self,xmlPath):
@@ -140,23 +136,22 @@ class Input:
         print ET.tostring(self.root,pretty_print=True)
 
     def retrieveSiteSearches(self):
-        """ Summary line
+        """ Converts each XML study objective to type SiteSearch
 
-        Detailed description
+        Retreives each indivdidual study objective, such as an individual airfield, and
+        appends to a list
 
         Args:
-            param1 (int): The first parameter.
-            param1 (str): The second parameter.
+            None
 
         Returns:
-            network (pandas dataframe): The return and how to interpret it
+            None (updates siteSearches)
 
         Raises:
-            IOError: An error occured accessing the database
+            None
 
         Tests:
-            >>> get_nearest_node(-92.1647,37.7252)
-            node_id = 634267, dist = 124
+            None
         """
         siteSearches = []
         siteSearchesElement = self.root[0]
@@ -169,23 +164,21 @@ class Input:
         return siteSearches
 
     def retrieveSiteRelationalConstraints(self):
-        """ Summary line
+        """ Converts each XML relational constraint to type SiteRelationalConstraint
 
-        Detailed description
+        Captures the interelationships between study objectives, linking the objects
 
         Args:
-            param1 (int): The first parameter.
-            param1 (str): The second parameter.
+            None
 
         Returns:
-            network (pandas dataframe): The return and how to interpret it
+            None (updates siteRelationalConstraints)
 
         Raises:
-            IOError: An error occured accessing the database
+            None
 
         Tests:
-            >>> get_nearest_node(-92.1647,37.7252)
-            node_id = 634267, dist = 124
+            None
         """
         siteRelationalConstraints = self.root[1]
         siteRelationalConstraint = SiteRelationalConstraint()
