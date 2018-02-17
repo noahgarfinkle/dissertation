@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-"""Implements routing
+"""
+Implements routing using pgrouting
 """
 
 __author__ = "Noah W. Garfinkle"
@@ -44,19 +45,25 @@ cur = conn.cursor()
 
 ## FUNCTIONS
 def get_nearest_node(lon,lat):
-    """ Summary line
+    """ Finds the node in the routing table nearest to the coordinates
 
-    Detailed description
+    Searches the routing table and returns a dataframe with the ndoe id and
+    distance from the longitude and latitude, in EPSG:4326
 
     Args:
-        param1 (int): The first parameter.
-        param1 (str): The second parameter.
+        lon (float): Longitude
+        lat (float): Latitude
 
     Returns:
-        network (pandas dataframe): The return and how to interpret it
+        nearestNode (GeoPandas GeoDataFrame): Contains a single node with the node
+            id and distance to the node
 
     Raises:
-        IOError: An error occured accessing the database
+        None
+
+    Todo:
+        * Consume a geometry or GeoDataFrame to support projections automatically,
+            or consume (x,y,crs)
 
     Tests:
         >>> get_nearest_node(-92.1647,37.7252)
@@ -89,30 +96,6 @@ def get_nearest_node(lon,lat):
     cur.execute(sql_CreateFunction)
     sql_queryNode = "SELECT * FROM get_nearest_node(%s,%s)" %(lon,lat)
     nearestNode = pd.read_sql_query(sql_queryNode,con=conn)
-    return nearestNode
-
-
-def shorterQueryWithoutDistance(lon,lat):
-    """ Summary line
-
-    Detailed description
-
-    Args:
-        param1 (int): The first parameter.
-        param1 (str): The second parameter.
-
-    Returns:
-        network (pandas dataframe): The return and how to interpret it
-
-    Raises:
-        IOError: An error occured accessing the database
-
-    Tests:
-        >>> get_nearest_node(-92.1647,37.7252)
-        node_id = 634267, dist = 124
-    """
-    sql = "SELECT * FROM ways_vertices_pgr ORDER BY the_geom <-> ST_GeometryFromText('POINT(%s %s)',4326) LIMIT 1;" %(lon,lat)
-    nearestNode = pd.read_sql_query(sql,con=conn)
     return nearestNode
 
 
