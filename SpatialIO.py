@@ -5,6 +5,9 @@ This module creates wrapper classes for the spatial data
 structures required for my dissertation, equipping each
 with my most commonly used operators in order to replace
 R and it's great spatial support from my dissertation.
+
+Todo:
+    * Connect with the other modules
 """
 
 __author__ = "Noah W. Garfinkle"
@@ -264,112 +267,114 @@ class GeoDataFrame:
         self.df[colName] = None
 
     def addRow(self,mapping):
-        """ Summary line
+        """ Insert a row into the geodataframe
 
-        Detailed description
+        Not well implemented yet
 
         Args:
-            param1 (int): The first parameter.
-            param1 (str): The second parameter.
+            mapping (var): The row to insert
 
         Returns:
-            network (pandas dataframe): The return and how to interpret it
+            None
 
         Raises:
-            IOError: An error occured accessing the database
+            None
 
         Tests:
-            >>> get_nearest_node(-92.1647,37.7252)
-            node_id = 634267, dist = 124
+            None
         """
         self.df = self.df.append(mapping,ignore_index=True)
 
     def plot(self,column=None):
+        """ Utilizes the GeoDataFrame default plot behavior
+
+        Not well implemented yet
+
+        Args:
+            column (str): If a valid column is passed, produces a choropleth plot
+                using that column
+
+        Returns:
+            None
+
+        Raises:
+            None
+
+        Todo:
+            * Option to save the plot to a file
+
+        Tests:
+            None
+        """
         self.df.plot(column=column)
 
     def to_shapefile(self,filePath):
-        """ Summary line
-
-        Detailed description
+        """ Writes the GeoDataFrame to an ESRI shapefile
 
         Args:
-            param1 (int): The first parameter.
-            param1 (str): The second parameter.
+            filePath (str): The filepath to write the shapefile files to
 
         Returns:
-            network (pandas dataframe): The return and how to interpret it
+            None
 
         Raises:
-            IOError: An error occured accessing the database
+            None
 
         Tests:
-            >>> get_nearest_node(-92.1647,37.7252)
-            node_id = 634267, dist = 124
+            None
         """
         self.df.to_file(filePath,driver="ESRI Shapefile")
 
     def to_json(self):
-        """ Summary line
-
-        Detailed description
+        """ Writes the GeoDataFrame to a GeoJSON file
 
         Args:
-            param1 (int): The first parameter.
-            param1 (str): The second parameter.
+            filePath (str): The filepath to write the GeoJSON file to
 
         Returns:
-            network (pandas dataframe): The return and how to interpret it
+            None
 
         Raises:
-            IOError: An error occured accessing the database
+            None
 
         Tests:
-            >>> get_nearest_node(-92.1647,37.7252)
-            node_id = 634267, dist = 124
+            None
         """
         json = self.df.to_json()
         return json
 
     def reproject(self,toCRS):
-        """ Summary line
-
-        Detailed description
+        """ Reprojects the GeoDataFrame, replacing it
 
         Args:
-            param1 (int): The first parameter.
-            param1 (str): The second parameter.
+            toCRS (ENUM CRS): The target projection for the data frame
 
         Returns:
-            network (pandas dataframe): The return and how to interpret it
+            None
 
         Raises:
-            IOError: An error occured accessing the database
+            None
 
         Tests:
-            >>> get_nearest_node(-92.1647,37.7252)
-            node_id = 634267, dist = 124
+            None
         """
         self.df.to_crs(epsg=toCRS.value,inplace=True)
         self.crs = toCRS
 
     def summary(self):
-        """ Summary line
-
-        Detailed description
+        """ Prints the GeoDataFrame 'head()'' function
 
         Args:
-            param1 (int): The first parameter.
-            param1 (str): The second parameter.
+            None
 
         Returns:
-            network (pandas dataframe): The return and how to interpret it
+            None
 
         Raises:
-            IOError: An error occured accessing the database
+            None
 
         Tests:
-            >>> get_nearest_node(-92.1647,37.7252)
-            node_id = 634267, dist = 124
+            None
         """
         print self.df.head()
 
