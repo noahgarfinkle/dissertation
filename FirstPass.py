@@ -288,23 +288,31 @@ def projectWKT(wkt,from_epsg,to_epsg):
     return reprojectedWKT
 
 def createEmptyRaster(rasterPath,topLeftX,topLeftY,cellSize,width,height,epsg):
-    """ Summary line
+    """ Generates a raster failled with zeros in GeoTiff format
 
-    Detailed description
+    Uses GDAL to create an empty raster
 
     Args:
-        param1 (int): The first parameter.
-        param1 (str): The second parameter.
+        rasterPath (str): Where to place the newly created raster
+        topLeftX (float): The x-coordinate of the top left of the raster, in raster
+            projection
+        topLeftY (float): The y-coordinate of the top left of the raster, in raster
+            projection
+        cellSize (float): The raster resolution, assumes that the raster cell
+            size is the same in the x and y dimension
+        width (int): X-dimension of the raster, in pixels
+        height (int): Y-dimension of the raster, in pixels
+        epsg (int): The EPSG representation of the projection of the raster
 
     Returns:
-        network (pandas dataframe): The return and how to interpret it
+        rasterPath (str): The path of the created raster, as a confirmation that
+            the raster was written
 
     Raises:
-        IOError: An error occured accessing the database
+        None
 
     Tests:
-        >>> get_nearest_node(-92.1647,37.7252)
-        node_id = 634267, dist = 124
+        <<< raster[25:50,25:50] = 100 # this code is for testing, and not a unit test
     """
     geotransform = [topLeftX,cellSize,0,topLeftY,0,-cellSize]
     driver = gdal.GetDriverByName("GTiff")
@@ -314,28 +322,28 @@ def createEmptyRaster(rasterPath,topLeftX,topLeftY,cellSize,width,height,epsg):
     srs.ImportFromEPSG(epsg)
     dst_ds.SetProjection(srs.ExportToWkt())
     raster = np.zeros((height,width),dtype=np.uint32)
-    raster[25:50,25:50] = 100 # this code is for testing
     dst_ds.GetRasterBand(1).WriteArray(raster)
+    return rasterPath
 
 
 def floatrange(start, stop, step):
-    """ Summary line
+    """ Generates a range between two floats with a float step size
 
-    Detailed description
+    Taken from http://portolan.leaffan.net/creating-sample-points-with-ogr-and-shapely-pt-2-regular-grid-sampling/
 
     Args:
-        param1 (int): The first parameter.
-        param1 (str): The second parameter.
+        start (float): Lower bound, inclusive
+        stop (float): Upper bound, exclusive
+        step (float): Step size
 
     Returns:
-        network (pandas dataframe): The return and how to interpret it
+        generator (generator of floats): Range between start and stop
 
     Raises:
-        IOError: An error occured accessing the database
+        None
 
     Tests:
-        >>> get_nearest_node(-92.1647,37.7252)
-        node_id = 634267, dist = 124
+        None
     """
     while start < stop:
         yield start
