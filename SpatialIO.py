@@ -478,47 +478,29 @@ class RasterLayer:
         self.ly = self.uy + geoTransform[5] * self.raster.RasterYSize
 
     def plot(self):
+        """ Not yet implemented
+        """
         return 0
 
     def export(self,newPath):
-        """ Summary line
-
-        Detailed description
-
-        Args:
-            param1 (int): The first parameter.
-            param1 (str): The second parameter.
-
-        Returns:
-            network (pandas dataframe): The return and how to interpret it
-
-        Raises:
-            IOError: An error occured accessing the database
-
-        Tests:
-            >>> get_nearest_node(-92.1647,37.7252)
-            node_id = 634267, dist = 124
+        """ Not yet implemented
         """
         self.rasterPath = newPath
 
     def reproject(self,crs=CRS.WMAS):
-        """ Summary line
-
-        Detailed description
+        """ Reprojects the raster into a tmp file and in memory
 
         Args:
-            param1 (int): The first parameter.
-            param1 (str): The second parameter.
+            crs (ENUM CRS): target projection
 
         Returns:
-            network (pandas dataframe): The return and how to interpret it
+            None
 
         Raises:
-            IOError: An error occured accessing the database
+            None
 
         Tests:
-            >>> get_nearest_node(-92.1647,37.7252)
-            node_id = 634267, dist = 124
+            None
         """
         tmpRaster = "./tmp/tmp.tif"
         spatRef = osr.SpatialReference()
@@ -529,45 +511,30 @@ class RasterLayer:
         self.rasterPath = "In memory: export to update"
 
     def crop(self,lx,ly,ux,uy):
-        """ Summary line
-
-        Detailed description
-
-        Args:
-            param1 (int): The first parameter.
-            param1 (str): The second parameter.
-
-        Returns:
-            network (pandas dataframe): The return and how to interpret it
-
-        Raises:
-            IOError: An error occured accessing the database
-
-        Tests:
-            >>> get_nearest_node(-92.1647,37.7252)
-            node_id = 634267, dist = 124
+        """ Not yet implemented
         """
         result = RasterLayer()
         return result
 
     def toPNG(self,outputPath):
-        """ Summary line
+        """ Produces PNG from the raster
 
-        Detailed description
+        Currently uses hillshade and not the correct color table
 
         Args:
-            param1 (int): The first parameter.
-            param1 (str): The second parameter.
+            outputPath (str): Filepath to write the PNG to
 
         Returns:
-            network (pandas dataframe): The return and how to interpret it
+            argument (str): A string for debugging
 
         Raises:
-            IOError: An error occured accessing the database
+            None
+
+        Todo:
+            * Implement correct color table
 
         Tests:
-            >>> get_nearest_node(-92.1647,37.7252)
-            node_id = 634267, dist = 124
+            None
         """
         argument = "gdaldem hillshade -of PNG %s %s" %(self.rasterPath,outputPath)
         cdArgument = "cd /home/noah/GIT/dissertation/results"
