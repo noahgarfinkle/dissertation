@@ -136,7 +136,7 @@ class PostGIS:
             print "Unable to execute query"
 
 
-class GeoDataFrame:
+class VectorLayer:
     """ Wrapper for GeoPandas GeoDataFrame
 
         Designed to make it more convenient to interact with certain workflows in
@@ -575,13 +575,13 @@ class RasterLayer:
 
 
 class Map:
-    """ Summary of class
+    """ Wrapper for folium map to abstract out map product generation
 
-        Longer class information
+        Helps to produce nice looking maps and load data
 
         Attributes:
-            attr1 (str): The first attribute
-            attr2 (int): The second attribute
+            map (Folium Map): The map object
+            name (str): Pretty-print version of the name for the map
     """
 
     def __init__(self,name="Not set"):
@@ -589,13 +589,11 @@ class Map:
         self.name = name
 
     def addRasterLayerAsOverlay(self,rasterLayer,opacity):
-        """ Summary line
-
-        Detailed description
+        """ Adds a raster object to the map
 
         Args:
-            param1 (int): The first parameter.
-            param1 (str): The second parameter.
+            rasterLayer (RasterLayer): The first parameter.
+            opacity (str): The second parameter.
 
         Returns:
             network (pandas dataframe): The return and how to interpret it
@@ -628,8 +626,7 @@ class Map:
         Detailed description
 
         Args:
-            param1 (int): The first parameter.
-            param1 (str): The second parameter.
+            vectorLayer (GeoDataFrame): A GeoDataFrame populated with vectors
 
         Returns:
             network (pandas dataframe): The return and how to interpret it
