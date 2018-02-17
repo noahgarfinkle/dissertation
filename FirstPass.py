@@ -391,25 +391,23 @@ def generateEvaluationGridDataFrame(polygon,gridSpacing):
 
 
 def convertRasterToNumpyArray(raster_path):
-    """ Summary line
+    """ Generates a numpy array from a GeoTiff
 
-    Detailed description
 
     Args:
-        param1 (int): The first parameter.
-        param1 (str): The second parameter.
+        raster_path (str): Filepath of a GeoTiff
 
     Returns:
-        network (pandas dataframe): The return and how to interpret it
+        data (Numpy Array): The first band of the raster, as an array
 
     Raises:
-        IOError: An error occured accessing the database
+        None
 
     Tests:
-        >>> get_nearest_node(-92.1647,37.7252)
-        node_id = 634267, dist = 124
+        >>> raster_path = "./test_data/testelevunproj.tif"
+        >>> convertRasterToNumpyArray(raster_path)
     """
-    raster_path = "./test_data/testelevunproj.tif"
+
 
     dataset = gdal.Open(raster_path)
     band = dataset.GetRasterBand(1)
@@ -423,25 +421,32 @@ def convertRasterToNumpyArray(raster_path):
     # data = band.ReadAsArray(col1, row1, col2 - col1 + 1, row2 - row1 + 1) # partial band
     print data.shape
     print np.mean(data)
+    return data
 
-def generateRasterStatisticsForDataFrame(df,raster_Path,stats="count majority minority unique mean",isCategorical=False):
-    """ Summary line
+def generateRasterStatisticsForDataFrame(df,raster_path,stats="count majority minority unique mean",isCategorical=False):
+    """ Produces neighborhood statistics for a raster based on each feature in a
+        GeoPandas GeoDataFrame
 
-    Detailed description
+    Works for both categorical and continuous rasters.  Note that some stats, such
+    as count, substantially increase processing time.
 
     Args:
-        param1 (int): The first parameter.
-        param1 (str): The second parameter.
+        df (GeoPandas GeoDataFrame): Each row represents a polygon geometry to
+            generate neighborhood statistics for
+        raster_path (str): Filepath of a GeoTiff raster
+        stats (str): space-separated list of valid statistics from validStats
+        isCategorical (bool): Raster values will be interpreted as categorical if
+            True, continuous if False.  Defaults False.
 
     Returns:
-        network (pandas dataframe): The return and how to interpret it
+        newDF (GeoPandas GeoDataFrame): The input df, merged with the appropriate
+            raster statistics
 
     Raises:
-        IOError: An error occured accessing the database
+        None
 
     Tests:
-        >>> get_nearest_node(-92.1647,37.7252)
-        node_id = 634267, dist = 124
+        None
     """
     row_stats_df = gpd.GeoDataFrame(raster_stats(vectors=df['geometry'],raster=raster_path,stats=stats, copy_properties=True, nodata_value=0, categorical=isCategorical))
     newDF = gpd.GeoDataFrame(pd.concat([df,row_stats_df],axis=1))
