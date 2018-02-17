@@ -380,13 +380,25 @@ class GeoDataFrame:
 
 
 class RasterLayer:
-    """ Summary of class
-
-        Longer class information
+    """ Represents a raster
 
         Attributes:
-            attr1 (str): The first attribute
-            attr2 (int): The second attribute
+            name (str): Neat name for the raster
+            rasterPath (str): Filepath to the source GeoTIFF
+            raster (GDAL Raster): Memory representation of the GDAL raster object
+            crs (ENUM CRS): Projection of the raster
+            scale (float): Resolution of the raster, in raster projection units
+            minimum (float): Minimum value contained by the raster
+            maximum (float): Maximum value contained by the raster
+            unitType (str): Raster band unit types
+            colorInterpretation (str): Raster band color interpretation
+            colorTable (str): Raster band color table
+            lx (float): x-coordinate of lower left, in same units as projection
+            ly (float): y-coordinate of lower left, in same units as projection
+            ux (float): x-coordinate of upper right, in same units as projection
+            uy (float): y-coordinate of upper right, in same units as projection
+            isCategorical (bool): True if the raster encodes continuous data,
+                False if the raster encodes categorical data
     """
 
     def __init__(self,name="Not set"):
@@ -404,6 +416,7 @@ class RasterLayer:
         self.ly = None
         self.ux = None
         self.uy = None
+        self.isCategorical = False
 
 
     def from_empty(self,lx,ly,ux,uy,crs,scale):
