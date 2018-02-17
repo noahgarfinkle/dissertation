@@ -287,33 +287,6 @@ def projectWKT(wkt,from_epsg,to_epsg):
     reprojectedWKT = df_to_project.geometry[0].to_wkt()
     return reprojectedWKT
 
-def buildSearchGrid(aoiWKT,aoiWKTProjection=4326,gridSpacing=30,exclusionFeatures = []):
-    """ Summary line
-
-    Detailed description
-
-    Args:
-        param1 (int): The first parameter.
-        param1 (str): The second parameter.
-
-    Returns:
-        network (pandas dataframe): The return and how to interpret it
-
-    Raises:
-        IOError: An error occured accessing the database
-
-    Tests:
-        >>> get_nearest_node(-92.1647,37.7252)
-        node_id = 634267, dist = 124
-    """
-    numberXCells = np.ceiling((ux-lx)/qafCellSize)
-    numberYCells = np.ceiling((uy-ly)/qafCellSize)
-
-    newUX = lx + (numberXCells * qafCellSize)
-    newUY = ly + (numberYCells * qafCellSize)
-
-    qafMatrix = np.empty([numberXCells,numberYCells])
-
 def createEmptyRaster(rasterPath,topLeftX,topLeftY,cellSize,width,height,epsg):
     """ Summary line
 
