@@ -624,6 +624,8 @@ cutFillDF.head()
 cutFillDF.plot(column="totalCutFillVolume")
 plt.savefig("./results/cutfillquantity.png")
 
+cutFillDF.head()
+
 plt.figure()
 plt.suptitle("Cut fill for evaluation cells (m3) for AOI")
 plt.xlabel("Total volume cut/fill required (m3)")
@@ -667,6 +669,11 @@ f.suptitle("Minimum distance from infrastructure")
 evaluationDF.plot(column='distance',ax=vectorDF_filtered.plot())
 plt.savefig("./results/distancefrominfrastructure.png")
 
+
+
+a = evaluationDF[0:1]
+a
+a.to_html()
 
 
 ## TESTS

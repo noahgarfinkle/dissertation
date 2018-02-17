@@ -855,6 +855,64 @@ class GenerationalSolutions:
 
 ## CURRENT TEST
 
+# Mapping with tables
+# https://ocefpaf.github.io/python4oceanographers/blog/2015/12/14/geopandas_folium/
+import folium
+
+mapa = folium.Map([-15.783333, -47.866667],
+                  zoom_start=4,
+                  tiles='cartodbpositron')
+
+points = folium.features.GeoJson(gjson)
+
+mapa.add_children(points)
+mapa
+
+
+table = """
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+table {{
+    width:100%;
+}}
+table, th, td {{
+    border: 1px solid black;
+    border-collapse: collapse;
+}}
+th, td {{
+    padding: 5px;
+    text-align: left;
+}}
+table#t01 tr:nth-child(odd) {{
+    background-color: #eee;
+}}
+table#t01 tr:nth-child(even) {{
+   background-color:#fff;
+}}
+</style>
+</head>
+<body>
+
+<table id="t01">
+  <tr>
+    <td>Type</td>
+    <td>{}</td>
+  </tr>
+  <tr>
+    <td>Name</td>
+    <td>{}</td>
+  </tr>
+  <tr>
+    <td>Operational</td>
+    <td>{}</td>
+  </tr>
+</table>
+</body>
+</html>
+""".format
+
 ## TESTS
 # test composite
 def testComposite():
