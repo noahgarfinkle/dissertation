@@ -273,28 +273,6 @@ def route(startLon,startLat,endLon,endLat):
     map.save('./results/mapwithroute.html')
 
 
-def createCustomCost():
-    """ Summary line
-
-    Detailed description
-
-    Args:
-        param1 (int): The first parameter.
-        param1 (str): The second parameter.
-
-    Returns:
-        network (pandas dataframe): The return and how to interpret it
-
-    Raises:
-        IOError: An error occured accessing the database
-
-    Tests:
-        >>> get_nearest_node(-92.1647,37.7252)
-        node_id = 634267, dist = 124
-    """
-    return 0
-
-
 def routeWithAvoidance(startLon,startLat,endLon,endLat,linkIDsToAvoid=[]):
     """ Summary line
 
