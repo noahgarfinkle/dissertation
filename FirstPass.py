@@ -36,7 +36,7 @@ import shapely.geometry as geom
 from rasterstats import zonal_stats, raster_stats, point_query, utils
 import matplotlib.pyplot as plt
 
-#import SpatialIO as io
+import SpatialIO as io
 
 ## HELPFUL FOR DEBUGGING
 # %matplotlib inline
