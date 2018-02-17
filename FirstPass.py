@@ -214,48 +214,51 @@ def filterDataFrameByBounds(df,lx,ly,ux,uy,bufferDistance=0):
     return filteredDF
 
 def filterDataFrameByValue(df,column,argument):
-    """ Summary line
+    """ Returns a subset of a GeoPandas GeoDataframe
 
-    Detailed description
+    Currently only works for single instances of categorical variables.  For more
+    complicated cases, either code directly or update this function
 
     Args:
-        param1 (int): The first parameter.
-        param1 (str): The second parameter.
+        df (GeoPandas DataFrame): The dataframe to be filtered
+        column (str): The string name of the dataframe column to be filtered
+        argument(var): The value determining which rows to return
 
     Returns:
-        network (pandas dataframe): The return and how to interpret it
+        filteredDF (GeoPandas DataFrame): A filtered copy of the original df
 
     Raises:
-        IOError: An error occured accessing the database
+        None
 
     Tests:
-        >>> get_nearest_node(-92.1647,37.7252)
-        node_id = 634267, dist = 124
+        None
     """
     filteredDF = df[df[column]==argument]
     return filteredDF
 
 def minimumDistanceFromPointToDataFrameFeatures(x,y,crs,df):
-    """ Summary line
+    """ Returns the minimum euclidean distance from a point to the dataframe
 
-    Detailed description
+    Currently CRS does not project the point
 
     Args:
-        param1 (int): The first parameter.
-        param1 (str): The second parameter.
+        x (float): x-coordinate in the same projection as the dataframe
+        y (float): y-coordinate in the same projection as the dataframe
+        crs (ENUM CRS): The projection of the point
+        df (GeoPandas DataFrame): A dataframe of vector features
 
     Returns:
-        network (pandas dataframe): The return and how to interpret it
+        minDistance (float): the smallest euclidean distance calculated
 
     Raises:
-        IOError: An error occured accessing the database
+        None
 
     Tests:
-        >>> get_nearest_node(-92.1647,37.7252)
-        node_id = 634267, dist = 124
+        None
     """
     point = Point(x,y)
-    return df.distance(point).min()
+    minDistance = df.distance(point).min()
+    return minDistance
 
 def projectWKT(wkt,from_epsg,to_epsg):
     """ Summary line
