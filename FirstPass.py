@@ -562,6 +562,35 @@ def calculateCutFill(df,dem_path,finalElevation='mean',rasterResolution=10):
     appendedDF['totalCutFillVolume'] = totalCutFillVolumes
     return appendedDF
 
+def minimumDistanceFromEvaluationToDataFrameFeatures(evaluationDF,vectorDF):
+        """ Implements Euclidean distance from a data frame of candiate polygons
+        to a vector data frame
+
+        Assumes that evaluationDF contains polygons and vectorDF contains vectors
+
+        Args:
+            evaluationDF (GeoPandas GeoDataFrame): Each row represents a polygon
+                geometry to evaluate Euclidean distances for
+            vectorDF (GeoPandas GeoDataFrame): Each row represents a vector
+                geometry
+
+        Returns:
+            evaluationDF (GeoPandas GeoDataFrame): Appends the minimum distance
+                to vectorDF in the column 'distance'
+
+        Raises:
+            None
+
+        Tests:Summary line
+            None
+        """
+    minDistances = []
+    for i,row in evaluationDF.iterrows():
+        minDistance = vectorDF.distance(row.geometry).min()
+        minDistances.append(minDistance)
+    evaluationDF['distance'] = minDistances
+    return evaluationDF
+
 ## CURRENT TEST
 # building the evaluation grid structure
 
@@ -635,13 +664,7 @@ meaninglessCategoricalDF = generateRasterStatisticsForDataFrame(df_subset,raster
 meaninglessCategoricalDF
 
 # minimum distance from each raster cell to roads
-def minimumDistanceFromEvaluationToDataFrameFeatures(evaluationDF,vectorDF):
-    minDistances = []
-    for i,row in evaluationDF.iterrows():
-        minDistance = vectorDF.distance(row.geometry).min()
-        minDistances.append(minDistance)
-    evaluationDF['distance'] = minDistances
-    return evaluatioNDF
+
 
 vector_path = "./test_data/UtilityInfrastructureCrv_3.shp"
 roadsDF = gpd.read_file(vector_path)
