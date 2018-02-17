@@ -187,28 +187,6 @@ class Input:
         return siteSearchRelationalConstraints
 
 ## FUNCTIONS
-def distance():
-    """ Summary line
-
-    Detailed description
-
-    Args:
-        param1 (int): The first parameter.
-        param1 (str): The second parameter.
-
-    Returns:
-        network (pandas dataframe): The return and how to interpret it
-
-    Raises:
-        IOError: An error occured accessing the database
-
-    Tests:
-        >>> get_nearest_node(-92.1647,37.7252)
-        node_id = 634267, dist = 124
-    """
-    distances = gdal.distances()
-    return None
-
 def filterDataFrameByBounds(df,lx,ly,ux,uy):
     """ Summary line
 
