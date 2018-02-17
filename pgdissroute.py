@@ -99,24 +99,32 @@ def get_nearest_node(lon,lat):
     return nearestNode
 
 
-def drivingDistance(startNode,distance):
-    """ Summary line
+def drivingDistance(startNode,distance,mapPath="./results/mapwithdrivedistance.html"):
+    """ Returns all nodes and edges within a specified drive distance
 
     Detailed description
 
     Args:
-        param1 (int): The first parameter.
-        param1 (str): The second parameter.
+        startNode (int): The id of your point
+        distance (float): How far from this point you want to be able to reach
+        mapPath (str): Where to write the map to
 
     Returns:
-        network (pandas dataframe): The return and how to interpret it
+        nodes_features (folium features):
+        edges_features (folium features):
 
     Raises:
-        IOError: An error occured accessing the database
+        None
+
+    Todo:
+        * remove mapPath and convert to its own function
+        * return geodataframe(s)
+        * replace startNode with coordinates
+        * figure out units for distance
+        * implement drive time
 
     Tests:
-        >>> get_nearest_node(-92.1647,37.7252)
-        node_id = 634267, dist = 124
+        None
     """
     sql = "SELECT * FROM pgr_drivingDistance('SELECT id, source, target, cost, reverse_cost FROM ways',%s,%s);" %(startNode,distance)
     drivingDistance = pd.read_sql_query(sql,con=conn)
@@ -137,28 +145,33 @@ def drivingDistance(startNode,distance):
     map2 = folium.Map( tiles='stamentoner', zoom_start=6)
     #map2.add_child(nodes_features)
     map2.add_child(edges_features)
-    map2.save('./results/mapwithdrivedistance.html')
+    map2.save(mapPath)
     return nodes_features, edges_features
 
 
 def kMultipleRoutes(startNode,endNode,k):
-    """ Summary line
+    """ Utilizes pgrouting's k-multiple routes
 
-    Detailed description
+    Does not necessarily return routes which are very different from each other
 
     Args:
-        param1 (int): The first parameter.
-        param1 (str): The second parameter.
+        startNode (int): Starting location
+        endNode (int): Ending location
+        k (int): number of routes to return
 
     Returns:
-        network (pandas dataframe): The return and how to interpret it
+        None
 
     Raises:
-        IOError: An error occured accessing the database
+        None
+
+    Todo:
+        * remove mapPath and convert to its own function
+        * return geodataframe(s)
+        * replace nodes with coordinates
 
     Tests:
-        >>> get_nearest_node(-92.1647,37.7252)
-        node_id = 634267, dist = 124
+        None
     """
     sql = "SELECT * FROM pgr_ksp('SELECT id, source, target, cost, reverse_cost FROM ways',%s,%s,%s);" %(startNode,endNode,k)
     df = pd.read_sql_query(sql,con=conn)
