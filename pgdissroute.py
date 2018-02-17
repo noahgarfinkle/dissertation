@@ -277,23 +277,32 @@ def route(startLon,startLat,endLon,endLat):
 
 
 def routeWithAvoidance(startLon,startLat,endLon,endLat,linkIDsToAvoid=[]):
-    """ Summary line
+    """ Route between two coordinates avoiding any links in a list
 
-    Detailed description
+    Takes longitude and latitude for two points and provides the pgrouting
+    shortest route between the two, using Dijkstra's algorithm.  Any link id's
+    contained in the list will be avoided
 
     Args:
-        param1 (int): The first parameter.
-        param1 (str): The second parameter.
+        startLon (float): Longitude of starting point in EPSG:4326
+        startLat (float): Latitude of starting point in EPSG:4326
+        endLon (float): Longitude of ending point in EPSG:4326
+        endLat (float): Latitude of ending point in EPSG:4326
+        linkIDsToAvoid (list:int): Primary key id's of links to avoid
 
     Returns:
-        network (pandas dataframe): The return and how to interpret it
+        df (GeoPandas GeoDataFrame): a dataframe with the links of the route
 
     Raises:
-        IOError: An error occured accessing the database
+        None
+
+    Todo:
+        * Allow for projections
+        * remove mapPath and convert to its own function
+        * return geodataframe(s)
 
     Tests:
-        >>> get_nearest_node(-92.1647,37.7252)
-        node_id = 634267, dist = 124
+        None
     """
     startNode = int(get_nearest_node(startLon,startLat)["node_id"])
     endNode = int(get_nearest_node(endLon,endLat)["node_id"])
