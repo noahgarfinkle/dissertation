@@ -71,9 +71,14 @@ Noah W. Garfinkle
   - [x] Extract from raster within distance of point and convert to array for custom analysis/ resampling
   - [ ] Plot solution dataframe to raster with n/a where no solutions considered and ability to place any of the scores from the dataframe, saving to a geotiff
 
+## 17 February Tasks
+- [ ] Get comments in all files
+- [ ] Clean up all code
+- [ ] Get routing to write to dataframes and connect plotting to SpatialIO
+
 ## Tasks
 - [x] set up a repo
-- [ ] convert all current functions from R to Python
+- [x] convert all current functions from R to Python
 - [x] Read in and manipulate rasters
 - [x] Computer Euclidean distance
 - [x] Compute routing distance
