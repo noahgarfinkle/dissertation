@@ -799,7 +799,7 @@ class Map:
         for gen in range(0,5):
             gen = []
             for i in range(0,1001):
-                lat,lon = self.generateRandomLatLonPair(35,50,-90,-80)
+                lat,lon = self.test_generateRandomLatLonPair(35,50,-90,-80)
                 #lat = np.random.randint(35,50)
                 #lon = np.random.randint(-90,-80)
                 val = [lat,lon]
