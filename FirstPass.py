@@ -559,43 +559,22 @@ def minimumDistanceFromEvaluationToDataFrameFeatures(evaluationDF,vectorDF):
 
 
 ## CURRENT TEST
-# building the evaluation grid structure
+# First pass implementation for class
 
-aoiDF = gpd.read_file("./test_data/geojson.json")
-aoiDF.CRS = {'init':'epsg:4326'}
+#aoiDF = gpd.read_file("./test_data/geojson.json")
+#aoiDF.CRS = {'init':'epsg:4326'}
+
+aoiDF = gpd.read_file("../FLW_Missouri Mission Folder/SUPPORT/Staging.shp")
 aoiDF = aoiDF.to_crs({'init':'epsg:3857'})
+aoiDF
+aoiDF.plot(column="Stage")
 aoiPolygon = aoiDF.geometry[0]
 
-testDF = generateEvaluationGridDataFrame(aoiPolygon,300)
-testDF
+evaluationGridDataFrame = generateEvaluationGridDataFrame(aoiPolygon,300)
 
-aoiPolygon
-import datetime
-gridSpacing = 300
-squareList = []
-bounds = aoiPolygon.bounds
-ll = bounds[:2]
-ur = bounds[2:]
-# https://stackoverflow.com/questions/30457089/how-to-create-a-polygon-given-its-point-vertices
-start = datetime.datetime.now()
-for x in floatrange(ll[0],ur[0],gridSpacing):
-    for y in floatrange(ll[1],ur[1],gridSpacing):
-        square = Polygon([[x,y],[x+gridSpacing,y],[x+gridSpacing,y+gridSpacing],[x,y+gridSpacing]])
-        if square.within(aoiPolygon):
-            squareList.append(square)
-end = datetime.datetime.now()
-end - start
-timeElapsed = end - start
-nFeatures = len(squareList)
-print "Generated %s squares in %s seconds" %(nFeatures,timeElapsed.seconds)
 
-evaluationGridDataFrame = gpd.GeoDataFrame(squareList)
-evaluationGridDataFrame.columns = ['geometry']
-plt.figure()
-evaluationGridDataFrame.plot()
-plt.savefig("./results/aoidiscretization.png")
-df_cropped = evaluationGridDataFrame[0:100]
-df_cropped.plot()
+
+
 
 raster_path = "../FLW_Missouri Mission Folder/RASTER/DEM_CMB_ELV_SRTMVF2_proj.tif"
 result_DF = generateRasterStatisticsForDataFrame(evaluationGridDataFrame,raster_path,stats="mean",isCategorical=False)
