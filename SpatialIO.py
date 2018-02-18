@@ -954,7 +954,7 @@ df.head()
 
 shp_fn = vector_path
 rst_fn = rasterPath
-out_fn = './results/rasterized14.tif'
+out_fn = './results/rasterized15.tif'
 
 
 rst = rasterio.open( rst_fn )
@@ -1000,9 +1000,8 @@ aoiDF = gpd.read_file("./test_data/geojson.json")
 aoiDF.CRS = {'init':'epsg:4326'}
 aoiDF = aoiDF.to_crs({'init':'epsg:3857'})
 aoiPolygon = aoiDF.geometry[0]
-aoiPolygon
 import datetime
-gridSpacing = 3000
+gridSpacing = 30
 squareList = []
 bounds = aoiPolygon.bounds
 ll = bounds[:2]
@@ -1015,6 +1014,7 @@ for x in floatrange(ll[0],ur[0],gridSpacing):
         if square.within(aoiPolygon):
             squareList.append(square)
 df = gpd.GeoDataFrame(squareList)
+df.columns = ['geometry']
 len(df.index)
 df['score'] = np.random.randint(0,100,len(df.index))
 
@@ -1036,7 +1036,7 @@ nodata = band.GetNoDataValue()
 
 shp_fn = vector_path
 rst_fn = rasterPath
-out_fn = './results/rasterized14.tif'
+out_fn = './results/rasterized16.tif'
 
 
 rst = rasterio.open( rst_fn )
