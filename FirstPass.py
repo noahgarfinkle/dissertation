@@ -414,8 +414,6 @@ def generateRasterStatisticsForDataFrame(df,raster_path,stats="count majority mi
     newDF = gpd.GeoDataFrame(pd.concat([df,row_stats_df],axis=1))
     return newDF
 
-# Note: Requires point in same coordinate system as raster, I assume
-# todo: implement projections
 def queryRasterValueForPoint(x,y,raster_path,pointCRS=None,rasterCRS=None):
     """ Returns the value of a GeoTiff at a specified point
 
@@ -434,6 +432,9 @@ def queryRasterValueForPoint(x,y,raster_path,pointCRS=None,rasterCRS=None):
 
     Raises:
         None
+
+    Todo:
+        * Implement projections
 
     Tests:
         None
