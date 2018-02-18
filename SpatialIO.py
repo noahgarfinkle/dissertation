@@ -1035,9 +1035,8 @@ def rasterizeGeodataFrameColumn(df,column,outputRasterPath,resolution=30,crs=Non
         out.write_band( 1, burned )
     stop = datetime.datetime.now()
     timeDelta = stop - start
-    print "Raster created in %s seconds at %s" %(timeDelta.seconds,outputRasterPath)
+    print "Raster created with datatype %s in %s seconds at %s" %(dtype.name,timeDelta.seconds,outputRasterPath)
     return outputRasterPath
-
 
 # try again
 def floatrange(start, stop, step):
