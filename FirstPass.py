@@ -631,7 +631,7 @@ cutFillDF = calculateCutFill(largerAirfields,elevationPath,finalElevation='mean'
 cutFillDF.head()
 cutFillDF.plot(column='totalCutFillVolume')
 
-
+plt.hist(cutFillDF['totalCutFillVolume'])
 
 # Base Objective 1
 baseObjective1AOI = aoiDF[aoiDF['Stage']=='Gold'].reset_index().geometry[0]

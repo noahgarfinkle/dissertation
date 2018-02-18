@@ -346,7 +346,7 @@ def testMapWithRoute():
     df2
     df2.plot()
     map = folium.Map( tiles='stamentoner', zoom_start=6)
-    df2.crs = {'init':'epsg:4326'browser}
+    df2.crs = {'init':'epsg:4326'}
     gjson = df2.to_crs(epsg='4326').to_json()
     lines = folium.features.GeoJson(gjson)
     map.add_child(lines)
