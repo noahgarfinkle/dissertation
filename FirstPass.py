@@ -512,18 +512,22 @@ def calculateCutFill(df,dem_path,finalElevation='mean',rasterResolution=10):
     totalRequiredHeightChanges = []
     totalCutFillVolumes = []
     for i,row in appendedDF.iterrows():
-        maskedRaster = row['mini_raster_array']
-        maskedRaster_Array = ma.masked_array(maskedRaster)
-        targetElevation = -999
-        if isinstance(finalElevation,basestring):
-            targetElevation = row[finalElevation]
-        else:
-            targetElevation = finalElevation
-        requiredHeightChange = np.subtract(maskedRaster_Array,targetElevation)
-        totalRequiredHeightChange = np.sum(np.abs(requiredHeightChange))
-        totalCutFillVolume = totalRequiredHeightChange * rasterResolution * rasterResolution
-        elevationChangeArrays.append(requiredHeightChange)
-        totalCutFillVolumes.append(totalCutFillVolume)
+        try:
+            maskedRaster = row['mini_raster_array']
+            maskedRaster_Array = ma.masked_array(maskedRaster)
+            targetElevation = -999
+            if isinstance(finalElevation,basestring):
+                targetElevation = row[finalElevation]
+            else:
+                targetElevation = finalElevation
+            requiredHeightChange = np.subtract(maskedRaster_Array,targetElevation)
+            totalRequiredHeightChange = np.sum(np.abs(requiredHeightChange))
+            totalCutFillVolume = totalRequiredHeightChange * rasterResolution * rasterResolution
+            elevationChangeArrays.append(requiredHeightChange)
+            totalCutFillVolumes.append(totalCutFillVolume)
+        except:
+            elevationChangeArrays.append(-999)
+            totalCutFillVolumes.append(-999)
     appendedDF['elevationChangeArray'] = elevationChangeArrays
     appendedDF['totalCutFillVolume'] = totalCutFillVolumes
     return appendedDF
@@ -607,7 +611,8 @@ elevationPath = "../FLW_Missouri Mission Folder/RASTER/DEM_CMB_ELV_SRTMVF2_proj.
 largerAirfields.head()
 airfieldEvaluationDataFrame.head()
 cutFillDF = calculateCutFill(largerAirfields,elevationPath,finalElevation='mean',rasterResolution=30)
-cutFillDF.plot(column='totalCutFillVolume')
+cutFillDF.head()
+cutFillDF['totalCutFillVolume']
 
 testDissolve = airfieldSlopeEvaluationDataFrameSubset.dissolve(by='max')
 len(testDissolve.index)
