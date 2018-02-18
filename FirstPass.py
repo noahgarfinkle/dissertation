@@ -334,7 +334,7 @@ def generateEvaluationGridDataFrame(polygon,gridSpacing):
         None
     """
     squareList = []
-    bounds = poyglon.bounds
+    bounds = polygon.bounds
     ll = bounds[:2]
     ur = bounds[2:]
     # https://stackoverflow.com/questions/30457089/how-to-create-a-polygon-given-its-point-vertices
@@ -563,7 +563,7 @@ aoiDF.CRS = {'init':'epsg:4326'}
 aoiDF = aoiDF.to_crs({'init':'epsg:3857'})
 aoiPolygon = aoiDF.geometry[0]
 
-testDF = generateEvaluationGridDataFrame("./test_data/geojson.json")
+testDF = generateEvaluationGridDataFrame(aoiPolygon,300)
 
 aoiPolygon
 import datetime
