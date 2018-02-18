@@ -764,42 +764,6 @@ class Map:
         self.map.add_child(hm)
 
 
-class GenerationalSolutions:
-    """ Summary of class
-
-        Longer class information
-
-        Attributes:
-            attr1 (str): The first attribute
-            attr2 (int): The second attribute
-    """
-    def __init__(self):
-        self.dataFrame = GeoDataFrame()
-        self.dataFrame.createGeoDataFrame(CRS.WMAS,columns=['geometry','generation','score'])
-
-    def addPoint(self,lat,lon,generation,score):
-        """ Summary line
-
-        Detailed description
-
-        Args:
-            param1 (int): The first parameter.
-            param1 (str): The second parameter.
-
-        Returns:
-            network (pandas dataframe): The return and how to interpret it
-
-        Raises:
-            IOError: An error occured accessing the database
-
-        Tests:
-            >>> get_nearest_node(-92.1647,37.7252)
-            node_id = 634267, dist = 124
-        """
-        geom = Point(lon,lat)
-        self.dataFrame.addRow({'geometry':geom,'generation':generation,'score':score})
-
-
 ## CURRENT TEST
 
 # Mapping with tables
