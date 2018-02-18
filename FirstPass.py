@@ -35,6 +35,7 @@ from shapely.wkt import loads
 import shapely.geometry as geom
 from rasterstats import zonal_stats, raster_stats, point_query, utils
 import matplotlib.pyplot as plt
+import datetime
 
 import SpatialIO as io
 
