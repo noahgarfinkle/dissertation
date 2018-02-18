@@ -506,31 +506,53 @@ def calculateCutFill(df,dem_path,finalElevation='mean',rasterResolution=10):
     Tests:Summary line
         None
     """
+    # KLUDGE to remove raster stats with the same name
+    if finalElevation in df.columns:
+        df = df.drop(finalElevation,axis=1)
+
+    if 'old_geo' in df.columns:
+        df = df.drop('old_geo',axis=1)
+
+    if 'old_geometry' in df.columns:
+        df = df.drop('old_geometry',axis=1)
+
+    df = df.reset_index()
     croppedRasterDF = rasterStatCroppedRaster(df,dem_path)
     appendedDF = gpd.GeoDataFrame(pd.concat([df,croppedRasterDF],axis=1))
     elevationChangeArrays = []
     totalRequiredHeightChanges = []
     totalCutFillVolumes = []
     for i,row in appendedDF.iterrows():
-        try:
-            maskedRaster = row['mini_raster_array']
-            maskedRaster_Array = ma.masked_array(maskedRaster)
-            targetElevation = -999
-            if isinstance(finalElevation,basestring):
-                targetElevation = row[finalElevation]
-            else:
-                targetElevation = finalElevation
-            requiredHeightChange = np.subtract(maskedRaster_Array,targetElevation)
-            totalRequiredHeightChange = np.sum(np.abs(requiredHeightChange))
-            totalCutFillVolume = totalRequiredHeightChange * rasterResolution * rasterResolution
-            elevationChangeArrays.append(requiredHeightChange)
-            totalCutFillVolumes.append(totalCutFillVolume)
-        except:
-            elevationChangeArrays.append(-999)
-            totalCutFillVolumes.append(-999)
+        maskedRaster = row['mini_raster_array']
+        maskedRaster_Array = ma.masked_array(maskedRaster)
+        targetElevation = -999
+        if isinstance(finalElevation,basestring):
+            targetElevation = row[finalElevation]
+        else:
+            targetElevation = finalElevation
+        requiredHeightChange = np.subtract(maskedRaster_Array,targetElevation)
+        totalRequiredHeightChange = np.sum(np.abs(requiredHeightChange))
+        totalCutFillVolume = totalRequiredHeightChange * rasterResolution * rasterResolution
+        elevationChangeArrays.append(requiredHeightChange)
+        totalCutFillVolumes.append(totalCutFillVolume)
+
     appendedDF['elevationChangeArray'] = elevationChangeArrays
     appendedDF['totalCutFillVolume'] = totalCutFillVolumes
     return appendedDF
+
+
+df.plot()
+df.head()
+
+largerAirfields.head()
+
+df = airfieldEvaluationDataFrame
+df = largerAirfields
+df = airfieldSlopeEvaluationDataFrameSubset
+appendedDF.head()
+row = appendedDF[0:1]
+maskedRaster_Array
+targetElevation
 
 def minimumDistanceFromEvaluationToDataFrameFeatures(evaluationDF,vectorDF):
         """ Implements Euclidean distance from a data frame of candiate polygons
@@ -574,8 +596,8 @@ def convertSubsettedEvaluationDFIntoPolygonGrid(evaluationDF, squareDimension):
                           [centroid_x + offset,centroid_y + offset],
                           [centroid_x - offset,centroid_y + offset]])
         polygonEvaluations.append(square)
-    evaluationDF.geometry = polygonEvaluations
-    evaluationDF['old_geometry'] = oldPolygons
+    evaluationDF['geometry'] = polygonEvaluations
+    evaluationDF['old_geo'] = oldPolygons
     return evaluationDF
 
 
@@ -610,6 +632,7 @@ largerAirfields.plot()
 elevationPath = "../FLW_Missouri Mission Folder/RASTER/DEM_CMB_ELV_SRTMVF2_proj.tif"
 largerAirfields.head()
 airfieldEvaluationDataFrame.head()
+
 cutFillDF = calculateCutFill(largerAirfields,elevationPath,finalElevation='mean',rasterResolution=30)
 cutFillDF.head()
 cutFillDF['totalCutFillVolume']
