@@ -557,11 +557,19 @@ def minimumDistanceFromEvaluationToDataFrameFeatures(evaluationDF,vectorDF):
         evaluationDF['distance'] = minDistances
         return evaluationDF
 
-def convertSubsettedEvaluationDFIntoPolygonGrid(evaluationDF, squareDimensions):
+def convertSubsettedEvaluationDFIntoPolygonGrid(evaluationDF, squareDimension):
     polygonEvaluations = []
     oldPolygons = []
-
-
+    for geometry in evaluationDF.geometry:
+        oldPolygons.append(geometry)
+        centroid_x = geometry.centroid.x
+        centroid_y = geometry.centroid.y
+        offset = squareDimension / 2
+        square = Polygon([[centroid_x - offset,centroid_y - offset],
+                          [centroid_x + offset,centroid_y - offset],
+                          [centroid_x + offset,centroid_y + offset],
+                          [centroid_x - offset,centroid_y + offset]])
+        polygonEvaluations.append(square)
     evaluationDF.geometry = polygonEvaluations
     evaluationDF['old_geometry'] = oldPolygons
     return evaluationDF
@@ -572,7 +580,11 @@ def convertSubsettedEvaluationDFIntoPolygonGrid(evaluationDF, squareDimensions):
 aoiDF = gpd.read_file("../FLW_Missouri Mission Folder/SUPPORT/Staging.shp")
 aoiDF = aoiDF.to_crs({'init':'epsg:3857'})
 
-aoiDF
+aoiDF.geometry[0].centroid.x
+
+geometry = aoiDF.geometry[0]
+squareDimension = 400
+square
 aoiDF.plot()
 
 # Airfield Objective
