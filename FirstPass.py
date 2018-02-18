@@ -560,17 +560,29 @@ def minimumDistanceFromEvaluationToDataFrameFeatures(evaluationDF,vectorDF):
 
 ## CURRENT TEST
 # First pass implementation for class
-
-#aoiDF = gpd.read_file("./test_data/geojson.json")
-#aoiDF.CRS = {'init':'epsg:4326'}
-
 aoiDF = gpd.read_file("../FLW_Missouri Mission Folder/SUPPORT/Staging.shp")
 aoiDF = aoiDF.to_crs({'init':'epsg:3857'})
-aoiDF
-aoiDF.plot(column="Stage")
-aoiPolygon = aoiDF.geometry[0]
 
-evaluationGridDataFrame = generateEvaluationGridDataFrame(aoiPolygon,300)
+aoiDF
+aoiDF.plot()
+
+# Airfield Objective
+airfieldAOI = aoiDF[aoiDF['Stage']=='Gold'].reset_index().geometry[0]
+airfieldEvaluationDataFrame = generateEvaluationGridDataFrame(airfieldAOI,100)
+
+airfieldAOI.values
+
+# Base Objective 1
+baseObjective1AOI = aoiDF[aoiDF['Stage']=='Gold'].reset_index().geometry[0]
+baseObjective1EvaluationDataFrame = generateEvaluationGridDataFrame(baseObjective1AOI,100)
+
+
+# Base Objective 2
+baseObjective2AOI = aoiDF[aoiDF['Stage']=='Gold'].reset_index().geometry[0]
+baseObjective2EvaluationDataFrame = generateEvaluationGridDataFrame(baseObjective2AOI,100)
+
+
+
 
 
 
