@@ -603,6 +603,12 @@ airfieldSlopeEvaluationDataFrameSubset.plot(column='max')
 largerAirfields = convertSubsettedEvaluationDFIntoPolygonGrid(airfieldSlopeEvaluationDataFrameSubset, 800)
 largerAirfields.plot()
 
+elevationPath = "../FLW_Missouri Mission Folder/RASTER/DEM_CMB_ELV_SRTMVF2_proj.tif"
+largerAirfields.head()
+airfieldEvaluationDataFrame.head()
+cutFillDF = calculateCutFill(largerAirfields,elevationPath,finalElevation='mean',rasterResolution=30)
+cutFillDF.plot(column='totalCutFillVolume')
+
 testDissolve = airfieldSlopeEvaluationDataFrameSubset.dissolve(by='max')
 len(testDissolve.index)
 testDissolve.plot()
