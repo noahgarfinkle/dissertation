@@ -704,47 +704,51 @@ class Map:
              )
         self.map.add_child(coolIcon)
 
-    def generateRandomLatLonPair(self,latMin,latMax,lonMin,lonMax):
-        """ Summary line
+    def test_generateRandomLatLonPair(self,latMin,latMax,lonMin,lonMax):
+        """ Creates random points to help test other functions
 
-        Detailed description
+        This code is a helper function
 
         Args:
-            param1 (int): The first parameter.
-            param1 (str): The second parameter.
+            latMin (float): Lower bound of latitude
+            latMax (float): Upper bound of latitude
+            lonMin (float): Lower bound of longitude
+            lonMax (float): Upper bound of longitude
 
         Returns:
-            network (pandas dataframe): The return and how to interpret it
+            lat (float): A random latitude within the specified range
+            lon (float): A random longitude within the specified range
 
         Raises:
-            IOError: An error occured accessing the database
+            None
 
         Tests:
-            >>> get_nearest_node(-92.1647,37.7252)
-            node_id = 634267, dist = 124
+            None
         """
         lat = np.random.uniform(latMin,latMax)
         lon = np.random.uniform(lonMin,lonMax)
         return lat,lon
 
-    def addTimeSeriesHeatMap(self):
-        """ Summary line
+    def test_addTimeSeriesHeatMap(self):
+        """ Creatse a random time series map to demonstrate functionality
 
-        Detailed description
+        This is test code to demonstrate the ability to add time series, which
+        will be a cool way to demonstrate generations in genetic algorithms
 
         Args:
-            param1 (int): The first parameter.
-            param1 (str): The second parameter.
+            None
 
         Returns:
-            network (pandas dataframe): The return and how to interpret it
+            None
 
         Raises:
-            IOError: An error occured accessing the database
+            None
+
+        Todo:
+            * Have this take in a dataframe and value of the time column instead
 
         Tests:
-            >>> get_nearest_node(-92.1647,37.7252)
-            node_id = 634267, dist = 124
+            None
         """
         heat_data = []
         for gen in range(0,5):
