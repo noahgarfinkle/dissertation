@@ -523,6 +523,8 @@ def calculateCutFill(df,dem_path,finalElevation='mean',rasterResolution=10):
     totalRequiredHeightChanges = []
     totalCutFillVolumes = []
     for i,row in appendedDF.iterrows():
+    #for i in range(0,len(appendedDF.index+1)):
+        #row = appendedDF[i:i+1]
         maskedRaster = row['mini_raster_array']
         maskedRaster_Array = ma.masked_array(maskedRaster)
         targetElevation = -999
@@ -539,20 +541,6 @@ def calculateCutFill(df,dem_path,finalElevation='mean',rasterResolution=10):
     appendedDF['elevationChangeArray'] = elevationChangeArrays
     appendedDF['totalCutFillVolume'] = totalCutFillVolumes
     return appendedDF
-
-
-df.plot()
-df.head()
-
-largerAirfields.head()
-
-df = airfieldEvaluationDataFrame
-df = largerAirfields
-df = airfieldSlopeEvaluationDataFrameSubset
-appendedDF.head()
-row = appendedDF[0:1]
-maskedRaster_Array
-targetElevation
 
 def minimumDistanceFromEvaluationToDataFrameFeatures(evaluationDF,vectorDF):
         """ Implements Euclidean distance from a data frame of candiate polygons
