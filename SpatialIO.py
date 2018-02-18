@@ -1013,9 +1013,12 @@ for x in floatrange(ll[0],ur[0],gridSpacing):
         square = Polygon([[x,y],[x+gridSpacing,y],[x+gridSpacing,y+gridSpacing],[x,y+gridSpacing]])
         if square.within(aoiPolygon):
             squareList.append(square)
+stop = datetime.datetime.now()
+timDif = stop - start
 df = gpd.GeoDataFrame(squareList)
 df.columns = ['geometry']
 len(df.index)
+timDif
 df['score'] = np.random.randint(0,100,len(df.index))
 
 
@@ -1027,7 +1030,10 @@ height = int(np.ceil((uy-ly)/resolution))
 # 3. Create an empty raster at those bounds
 # https://gis.stackexchange.com/questions/31568/gdal-rasterizelayer-does-not-burn-all-polygons-to-raster
 rasterPath = "./results/createarasterization.tif"
+start = datetime.datetime.now()
 rasterPath = createEmptyRaster(rasterPath,lx,uy,resolution,width,height,3857)
+stop = datetime.datetime.now()
+print stop-start
 # 4. Rasterize the vector to the empty raster
 rasterDataSet = gdal.Open(rasterPath)
 band = rasterDataSet.GetRasterBand(1)
@@ -1036,12 +1042,13 @@ nodata = band.GetNoDataValue()
 
 shp_fn = vector_path
 rst_fn = rasterPath
-out_fn = './results/rasterized16.tif'
+out_fn = './results/rasterized17.tif'
 
 
 rst = rasterio.open( rst_fn )
 meta = rst.meta
 meta.update( compress='lzw' )
+start = datetime.datetime.now()
 with rasterio.open( out_fn, 'w', **meta ) as out:
     out_arr = out.read( 1 )
     # this is where we create a generator of geom, value pairs to use in rasterizing
@@ -1051,7 +1058,8 @@ with rasterio.open( out_fn, 'w', **meta ) as out:
     burned = features.rasterize( shapes=shapes, fill=0, out=out_arr, transform=out.transform,dtype=rasterio.uint32)
 
     out.write_band( 1, burned )
-
+stop = datetime.datetime.now()
+print stop - start
 
 
 
