@@ -505,17 +505,19 @@ def calculateCutFill(df,dem_path,finalElevation='mean',rasterResolution=10):
 
     Tests:Summary line
         None
+            if 'old_geo' in df.columns:
+                df = df.drop('old_geo',axis=1)
+
+            if 'old_geometry' in df.columns:
+                df = df.drop('old_geometry',axis=1)
+
+
+                    #for i in range(0,len(appendedDF.index+1)):
+                        #row = appendedDF[i:i+1]
     """
     # KLUDGE to remove raster stats with the same name
     if finalElevation in df.columns:
         df = df.drop(finalElevation,axis=1)
-
-    if 'old_geo' in df.columns:
-        df = df.drop('old_geo',axis=1)
-
-    if 'old_geometry' in df.columns:
-        df = df.drop('old_geometry',axis=1)
-
     df = df.reset_index()
     croppedRasterDF = rasterStatCroppedRaster(df,dem_path)
     appendedDF = gpd.GeoDataFrame(pd.concat([df,croppedRasterDF],axis=1))
@@ -523,9 +525,8 @@ def calculateCutFill(df,dem_path,finalElevation='mean',rasterResolution=10):
     totalRequiredHeightChanges = []
     totalCutFillVolumes = []
     for i,row in appendedDF.iterrows():
-    #for i in range(0,len(appendedDF.index+1)):
-        #row = appendedDF[i:i+1]
-        maskedRaster = row['mini_raster_array']
+        #maskedRaster = row['mini_raster_array']
+        maskedRaster = croppedRasterDF['mini_raster_array'][i] # KLUDGE
         maskedRaster_Array = ma.masked_array(maskedRaster)
         targetElevation = -999
         if isinstance(finalElevation,basestring):
@@ -541,6 +542,7 @@ def calculateCutFill(df,dem_path,finalElevation='mean',rasterResolution=10):
     appendedDF['elevationChangeArray'] = elevationChangeArrays
     appendedDF['totalCutFillVolume'] = totalCutFillVolumes
     return appendedDF
+
 
 def minimumDistanceFromEvaluationToDataFrameFeatures(evaluationDF,vectorDF):
         """ Implements Euclidean distance from a data frame of candiate polygons
@@ -584,6 +586,7 @@ def convertSubsettedEvaluationDFIntoPolygonGrid(evaluationDF, squareDimension):
                           [centroid_x + offset,centroid_y + offset],
                           [centroid_x - offset,centroid_y + offset]])
         polygonEvaluations.append(square)
+    evaluationDF = evaluationDF.drop('geometry',axis=1)
     evaluationDF['geometry'] = polygonEvaluations
     evaluationDF['old_geo'] = oldPolygons
     return evaluationDF
@@ -610,11 +613,14 @@ airfieldSlopeEvaluationDataFrame.head()
 airfieldSlopeEvaluationDataFrame.plot(column='max')
 plt.hist(airfieldSlopeEvaluationDataFrame['max'])
 airfieldSlopeEvaluationDataFrameSubset = airfieldSlopeEvaluationDataFrame[airfieldSlopeEvaluationDataFrame['max'] < 2]
+airfieldSlopeEvaluationDataFrameSubset.head()
+
 len(airfieldSlopeEvaluationDataFrameSubset.index)
 airfieldSlopeEvaluationDataFrameSubset.plot(column='max')
 
 
 largerAirfields = convertSubsettedEvaluationDFIntoPolygonGrid(airfieldSlopeEvaluationDataFrameSubset, 800)
+largerAirfields.head()
 largerAirfields.plot()
 
 elevationPath = "../FLW_Missouri Mission Folder/RASTER/DEM_CMB_ELV_SRTMVF2_proj.tif"
@@ -623,11 +629,9 @@ airfieldEvaluationDataFrame.head()
 
 cutFillDF = calculateCutFill(largerAirfields,elevationPath,finalElevation='mean',rasterResolution=30)
 cutFillDF.head()
-cutFillDF['totalCutFillVolume']
+cutFillDF.plot(column='totalCutFillVolume')
 
-testDissolve = airfieldSlopeEvaluationDataFrameSubset.dissolve(by='max')
-len(testDissolve.index)
-testDissolve.plot()
+
 
 # Base Objective 1
 baseObjective1AOI = aoiDF[aoiDF['Stage']=='Gold'].reset_index().geometry[0]
