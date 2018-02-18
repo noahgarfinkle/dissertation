@@ -557,6 +557,15 @@ def minimumDistanceFromEvaluationToDataFrameFeatures(evaluationDF,vectorDF):
         evaluationDF['distance'] = minDistances
         return evaluationDF
 
+def convertSubsettedEvaluationDFIntoPolygonGrid(evaluationDF, squareDimensions):
+    polygonEvaluations = []
+    oldPolygons = []
+
+
+    evaluationDF.geometry = polygonEvaluations
+    evaluationDF['old_geometry'] = oldPolygons
+    return evaluationDF
+
 
 ## CURRENT TEST
 # First pass implementation for class
