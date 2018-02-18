@@ -349,6 +349,8 @@ def generateEvaluationGridDataFrame(polygon,gridSpacing):
     timeElapsed = end - start
     nFeatures = len(squareList)
     print "Generated %s squares in %s seconds" %(nFeatures,timeElapsed.seconds)
+    evaluationDF = gpd.GeoDataFrame(squareList)
+    evaluationDF.columns = ['geometry']
     return squareList
 
 
