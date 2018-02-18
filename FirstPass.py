@@ -287,44 +287,6 @@ def projectWKT(wkt,from_epsg,to_epsg):
     reprojectedWKT = df_to_project.geometry[0].to_wkt()
     return reprojectedWKT
 
-def createEmptyRaster(rasterPath,topLeftX,topLeftY,cellSize,width,height,epsg):
-    """ Generates a raster failled with zeros in GeoTiff format
-
-    Uses GDAL to create an empty raster
-
-    Args:
-        rasterPath (str): Where to place the newly created raster
-        topLeftX (float): The x-coordinate of the top left of the raster, in raster
-            projection
-        topLeftY (float): The y-coordinate of the top left of the raster, in raster
-            projection
-        cellSize (float): The raster resolution, assumes that the raster cell
-            size is the same in the x and y dimension
-        width (int): X-dimension of the raster, in pixels
-        height (int): Y-dimension of the raster, in pixels
-        epsg (int): The EPSG representation of the projection of the raster
-
-    Returns:
-        rasterPath (str): The path of the created raster, as a confirmation that
-            the raster was written
-
-    Raises:
-        None
-
-    Tests:
-        <<< raster[25:50,25:50] = 100 # this code is for testing, and not a unit test
-    """
-    geotransform = [topLeftX,cellSize,0,topLeftY,0,-cellSize]
-    driver = gdal.GetDriverByName("GTiff")
-    dst_ds = driver.Create(rasterPath, width, height, 1, gdal.GDT_Byte )
-    dst_ds.SetGeoTransform(geotransform)
-    srs = osr.SpatialReference()
-    srs.ImportFromEPSG(epsg)
-    dst_ds.SetProjection(srs.ExportToWkt())
-    raster = np.zeros((height,width),dtype=np.uint32)
-    dst_ds.GetRasterBand(1).WriteArray(raster)
-    return rasterPath
-
 
 def floatrange(start, stop, step):
     """ Generates a range between two floats with a float step size
@@ -718,14 +680,6 @@ def testFirstPassImplementation():
     filteredRoads = filterDataFrameByBounds(roadsDF,lx,ly,ux,uy)
     filteredCounties = filterDataFrameByBounds(df_proj,lx,ly,ux,uy)
     filteredCounties.plot(ax=filteredRoads.plot(facecolor='red'),facecolor='Green')
-
-
-def testCreatingEmptyRaster():
-    createEmptyRaster("./results/testemptyraster3.tif",lx,uy,30,100,100,3857)
-    ds = gdal.Open('./results/testemptyraster3.tif')
-    data = ds.ReadAsArray()
-    plt.imshow(data)
-
 
 def testPointDistance():
     point = Point(ux,uy)
