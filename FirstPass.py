@@ -352,7 +352,7 @@ def generateEvaluationGridDataFrame(polygon,gridSpacing):
     print "Generated %s squares in %s seconds" %(nFeatures,timeElapsed.seconds)
     evaluationDF = gpd.GeoDataFrame(squareList)
     evaluationDF.columns = ['geometry']
-    return squareList
+    return evaluationDF
 
 
 def convertRasterToNumpyArray(raster_path):
@@ -567,6 +567,7 @@ aoiDF = aoiDF.to_crs({'init':'epsg:3857'})
 aoiPolygon = aoiDF.geometry[0]
 
 testDF = generateEvaluationGridDataFrame(aoiPolygon,300)
+testDF
 
 aoiPolygon
 import datetime
