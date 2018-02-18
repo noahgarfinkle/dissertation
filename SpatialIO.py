@@ -981,11 +981,33 @@ def rasterizeGeodataFrameColumn(df,column,outputRasterPath,resolution=30,crs=Non
         * Implement re-projection
 
     Tests:
-        None
+        >>> rp = rasterizeGeodataFrameColumn(df,'score','./results/testrasterizationfunction.tif')
+        >>> rp = rasterizeGeodataFrameColumn(df,'score','./results/testrasterizationfunctionNegativeNoData.tif',noDataValue=-1)
     """
     # 1. Check if the column is all numeric, and if not raise an error.  Also,
     #       determine the data type and make sure all of the rasters reflect
     dtype = df[column].dtype.type # type numpy.dtype
+    if dtype == np.int16:
+        pass
+    elif dtype == np.int32:
+        pass
+    elif dtype == np.int64:
+        dtype = np.int32
+    elif dtype == np.uint8:
+        dtype = np.uint16
+    elif dtype == np.uint16:
+        pass
+    elif dtype == np.uint32:
+        pass
+    elif dtype == np.uint64:
+        dtype = np.uint32
+    elif dtype == np.float32:
+        pass
+    elif dtype == np.float64:
+        pass
+    else: # Fallback condition
+        dtype = np.uint32
+        gdal_dtype = gdal.GDT_UInt32
 
     # 2. Get the bounds of the geometries
     lx,ly,ux,uy = df.total_bounds
@@ -994,7 +1016,7 @@ def rasterizeGeodataFrameColumn(df,column,outputRasterPath,resolution=30,crs=Non
 
     # 3. Create an empty raster at those bounds
     # https://gis.stackexchange.com/questions/31568/gdal-rasterizelayer-does-not-burn-all-polygons-to-raster
-    rasterPath = "./results/createarasterization.tif"
+    rasterPath = "./results/tmpRasterForDF.tif"
     rasterPath = createEmptyRaster(rasterPath,lx,uy,resolution,width,height,3857,dtype=dtype)
 
     # 4. Rasterize the vector to a copy of the empty raster
@@ -1013,10 +1035,9 @@ def rasterizeGeodataFrameColumn(df,column,outputRasterPath,resolution=30,crs=Non
         out.write_band( 1, burned )
     stop = datetime.datetime.now()
     timeDelta = stop - start
-    print "Raster created in %s seconds at %s" %(timeDelta.second,outputRasterPath)
-    return rasterPath
+    print "Raster created in %s seconds at %s" %(timeDelta.seconds,outputRasterPath)
+    return outputRasterPath
 
-rp = rasterizeGeodataFrameColumn(df,'score','./results/testrasterizationfunction.tif')
 
 # try again
 def floatrange(start, stop, step):
