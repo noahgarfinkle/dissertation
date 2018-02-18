@@ -891,7 +891,7 @@ df = df.to_crs({"init":"EPSG:3857"})
 df['score'] = 1
 outRast = './results/testrasterization.tif'
 
-def createEmptyRaster(rasterPath,topLeftX,topLeftY,cellSize,width,height,epsg):
+def createEmptyRaster(rasterPath,topLeftX,topLeftY,cellSize,width,height,epsg,dtype=np.uint32):
     """ Generates a raster failled with zeros in GeoTiff format
 
     Uses GDAL to create an empty raster
@@ -907,6 +907,7 @@ def createEmptyRaster(rasterPath,topLeftX,topLeftY,cellSize,width,height,epsg):
         width (int): X-dimension of the raster, in pixels
         height (int): Y-dimension of the raster, in pixels
         epsg (int): The EPSG representation of the projection of the raster
+        dtype (dtype): The data type of the raster
 
     Returns:
         rasterPath (str): The path of the created raster, as a confirmation that
@@ -918,59 +919,104 @@ def createEmptyRaster(rasterPath,topLeftX,topLeftY,cellSize,width,height,epsg):
     Tests:
         <<< raster[25:50,25:50] = 100 # this code is for testing, and not a unit test
     """
+    gdal_dtype = gdal.GDT_UInt32
+    if dtype == np.byte:
+        gdal_dtype = gdal.GDT_Byte
+    elif dtype == np.int16:
+        gdal_dtype = gdal.GDT_Int16
+    elif dtype == np.int32:
+        gdal_dtype = gdal.GDT_Int32
+    elif dtype == np.int64:
+        dtype = np.int32 # This is a kludge
+        gdal_dtype = gdal.GDT_Int32
+    elif dtype == np.uint16:
+        gdal_dtype = gdal.GDT_UInt16
+    elif dtype == np.uint32:
+        gdal_dtype = gdal.GDT_UInt32
+    elif dtype == np.float32:
+        gdal_dtype = gdal.GDT_Float32
+    elif dtype == np.float64:
+        gdal_dtype = gdal.GDT_Float64
+    else: # Fallback condition
+        dtype = np.uint32
+        gdal_dtype = gdal.GDT_UInt32
+
     geotransform = [topLeftX,cellSize,0,topLeftY,0,-cellSize]
     driver = gdal.GetDriverByName("GTiff")
-    dst_ds = driver.Create(rasterPath, width, height, 1, gdal.GDT_UInt32 )
+    dst_ds = driver.Create(rasterPath, width, height, 1, gdal_dtype )
     dst_ds.SetGeoTransform(geotransform)
     srs = osr.SpatialReference()
     srs.ImportFromEPSG(epsg)
     dst_ds.SetProjection(srs.ExportToWkt())
-    raster = np.zeros((height,width),dtype=np.uint32)
+    raster = np.zeros((height,width),dtype=dtype)
     dst_ds.GetRasterBand(1).WriteArray(raster)
     return rasterPath
 
-# 1. Check if the column is all numeric, and if not raise an error.  Also,
-#       determine the data type and make sure all of the rasters reflect
-
-# 2. Get the bounds of the geometries
-resolution = 30
-lx,ly,ux,uy = df.total_bounds
-width = int(np.ceil((ux-lx)/resolution))
-height = int(np.ceil((uy-ly)/resolution))
-
-# 3. Create an empty raster at those bounds
-# https://gis.stackexchange.com/questions/31568/gdal-rasterizelayer-does-not-burn-all-polygons-to-raster
-rasterPath = "./results/createarasterization.tif"
-rasterPath = createEmptyRaster(rasterPath,lx,uy,resolution,width,height,3857)
-# 4. Rasterize the vector to the empty raster
-rasterDataSet = gdal.Open(rasterPath)
-band = rasterDataSet.GetRasterBand(1)
-nodata = band.GetNoDataValue()
-# 5. Return a raster object
 
 
-# https://www.queryoverflow.gdn/query/rasterize-a-shapefile-with-geopandas-or-fiona-python-23_151339.html
-df.head()
+def rasterizeGeodataFrameColumn(df,column,outputRasterPath,resolution=30,crs=None,noDataValue=0):
+    """ Creates a raster from the specified column
 
-shp_fn = vector_path
-rst_fn = rasterPath
-out_fn = './results/rasterized15.tif'
+    Given a GeoDataFrame and numeric column, creates a raster with the extents
+    as the overall dataframe and specified resolution, in the same CRS as the
+    dataframe unless CRS is specified.
 
+    Args:
+        df (GeoPandas GeoDataFrame): The collection of vector features
+        column (str): The name of a numeric column in the df, to be rasterized
+        rasterPath (str): Where to place the newly created raster
+        resolution (float): The cell size of the output raster
+        crs (ENUM CRS): The target projection.  If None, same as df.
+        noDataValue (int/float): The value to write where no data exists
 
-rst = rasterio.open( rst_fn )
-meta = rst.meta
-meta.update( compress='lzw' )
-with rasterio.open( out_fn, 'w', **meta ) as out:
-    out_arr = out.read( 1 )
-    # this is where we create a generator of geom, value pairs to use in rasterizing
-    shapes = ( (geom,value) for geom, value in zip( df.geometry, df.score ) )
-    #burned = features.rasterize( shapes=shapes, fill=0, out=out_arr, transform=out.transform,dtype=rasterio.float32)
+    Returns:
+        rasterPath (str): The path of the created raster, as a confirmation that
+            the raster was written
 
-    burned = features.rasterize( shapes=shapes, fill=0, out=out_arr, transform=out.transform,dtype=rasterio.uint32)
+    Raises:
+        None
 
-    out.write_band( 1, burned )
+    Todo:
+        * Raise if column is not numeric
+        * Implement re-projection
 
+    Tests:
+        None
+    """
+    # 1. Check if the column is all numeric, and if not raise an error.  Also,
+    #       determine the data type and make sure all of the rasters reflect
+    dtype = df[column].dtype.type # type numpy.dtype
 
+    # 2. Get the bounds of the geometries
+    lx,ly,ux,uy = df.total_bounds
+    width = int(np.ceil((ux-lx)/resolution))
+    height = int(np.ceil((uy-ly)/resolution))
+
+    # 3. Create an empty raster at those bounds
+    # https://gis.stackexchange.com/questions/31568/gdal-rasterizelayer-does-not-burn-all-polygons-to-raster
+    rasterPath = "./results/createarasterization.tif"
+    rasterPath = createEmptyRaster(rasterPath,lx,uy,resolution,width,height,3857,dtype=dtype)
+
+    # 4. Rasterize the vector to a copy of the empty raster
+    rst = rasterio.open( rasterPath )
+    meta = rst.meta
+    meta.update( compress='lzw' )
+    start = datetime.datetime.now()
+    with rasterio.open( outputRasterPath, 'w', **meta ) as out:
+        out_arr = out.read( 1 )
+        # this is where we create a generator of geom, value pairs to use in rasterizing
+        shapes = ( (geom,value) for geom, value in zip( df.geometry, df[column] ) )
+        #burned = features.rasterize( shapes=shapes, fill=0, out=out_arr, transform=out.transform,dtype=rasterio.float32)
+
+        burned = features.rasterize( shapes=shapes, fill=noDataValue, out=out_arr, transform=out.transform,dtype=dtype)
+
+        out.write_band( 1, burned )
+    stop = datetime.datetime.now()
+    timeDelta = stop - start
+    print "Raster created in %s seconds at %s" %(timeDelta.second,outputRasterPath)
+    return rasterPath
+
+rp = rasterizeGeodataFrameColumn(df,'score','./results/testrasterizationfunction.tif')
 
 # try again
 def floatrange(start, stop, step):
