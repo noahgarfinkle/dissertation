@@ -569,6 +569,11 @@ aoiDF.plot()
 # Airfield Objective
 airfieldAOI = aoiDF[aoiDF['Stage']=='Gold'].reset_index().geometry[0]
 airfieldEvaluationDataFrame = generateEvaluationGridDataFrame(airfieldAOI,100)
+slopePath = '../FLW_Missouri Mission Folder/RASTER/slope_proj.tif'
+airfieldSlopeEvaluationDataFrame = generateRasterStatisticsForDataFrame(airfieldEvaluationDataFrame,slopePath,stats="mean max",isCategorical=False)
+airfieldSlopeEvaluationDataFrame.head()
+airfieldSlopeEvaluationDataFrame.plot(column='max')
+
 
 airfieldAOI.values
 
