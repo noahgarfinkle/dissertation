@@ -547,12 +547,13 @@ def minimumDistanceFromEvaluationToDataFrameFeatures(evaluationDF,vectorDF):
         Tests:Summary line
             None
         """
-    minDistances = []
-    for i,row in evaluationDF.iterrows():
-        minDistance = vectorDF.distance(row.geometry).min()
-        minDistances.append(minDistance)
-    evaluationDF['distance'] = minDistances
-    return evaluationDF
+        minDistances = []
+        for i,row in evaluationDF.iterrows():
+            minDistance = vectorDF.distance(row.geometry).min()
+            minDistances.append(minDistance)
+        evaluationDF['distance'] = minDistances
+        return evaluationDF
+
 
 ## CURRENT TEST
 # building the evaluation grid structure
@@ -561,6 +562,9 @@ aoiDF = gpd.read_file("./test_data/geojson.json")
 aoiDF.CRS = {'init':'epsg:4326'}
 aoiDF = aoiDF.to_crs({'init':'epsg:3857'})
 aoiPolygon = aoiDF.geometry[0]
+
+testDF = generateEvaluationGridDataFrame("./test_data/geojson.json")
+
 aoiPolygon
 import datetime
 gridSpacing = 300
