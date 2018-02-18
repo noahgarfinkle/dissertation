@@ -599,6 +599,10 @@ airfieldSlopeEvaluationDataFrameSubset = airfieldSlopeEvaluationDataFrame[airfie
 len(airfieldSlopeEvaluationDataFrameSubset.index)
 airfieldSlopeEvaluationDataFrameSubset.plot(column='max')
 
+
+largerAirfields = convertSubsettedEvaluationDFIntoPolygonGrid(airfieldSlopeEvaluationDataFrameSubset, 800)
+largerAirfields.plot()
+
 testDissolve = airfieldSlopeEvaluationDataFrameSubset.dissolve(by='max')
 len(testDissolve.index)
 testDissolve.plot()
