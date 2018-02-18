@@ -56,6 +56,9 @@ import os
 # %matplotlib inline
 # pd.options.display.max_columns = 300
 
+## LIFESAVING RESOURCES
+# http://www.thisprogrammingthing.com/2013/fixing-the-this-exceeds-githubs-file-size-limit-of-100-mb-error/
+
 ## SETUP
 
 """ REFERENCES
