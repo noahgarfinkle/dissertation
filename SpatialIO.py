@@ -65,6 +65,7 @@ http://nbviewer.jupyter.org/github/ocefpaf/folium_notebooks/blob/master/test_ima
 https://ocefpaf.github.io/python4oceanographers/blog/2015/12/14/geopandas_folium/
 http://andrewgaidus.com/leaflet_webmaps_python/
 https://www.kaggle.com/daveianhickey/how-to-folium-for-maps-heatmaps-time-series
+https://gist.github.com/mhweber/1a07b0881c2ab88d062e3b32060e5486
 """
 
 ## Enumerations
@@ -1033,77 +1034,6 @@ table#t01 tr:nth-child(even) {{
 """.format
 
 
-
-
-
-
-# rasterize a GeoDataFrame
-# https://gist.github.com/mhweber/1a07b0881c2ab88d062e3b32060e5486
-import geopandas as gpd
-import rasterio
-import fiona
-from rasterio import features
-import os
-import numpy as np
-
-def rasterize(convert_to_rast, out_rast, meta, field):
-    with rasterio.open(out_rast,'w',**meta) as out:
-        out_arr = out.read(1)
-        # this is where we create a generator of geom, value pairs to use in rasterizing
-        shapes = ((geom,value) for geom, value in zip(convert_to_rast.geometry, convert_to_rast[field]))
-
-        burned = features.rasterize(shapes=shapes, fill=0, out=out_arr, transform=out.transform)
-        out.write_band(1, burned)
-
-vector_path = "./test_data/geojson.json"
-templateRast = "./test_data/testelevunproj.tif"
-df = gpd.read_file(vector_path)
-df = df.to_crs({"init":"EPSG:3857"})
-df['score'] = 1
-outRast = './results/testrasterization.tif'
-
-
-
-
-
-resolution = 30
-lx,ly,ux,uy = df.total_bounds
-width = int(np.ceil((ux-lx)/resolution))
-height = int(np.ceil((uy-ly)/resolution))
-
-# 3. Create an empty raster at those bounds
-# https://gis.stackexchange.com/questions/31568/gdal-rasterizelayer-does-not-burn-all-polygons-to-raster
-rasterPath = "./results/createarasterization.tif"
-start = datetime.datetime.now()
-rasterPath = createEmptyRaster(rasterPath,lx,uy,resolution,width,height,3857)
-stop = datetime.datetime.now()
-print stop-start
-# 4. Rasterize the vector to the empty raster
-rasterDataSet = gdal.Open(rasterPath)
-band = rasterDataSet.GetRasterBand(1)
-nodata = band.GetNoDataValue()
-
-
-shp_fn = vector_path
-rst_fn = rasterPath
-out_fn = './results/rasterized17.tif'
-
-
-rst = rasterio.open( rst_fn )
-meta = rst.meta
-meta.update( compress='lzw' )
-start = datetime.datetime.now()
-with rasterio.open( out_fn, 'w', **meta ) as out:
-    out_arr = out.read( 1 )
-    # this is where we create a generator of geom, value pairs to use in rasterizing
-    shapes = ( (geom,value) for geom, value in zip( df.geometry, df.score ) )
-    #burned = features.rasterize( shapes=shapes, fill=0, out=out_arr, transform=out.transform,dtype=rasterio.float32)
-
-    burned = features.rasterize( shapes=shapes, fill=0, out=out_arr, transform=out.transform,dtype=rasterio.uint32)
-
-    out.write_band( 1, burned )
-stop = datetime.datetime.now()
-print stop - start
 
 
 
