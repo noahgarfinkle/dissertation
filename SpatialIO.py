@@ -929,7 +929,8 @@ def createEmptyRaster(rasterPath,topLeftX,topLeftY,cellSize,width,height,epsg):
     dst_ds.GetRasterBand(1).WriteArray(raster)
     return rasterPath
 
-# 1. Check if the column is all numeric, and if not raise an error
+# 1. Check if the column is all numeric, and if not raise an error.  Also,
+#       determine the data type and make sure all of the rasters reflect
 
 # 2. Get the bounds of the geometries
 resolution = 30
@@ -953,7 +954,7 @@ df.head()
 
 shp_fn = vector_path
 rst_fn = rasterPath
-out_fn = './results/rasterized13.tif'
+out_fn = './results/rasterized14.tif'
 
 
 rst = rasterio.open( rst_fn )
@@ -968,6 +969,91 @@ with rasterio.open( out_fn, 'w', **meta ) as out:
     burned = features.rasterize( shapes=shapes, fill=0, out=out_arr, transform=out.transform,dtype=rasterio.uint32)
 
     out.write_band( 1, burned )
+
+
+
+# try again
+def floatrange(start, stop, step):
+    """ Generates a range between two floats with a float step size
+
+    Taken from http://portolan.leaffan.net/creating-sample-points-with-ogr-and-shapely-pt-2-regular-grid-sampling/
+
+    Args:
+        start (float): Lower bound, inclusive
+        stop (float): Upper bound, exclusive
+        step (float): Step size
+
+    Returns:
+        generator (generator of floats): Range between start and stop
+
+    Raises:
+        None
+
+    Tests:
+        None
+    """
+    while start < stop:
+        yield start
+        start += step
+
+aoiDF = gpd.read_file("./test_data/geojson.json")
+aoiDF.CRS = {'init':'epsg:4326'}
+aoiDF = aoiDF.to_crs({'init':'epsg:3857'})
+aoiPolygon = aoiDF.geometry[0]
+aoiPolygon
+import datetime
+gridSpacing = 3000
+squareList = []
+bounds = aoiPolygon.bounds
+ll = bounds[:2]
+ur = bounds[2:]
+# https://stackoverflow.com/questions/30457089/how-to-create-a-polygon-given-its-point-vertices
+start = datetime.datetime.now()
+for x in floatrange(ll[0],ur[0],gridSpacing):
+    for y in floatrange(ll[1],ur[1],gridSpacing):
+        square = Polygon([[x,y],[x+gridSpacing,y],[x+gridSpacing,y+gridSpacing],[x,y+gridSpacing]])
+        if square.within(aoiPolygon):
+            squareList.append(square)
+df = gpd.GeoDataFrame(squareList)
+len(df.index)
+df['score'] = np.random.randint(0,100,len(df.index))
+
+
+resolution = 30
+lx,ly,ux,uy = df.total_bounds
+width = int(np.ceil((ux-lx)/resolution))
+height = int(np.ceil((uy-ly)/resolution))
+
+# 3. Create an empty raster at those bounds
+# https://gis.stackexchange.com/questions/31568/gdal-rasterizelayer-does-not-burn-all-polygons-to-raster
+rasterPath = "./results/createarasterization.tif"
+rasterPath = createEmptyRaster(rasterPath,lx,uy,resolution,width,height,3857)
+# 4. Rasterize the vector to the empty raster
+rasterDataSet = gdal.Open(rasterPath)
+band = rasterDataSet.GetRasterBand(1)
+nodata = band.GetNoDataValue()
+
+
+shp_fn = vector_path
+rst_fn = rasterPath
+out_fn = './results/rasterized14.tif'
+
+
+rst = rasterio.open( rst_fn )
+meta = rst.meta
+meta.update( compress='lzw' )
+with rasterio.open( out_fn, 'w', **meta ) as out:
+    out_arr = out.read( 1 )
+    # this is where we create a generator of geom, value pairs to use in rasterizing
+    shapes = ( (geom,value) for geom, value in zip( df.geometry, df.score ) )
+    #burned = features.rasterize( shapes=shapes, fill=0, out=out_arr, transform=out.transform,dtype=rasterio.float32)
+
+    burned = features.rasterize( shapes=shapes, fill=0, out=out_arr, transform=out.transform,dtype=rasterio.uint32)
+
+    out.write_band( 1, burned )
+
+
+
 
 
 ## TESTS
