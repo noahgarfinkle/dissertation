@@ -594,14 +594,10 @@ def convertSubsettedEvaluationDFIntoPolygonGrid(evaluationDF, squareDimension):
 
 ## CURRENT TEST
 # First pass implementation for class
+"""
 aoiDF = gpd.read_file("../FLW_Missouri Mission Folder/SUPPORT/Staging.shp")
 aoiDF = aoiDF.to_crs({'init':'epsg:3857'})
-
-aoiDF.geometry[0].centroid.x
-
-geometry = aoiDF.geometry[0]
 squareDimension = 400
-square
 aoiDF.plot()
 
 # Airfield Objective
@@ -632,7 +628,8 @@ cutFillDF.head()
 cutFillDF.plot(column='totalCutFillVolume')
 
 plt.hist(cutFillDF['totalCutFillVolume'])
-
+"""
+"""
 # Base Objective 1
 baseObjective1AOI = aoiDF[aoiDF['Stage']=='Gold'].reset_index().geometry[0]
 baseObjective1EvaluationDataFrame = generateEvaluationGridDataFrame(baseObjective1AOI,100)
@@ -641,14 +638,14 @@ baseObjective1EvaluationDataFrame = generateEvaluationGridDataFrame(baseObjectiv
 # Base Objective 2
 baseObjective2AOI = aoiDF[aoiDF['Stage']=='Gold'].reset_index().geometry[0]
 baseObjective2EvaluationDataFrame = generateEvaluationGridDataFrame(baseObjective2AOI,100)
+"""
 
 
 
 
 
 
-
-
+"""
 raster_path = "../FLW_Missouri Mission Folder/RASTER/DEM_CMB_ELV_SRTMVF2_proj.tif"
 result_DF = generateRasterStatisticsForDataFrame(evaluationGridDataFrame,raster_path,stats="mean",isCategorical=False)
 plt.figure()
@@ -716,7 +713,7 @@ plt.savefig("./results/distancefrominfrastructure.png")
 a = evaluationDF[0:1]
 a
 a.to_html()
-
+"""
 
 
 
