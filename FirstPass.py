@@ -573,9 +573,14 @@ slopePath = '../FLW_Missouri Mission Folder/RASTER/slope_proj.tif'
 airfieldSlopeEvaluationDataFrame = generateRasterStatisticsForDataFrame(airfieldEvaluationDataFrame,slopePath,stats="mean max",isCategorical=False)
 airfieldSlopeEvaluationDataFrame.head()
 airfieldSlopeEvaluationDataFrame.plot(column='max')
+plt.hist(airfieldSlopeEvaluationDataFrame['max'])
+airfieldSlopeEvaluationDataFrameSubset = airfieldSlopeEvaluationDataFrame[airfieldSlopeEvaluationDataFrame['max'] < 2]
+len(airfieldSlopeEvaluationDataFrameSubset.index)
+airfieldSlopeEvaluationDataFrameSubset.plot(column='max')
 
-
-airfieldAOI.values
+testDissolve = airfieldSlopeEvaluationDataFrameSubset.dissolve(by='max')
+len(testDissolve.index)
+testDissolve.plot()
 
 # Base Objective 1
 baseObjective1AOI = aoiDF[aoiDF['Stage']=='Gold'].reset_index().geometry[0]
