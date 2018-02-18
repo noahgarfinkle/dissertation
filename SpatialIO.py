@@ -635,7 +635,7 @@ class Map:
     """
 
     def __init__(self,name="Not set"):
-        self.map = folium.Map([48., 5.], tiles='stamentoner', zoom_start=6)
+        self.map = folium.Map([37.7945, -92.1348], tiles='stamentoner', zoom_start=6)
         self.name = name
 
     def addRasterLayerAsOverlay(self,rasterLayer,opacity):
