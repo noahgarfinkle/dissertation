@@ -72,8 +72,8 @@ Noah W. Garfinkle
   - [ ] Plot solution dataframe to raster with n/a where no solutions considered and ability to place any of the scores from the dataframe, saving to a geotiff
 
 ## 17 February Tasks
-- [ ] Get comments in all files
-- [ ] Clean up all code
+- [x] Get comments in all files
+- [x] Clean up all code
 - [ ] Get routing to write to dataframes and connect plotting to SpatialIO
 
 ## Tasks
