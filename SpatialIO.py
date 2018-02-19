@@ -808,6 +808,10 @@ class Map:
         hm = plugins.HeatMapWithTime(heat_data)
         self.map.add_child(hm)
 
+    def addTimeSeriesHeatMapFromArray(self,heat_data):
+        hm = plugins.HeatMapWithTime(heat_data)
+        self.map.add_child(hm)
+
 
 ## FUNCTIONS
 def createEmptyRaster(rasterPath,topLeftX,topLeftY,cellSize,width,height,epsg,dtype=np.uint32):
