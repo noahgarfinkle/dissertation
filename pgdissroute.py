@@ -149,7 +149,7 @@ def drivingDistance(startNode,distance,mapPath="./results/mapwithdrivedistance.h
     #map2.add_child(nodes_features)
     map2.add_child(edges_features)
     map2.save(mapPath)
-    return nodes_features, edges_features
+    return nodes_features, edges_features, map2
 
 
 def kMultipleRoutes(startNode,endNode,k):
