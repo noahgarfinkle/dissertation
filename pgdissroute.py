@@ -315,10 +315,8 @@ def calculateRouteDistance(startLon,startLat,endLon,endLat):
     sql2 = "select * from ways where id in (%s)" %(",".join(edges))
     df2 = gpd.read_postgis(sql2,con=conn,geom_col="the_geom")
     df2.crs = {'init':'epsg:4326'}
-    gjson = df2.to_crs(epsg='4326').to_json()
-    lines = folium.features.GeoJson(gjson)
-    #map.save('./results/mapwithroute.html')
-    return df,df2
+    totalLengthMeters = sum(df2['length_m'])
+    return totalLengthMeters
 
 
 def routeWithAvoidance(startLon,startLat,endLon,endLat,linkIDsToAvoid=[]):
