@@ -591,7 +591,69 @@ def convertSubsettedEvaluationDFIntoPolygonGrid(evaluationDF, squareDimension):
     evaluationDF['old_geo'] = oldPolygons
     return evaluationDF
 
+def generateRandomLatLonPair(latMin,latMax,lonMin,lonMax):
+    """ Creates random points to help test other functions
 
+    This code is a helper function
+
+    Args:
+        latMin (float): Lower bound of latitude
+        latMax (float): Upper bound of latitude
+        lonMin (float): Lower bound of longitude
+        lonMax (float): Upper bound of longitude
+
+    Returns:
+        lat (float): A random latitude within the specified range
+        lon (float): A random longitude within the specified range
+
+    Raises:
+        None
+
+    Tests:
+        None
+    """
+    lat = np.random.uniform(latMin,latMax)
+    lon = np.random.uniform(lonMin,lonMax)
+    return lat,lon
+
+def generateRandomCandidateDataFrame(nCandidates,latMin,latMax,lonMin,lonMax):
+        """ Creates random solutionDF to help test other functions
+
+        This code is a helper function
+
+        Args:
+            nCandidates (int): Number of candidate sites to create
+            latMin (float): Lower bound of latitude
+            latMax (float): Upper bound of latitude
+            lonMin (float): Lower bound of longitude
+            lonMax (float): Upper bound of longitude
+
+        Returns:
+            lat (float): A random latitude within the specified range
+            lon (float): A random longitude within the specified range
+
+        Raises:
+            None
+
+        Tests:
+            None
+        """
+        lats = []
+        lons = []
+        scores = []
+        geoms = []
+        for i in range(0,nCandidates):
+            lat,lon = generateRandomLatLonPair(latMin,latMax,lonMin,lonMax)
+            lats.append(lat)
+            lons.append(lon)
+            score = np.random.randint(0,101)
+            scores.append(score)
+            point = Point([lon,lat])
+            square = Polygon([[x,y],[x+gridSpacing,y],[x+gridSpacing,y+gridSpacing],[x,y+gridSpacing]])
+            if square.within(polygon):
+                squareList.append(square)
+        candidateDF = gpd.GeoDataFrame({""})
+    return 0
 ## CURRENT TEST
 # First pass implementation for class
 """
