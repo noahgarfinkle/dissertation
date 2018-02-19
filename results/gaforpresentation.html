@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<head>    
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <script>L_PREFER_CANVAS = false; L_NO_TOUCH = false; L_DISABLE_3D = false;</script>
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.2.0/dist/leaflet.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.2.0/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.css" />
+    <link rel="stylesheet" href="https://rawgit.com/python-visualization/folium/master/folium/templates/leaflet.awesome.rotate.css" />
+    <style>html, body {width: 100%;height: 100%;margin: 0;padding: 0;}</style>
+    <style>#map {position:absolute;top:0;bottom:0;right:0;left:0;}</style>
+    
+            <style> #map_033ef91bc1b9446d9765c7b7e6f982c8 {
+                position : relative;
+                width : 100.0%;
+                height: 100.0%;
+                left: 0.0%;
+                top: 0.0%;
+                }
+            </style>
+        
+    <script src="https://rawgit.com/socib/Leaflet.TimeDimension/master/dist/leaflet.timedimension.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/heatmap.js/2.0.2/heatmap.min.js"></script>
+    <script src="https://rawgit.com/pa7/heatmap.js/develop/plugins/leaflet-heatmap/leaflet-heatmap.js"></script>
+    <link rel="stylesheet" href="http://apps.socib.es/Leaflet.TimeDimension/dist/leaflet.timedimension.control.min.css" />
+    
+            <script>
+                var TDHeatmap = L.TimeDimension.Layer.extend({
+
+            initialize: function(data, options) {
+                var heatmapCfg = {
+                    radius: 15,
+                    maxOpacity: 1.,
+                    scaleRadius: false,
+                    useLocalExtrema: false,
+                    latField: 'lat',
+                    lngField: 'lng',
+                    valueField: 'count',
+                    defaultWeight : 1,
+                };
+                heatmapCfg = $.extend({}, heatmapCfg, options.heatmapOptions || {});
+                var layer = new HeatmapOverlay(heatmapCfg);
+                L.TimeDimension.Layer.prototype.initialize.call(this, layer, options);
+                this._currentLoadedTime = 0;
+                this._currentTimeData = {
+                    data: []
+                    };
+                this.data= data;
+                this.defaultWeight = heatmapCfg.defaultWeight || 1;
+            },
+            onAdd: function(map) {
+                L.TimeDimension.Layer.prototype.onAdd.call(this, map);
+                map.addLayer(this._baseLayer);
+                if (this._timeDimension) {
+                    this._getDataForTime(this._timeDimension.getCurrentTime());
+                }
+            },
+            _onNewTimeLoading: function(ev) {
+                this._getDataForTime(ev.time);
+                return;
+            },
+            isReady: function(time) {
+                return (this._currentLoadedTime == time);
+            },
+            _update: function() {
+                this._baseLayer.setData(this._currentTimeData);
+                return true;
+            },
+            _getDataForTime: function(time) {
+                    delete this._currentTimeData.data;
+                    this._currentTimeData.data = [];
+                    var data = this.data[time-1];
+                    for (var i = 0; i < data.length; i++) {
+                        this._currentTimeData.data.push({
+                                lat: data[i][0],
+                                lng: data[i][1],
+                                count: data[i].length>2 ? data[i][2] : this.defaultWeight
+                            });
+                        }
+                    this._currentLoadedTime = time;
+                    if (this._timeDimension && time == this._timeDimension.getCurrentTime() && !this._timeDimension.isLoading()) {
+                        this._update();
+                    }
+                    this.fire('timeload', {
+                        time: time
+                    });
+                }
+        });
+
+        L.Control.TimeDimensionCustom = L.Control.TimeDimension.extend({
+            initialize: function(index, options) {
+                var playerOptions = {
+                    buffer: 1,
+                    minBufferReady: -1
+                    };
+                options.playerOptions = $.extend({}, playerOptions, options.playerOptions || {});
+                L.Control.TimeDimension.prototype.initialize.call(this, options);
+                this.index = index;
+                },
+            _getDisplayDateFormat: function(date){
+                return this.index[date.getTime()-1];
+                }
+            });
+            </script>
+                
+</head>
+<body>    
+    
+            <div class="folium-map" id="map_033ef91bc1b9446d9765c7b7e6f982c8" ></div>
+        
+</body>
+<script>    
+    
+
+            
+                var bounds = null;
+            
+
+            var map_033ef91bc1b9446d9765c7b7e6f982c8 = L.map(
+                                  'map_033ef91bc1b9446d9765c7b7e6f982c8',
+                                  {center: [37.7945,-92.1348],
+                                  zoom: 6,
+                                  maxBounds: bounds,
+                                  layers: [],
+                                  worldCopyJump: false,
+                                  crs: L.CRS.EPSG3857
+                                 });
+            
+        
+    
+            var tile_layer_13a9d1201b6f4ca59a5f0065d73c99a1 = L.tileLayer(
+                'https://stamen-tiles-{s}.a.ssl.fastly.net/toner/{z}/{x}/{y}.png',
+                {
+  "attribution": null, 
+  "detectRetina": false, 
+  "maxZoom": 18, 
+  "minZoom": 1, 
+  "noWrap": false, 
+  "subdomains": "abc"
+}
+                ).addTo(map_033ef91bc1b9446d9765c7b7e6f982c8);
+        
+    
+
+            var times = [1, 2, 3];
+
+            map_033ef91bc1b9446d9765c7b7e6f982c8.timeDimension = L.timeDimension(
+                {times : times, currentTime: new Date(1)}
+            );
+
+            var heat_map_80b170def2c14b2baa6944d98a67ff52Control = new L.Control.TimeDimensionCustom(['1', '2', '3'], {
+                autoPlay: false,
+                backwardButton: true,
+                displayDate: true,
+                forwardButton: true,
+                limitMinimumRange: 5,
+                limitSliders: true,
+                loopButton: true,
+                maxSpeed: 10,
+                minSpeed: 0.1,
+                playButton: true,
+                playReverseButton: true,
+                position: "bottomleft",
+                speedSlider: true,
+                speedStep: 0.1,
+                styleNS: "leaflet-control-timecontrol",
+                timeSlider: true,
+                timeSliderDrapUpdate: false,
+                timeSteps: 1
+                })
+                .addTo(map_033ef91bc1b9446d9765c7b7e6f982c8);
+
+                var heat_map_80b170def2c14b2baa6944d98a67ff52 = new TDHeatmap([[[37.86442293357726, -91.98409938456426], [37.73316835040178, -92.2196702168448], [37.729747219430834, -92.07679701680588], [37.863713741362, -92.00026905967842], [37.728905527341446, -92.20709380286716], [37.67288677933579, -92.017508208054], [37.863713741362, -92.00026905967842], [37.728905527341446, -92.20709380286716], [37.72477367223507, -92.00762673992867], [37.85023779261275, -91.99038759155309], [37.73103696954662, -92.2376365225272], [37.733299548645334, -92.0507458735664], [37.84669108086045, -91.98948927626897], [37.67204444138336, -92.23943315309543], [37.69279289443659, -92.07769533209], [37.85023779261275, -91.99847242911017], [37.73316835040178, -92.2196702168448], [37.73543086437271, -92.03367788316814], [37.8651321189677, -91.98409938456426], [37.716826196069256, -92.23404326139072], [37.72903673313799, -92.06422060282819], [37.86229533645718, -91.99308253740546], [37.7274845317886, -92.26189103519842], [37.68923862282015, -92.02379641504282], [37.86158612376771, -91.99937074439428], [37.72819503297327, -92.2600944046302], [37.68639508287328, -92.017508208054], [37.86229533645718, -91.99308253740546], [37.67204444138336, -92.23943315309543], [37.71056169704567, -92.03277956788403]], [[37.84669108086045, -91.98948927626897], [37.728905527341446, -92.20709380286716], [37.729747219430834, -92.07679701680588], [37.863713741362, -92.00026905967842], [37.73316835040178, -92.2196702168448], [37.72477367223507, -92.00762673992867], [37.863713741362, -92.00026905967842], [37.728905527341446, -92.20709380286716], [37.73543086437271, -92.03367788316814], [37.85023779261275, -91.99847242911017], [37.73316835040178, -92.2196702168448], [37.72477367223507, -92.00762673992867], [37.863713741362, -92.00026905967842], [37.728905527341446, -92.20709380286716], [37.667909415922225, -92.01301663163339], [37.85023779261275, -91.99038759155309], [37.73103696954662, -92.2376365225272], [37.733299548645334, -92.0507458735664], [37.8651321189677, -91.98409938456426], [37.716826196069256, -92.23404326139072], [37.72903673313799, -92.06422060282819], [37.86442293357726, -91.98409938456426], [37.73316835040178, -92.2196702168448], [37.729747219430834, -92.07679701680588], [37.86229533645718, -91.99308253740546], [37.67204444138336, -92.23943315309543], [37.683551433903936, -92.08128859322647], [37.86158612376771, -91.99937074439428], [37.72819503297327, -92.2600944046302], [37.71056169704567, -92.03277956788403]], [[37.84669108086045, -91.98948927626897], [37.728905527341446, -92.20709380286716], [37.729747219430834, -92.07679701680588], [37.84314419851446, -92.00565895138313], [37.68342014756043, -92.21877190156071], [37.73543086437271, -92.03367788316814], [37.8651321189677, -91.98140443871188], [37.728905527341446, -92.20709380286716], [37.72477367223507, -92.00762673992867], [37.84669108086045, -91.98948927626897], [37.73316835040178, -92.2196702168448], [37.70132245124683, -92.05703408055524], [37.86158612376771, -91.99937074439428], [37.729616014893104, -92.25021293650487], [37.73543086437271, -92.03367788316814], [37.863713741362, -92.00026905967842], [37.728905527341446, -92.20709380286716], [37.667909415922225, -92.01301663163339], [37.863713741362, -92.00026905967842], [37.73316835040178, -92.2196702168448], [37.69990092659136, -92.06871217924879], [37.85023779261275, -91.99038759155309], [37.73103696954662, -92.2376365225272], [37.733299548645334, -92.0507458735664], [37.85945844475157, -92.00116737496252], [37.73316835040178, -92.2196702168448], [37.72903673313799, -92.06422060282819], [37.86442293357726, -91.98409938456426], [37.716826196069256, -92.23404326139072], [37.729747219430834, -92.07679701680588]]],
+                {heatmapOptions: {
+                        radius: 15,
+                        minOpacity: 0,
+                        maxOpacity: 0.6,
+                        scaleRadius: false,
+                        useLocalExtrema: false,
+                        defaultWeight: 1 ,
+                    }
+                })
+                .addTo(map_033ef91bc1b9446d9765c7b7e6f982c8);
+
+        
+</script>
