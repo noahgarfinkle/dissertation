@@ -245,7 +245,8 @@ def route(startLon,startLat,endLon,endLat):
         endLat (float): Latitude of ending point in EPSG:4326
 
     Returns:
-        None
+        df (GeoPandas GeoDataFrame): Dataframe of edges in the route
+        map (folium Map): map iwth the route added
 
     Raises:
         None
@@ -273,7 +274,8 @@ def route(startLon,startLat,endLon,endLat):
     gjson = df2.to_crs(epsg='4326').to_json()
     lines = folium.features.GeoJson(gjson)
     map.add_child(lines)
-    map.save('./results/mapwithroute.html')
+    #map.save('./results/mapwithroute.html')
+    return df2,map
 
 
 def routeWithAvoidance(startLon,startLat,endLon,endLat,linkIDsToAvoid=[]):
