@@ -277,6 +277,49 @@ def route(startLon,startLat,endLon,endLat):
     #map.save('./results/mapwithroute.html')
     return df2,map
 
+def calculateRouteDistance(startLon,startLat,endLon,endLat):
+    """ Routes between two points
+
+    Takes longitude and latitude for two points and provides the pgrouting
+    shortest route between the two, using Dijkstra's algorithm
+
+    Args:
+        startLon (float): Longitude of starting point in EPSG:4326
+        startLat (float): Latitude of starting point in EPSG:4326
+        endLon (float): Longitude of ending point in EPSG:4326
+        endLat (float): Latitude of ending point in EPSG:4326
+
+    Returns:
+        df (GeoPandas GeoDataFrame): Dataframe of edges in the route
+        map (folium Map): map iwth the route added
+
+    Raises:
+        None
+
+    Todo:
+        * Allow for projections
+        * remove mapPath and convert to its own function
+        * return geodataframe(s)
+
+    Tests:
+        >>> route(-92.068859,37.846720,-92.142373,37.557935)
+    """
+    startNode = int(get_nearest_node(startLon,startLat)["node_id"])
+    endNode = int(get_nearest_node(endLon,endLat)["node_id"])
+    sql = "select * from pgr_dijkstra('select id, source, target, cost, reverse_cost FROM ways',%s,%s);" %(startNode,endNode)
+    cur.execute(sql)
+    rows = cur.fetchall()
+    df = pd.read_sql_query(sql,con=conn)
+    edges = list(df['edge'])
+    edges = [str(edge) for edge in edges]
+    sql2 = "select * from ways where id in (%s)" %(",".join(edges))
+    df2 = gpd.read_postgis(sql2,con=conn,geom_col="the_geom")
+    df2.crs = {'init':'epsg:4326'}
+    gjson = df2.to_crs(epsg='4326').to_json()
+    lines = folium.features.GeoJson(gjson)
+    #map.save('./results/mapwithroute.html')
+    return df,df2
+
 
 def routeWithAvoidance(startLon,startLat,endLon,endLat,linkIDsToAvoid=[]):
     """ Route between two coordinates avoiding any links in a list
