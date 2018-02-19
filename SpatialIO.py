@@ -774,7 +774,7 @@ class Map:
         lon = np.random.uniform(lonMin,lonMax)
         return lat,lon
 
-    def test_addTimeSeriesHeatMap(self):
+    def test_addTimeSeriesHeatMap(self,latMin=35,latMax=50,lonMin=-90,lonMax=-80):
         """ Creatse a random time series map to demonstrate functionality
 
         This is test code to demonstrate the ability to add time series, which
@@ -799,7 +799,7 @@ class Map:
         for gen in range(0,5):
             gen = []
             for i in range(0,1001):
-                lat,lon = self.test_generateRandomLatLonPair(35,50,-90,-80)
+                lat,lon = self.test_generateRandomLatLonPair(latMin,latMax,lonMin,lonMax)
                 #lat = np.random.randint(35,50)
                 #lon = np.random.randint(-90,-80)
                 val = [lat,lon]
