@@ -654,6 +654,8 @@ def generateRandomCandidateDataFrame(nCandidates,latMin,latMax,lonMin,lonMax):
                 squareList.append(square)
         candidateDF = gpd.GeoDataFrame({""})
         return 0
+
+        
 ## CURRENT TEST
 # First pass implementation for class
 """
