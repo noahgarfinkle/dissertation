@@ -59,7 +59,7 @@
         <BufferDistanceFromVectorLayer layerPath="./test_data/tgc.shp" distanceUnits="m" minDistance="400" maxDistance="1600" note="Suitable distance from roads"/>
       </SiteSuitability>
       <SiteConfiguration>
-        <PolygonBuilder units="m" wkt="POLYGON ((0 0, 800 0, 800 800, 0 800, 0 0))"  gridSpacing="800" rotationUnits="degrees" rotationStart="0" rotationStop="180" rotationSpacing="90"/>
+        <PolygonBuilder units="m" wkt="POLYGON ((0 0, 800 0, 800 800, 0 800, 0 0))" gridSpacing="800" rotationUnits="degrees" rotationStart="0" rotationStop="180" rotationSpacing="90"/>
       </SiteConfiguration>
       <SiteEvaluation>
         <ContinuousRasterStat layerPath="../FLW_Missouri Mission Folder/RASTER/slope_proj.tif" stat="mean" colName="slope_mean" weight="0.5" note="Average slope between 2 and 7 degrees">

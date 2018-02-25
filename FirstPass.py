@@ -33,6 +33,7 @@ import shapely
 from shapely.geometry import Point, Polygon
 from shapely.wkt import loads
 import shapely.geometry as geom
+import shapely.affinity
 from rasterstats import zonal_stats, raster_stats, point_query, utils
 import matplotlib.pyplot as plt
 import datetime
@@ -313,7 +314,7 @@ def generateEvaluationGridDataFrame(polygon,gridSpacing):
     evaluationDF.columns = ['geometry']
     return evaluationDF
 
-def airfieldBuilder(aoiPolygon,units="m", length="1981", width="97.50", gridSpacing="800",
+def airfieldBuilder(aoiPolygon, units="m", length="1981", width="97.50", gridSpacing="800",
                     rotationUnits="degrees", rotationStart="0", rotationStop="180",
                     rotationSpacing="90"):
     """ Produces a GeoPandas GeoDataFrame of airfields similar to the TASS methodology
@@ -348,12 +349,99 @@ def airfieldBuilder(aoiPolygon,units="m", length="1981", width="97.50", gridSpac
     Raises:
         None
 
+    Todo:
+        * Implement units and rotationUnits
+
     Tests:
         None
     """
+    try:
+        # Ensure correct types, converting units of measure to float
+        length=float(length)
+        width=float(width)
+        gridSpacing=float(gridSpacing)
+        rotationStart=float(rotationStart)
+        rotationStop=float(rotationStop)
+        rotationSpacing=float(rotationSpacing)
+
+    except Exception, e:
+        pass
 
     # enforce conversions to correct types
     return None
+
+def polygonBuilder(aoiPolygon, epsg="3857", wkt="POLYGON ((0 0, 400 0, 400 800, 0 800, 0 0))",
+                    units="m", gridSpacing="800", rotationUnits="degrees",
+                    rotationStart="0", rotationStop="180", rotationSpacing="90"):
+    """ Produces a GeoPandas GeoDataFrame of arbitrary polygons on a test grid
+
+    This produces the fundamental solution data structure of First Pass, a
+    GeoPandas GeoDataFrame sized and rotated as specified, and falling exclusively
+    within the aoiPolygon, ideally which has already had no-build areas removed.
+    Can take arbitrary polygon definitions in WKT.
+
+    Args:
+        aoiPolygon (Shapely Polygon): A representation of the area of interest,
+            ideally with holes removed for areas which should not fall within
+            candidate solutions
+        epsg (int): The projection of the aoiPolygon
+        wkt (str): A well-known-text representation of the polygon being built
+        units (str): The distance units to utilize, typically 'm' for meters
+        gridSpacing (float): Distance between lower left corners of evaluation sites,
+            may be replaced in the future with centroids once PolygonBuilder is
+            implemented.  Converted to float.
+        rotationUnits (str): Defines how rotation is treated, typically degrees
+        rotationStart (float): Starting rotation, with 0 defined as due North,
+            and incrementing clockwise
+        rotationStop (float): Ending rotation, with 0 defined as due North,
+            and incrementing clockwise
+        rotationSpacing (float): Increment of rotation to evaluate
+
+    Returns:
+        airfieldList (GeoPandas GeoDataFrame): Each row represents a candidate site
+            for evaluation
+
+    Raises:
+        None
+
+    Todo:
+        * Implement units and rotationUnits
+
+    Tests:
+        None
+    """
+    epsg = int(epsg)
+    gridSpacing=float(gridSpacing)
+    rotationStart=float(rotationStart)
+    rotationStop=float(rotationStop)
+    rotationSpacing=float(rotationSpacing)
+
+    # build the polygon template
+    template = loads(wkt)
+    templateCentroid = template.centroid
+
+    # loop over the grid and rotations
+    candidatesList = []
+    bounds = aoiPolygon.bounds
+    ll = bounds[:2]
+    ur = bounds[2:]
+    # https://stackoverflow.com/questions/30457089/how-to-create-a-polygon-given-its-point-vertices
+    start = datetime.datetime.now()
+    for x in floatrange(ll[0],ur[0],gridSpacing):
+        for y in floatrange(ll[1],ur[1],gridSpacing):
+            xoffset = templateCentroid.x - x
+            yoffset = templateCentroid.y - y
+            candidate = shapely.affinity.translate(template,xoff=xoffset,yoff=yoffset)
+            if candidate.within(aoiPolygon):
+                candidatesList.append(candidate)
+    end = datetime.datetime.now()
+    end - start
+    timeElapsed = end - start
+    nFeatures = len(candidatesList)
+    print "Generated %s squares in %s seconds" %(nFeatures,timeElapsed.seconds)
+    evaluationDF = gpd.GeoDataFrame(candidatesList)
+    evaluationDF.columns = ['geometry']
+    return evaluationDF
 
 def convertRasterToNumpyArray(raster_path):
     """ Generates a numpy array from a GeoTiff
