@@ -4,7 +4,7 @@
       <AreaOfInterest epsg="4326" wkt="POLYGON ((-92.0420407203899771 37.8786674360582936, -91.9278626441980151 37.8792673513784450, -91.9272790878007129 37.8100408421962086, -92.0414571639926606 37.8094403634696405, -92.0420407203899771 37.8786674360582936))"/>
       <SiteSuitability>
         <DistanceFromWKT epsg="4326" wkt="POINT (-92.16726947722954 37.7405720468603)" distanceUnits="m" minDistance="0" maxDistance="3200" note="Maximum distance from CBITEC"/>
-        <DistanceFromVectorLayer layerPath="./test_data/tgc.shp" distanceUnits="m" minDistance="400" maxDistance="1600" note="Suitable distance from roads"/>
+        <BufferDistanceFromVectorLayer layerPath="./test_data/tgc.shp" distanceUnits="m" minDistance="400" maxDistance="1600" note="Suitable distance from roads"/>
       </SiteSuitability>
       <SiteConfiguration>
         <AirfieldBuilder/>
@@ -30,7 +30,7 @@
     <SiteSearch type="Contingency Base" studyObjectiveID="1" name="Red">
       <AreaOfInterest epsg="4326" wkt="POLYGON ((-92.2937812277846774 37.7353612509118079, -92.2020132175820066 37.7364461384693683, -92.2007296144230253 37.6685084584884251, -92.2924976246256676 37.6674225761625934, -92.2937812277846774 37.7353612509118079))"/>
       <SiteSuitability>
-        <DistanceFromVectorLayer layerPath="./test_data/tgc.shp" distanceUnits="m" minDistance="400" maxDistance="1600" note="Suitable distance from roads"/>
+        <BufferDistanceFromVectorLayer layerPath="./test_data/tgc.shp" distanceUnits="m" minDistance="400" maxDistance="1600" note="Suitable distance from roads"/>
       </SiteSuitability>
       <SiteConfiguration>
         <RasterBuilder cellSize="100"/>
@@ -43,21 +43,20 @@
             <Score lowerBoundInclusive="7" upperBoundExclusive="12" score="20"/>
           </Scores>
         </ContinuousRasterStat>
-        <CategoricalRasterStat layerPath="../FLW_Missouri Mission Folder/RASTER/LC_LandCover_GeoCover_proj.tif" stat="mode" colName="land_cover" weight="0.5" note="Land Cover Categorization">
+        <DistanceFromVectorLayer layerPath="./test_data/tgc.shp" distanceUnits="m" colName="roads_distance" weight="0.5" note="Suitable distance from roads">
           <Scores default="0" isZeroExclusionary="False">
-            <SiteEvaluationCriteriaEvaluation value="3" score="60"/>
-            <SiteEvaluationCriteriaEvaluation value="4" score="60"/>
-            <SiteEvaluationCriteriaEvaluation value="5" score="100"/>
-            <SiteEvaluationCriteriaEvaluation value="27" score="60"/>
+            <Score lowerBoundInclusive="400" upperBoundExclusive="800" score="40"/>
+            <Score lowerBoundInclusive="800" upperBoundExclusive="1600" score="100"/>
           </Scores>
-        </CategoricalRasterStat>
+        </DistanceFromVectorLayer>
+
       </SiteEvaluation>
     </SiteSearch>
 
     <SiteSearch type="Contingency Base" studyObjectiveID="2" name="Blue">
       <AreaOfInterest epsg="4326" wkt="POLYGON ((-92.0852172668016209 37.7407181466318420, -91.9877289887035090 37.7398891889496539, -91.9887410491910629 37.6654206226553256, -92.0862293272891321 37.6662504135641640, -92.0852172668016209 37.7407181466318420))"/>
       <SiteSuitability>
-        <DistanceFromVectorLayer layerPath="./test_data/tgc.shp" distanceUnits="m" minDistance="400" maxDistance="1600" note="Suitable distance from roads"/>
+        <BufferDistanceFromVectorLayer layerPath="./test_data/tgc.shp" distanceUnits="m" minDistance="400" maxDistance="1600" note="Suitable distance from roads"/>
       </SiteSuitability>
       <SiteConfiguration>
         <RasterBuilder cellSize="100"/>
