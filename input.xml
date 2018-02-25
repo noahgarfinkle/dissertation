@@ -12,15 +12,15 @@
       </SiteConfiguration>
       <SiteEvaluation>
         <ContinuousRasterStat layerPath="../FLW_Missouri Mission Folder/RASTER/slope_proj.tif" stat="mean" colName="slope_mean" weight="0.3" note="Average slope between 2 and 7 degrees">
-          <Scores default="0" isZeroExclusionary="False" >
+          <Scores default="0" isZeroExclusionary="False" type="Continuous">
             <Score lowerBoundInclusive="1" upperBoundExclusive="2" score="40"/>
             <Score lowerBoundInclusive="2" upperBoundExclusive="7" score="100"/>
             <Score lowerBoundInclusive="7" upperBoundExclusive="12" score="20"/>
           </Scores>
         </ContinuousRasterStat>
-        <CategoricalRasterStat layerPath="../FLW_Missouri Mission Folder/RASTER/LC_LandCover_GeoCover_proj.tif" stat="mean" colName="land_cover" isZeroExclusionary="False" weight="0.3" note="Average slope between 2 and 7 degrees">
+        <CategoricalRasterStat layerPath="../FLW_Missouri Mission Folder/RASTER/LC_LandCover_GeoCover_proj.tif" stat="count" colName="land_cover" weight="0.3" note="Average slope between 2 and 7 degrees">
           <Scores>
-            <DefaultScore score="0"/>
+            <DefaultScore default="0" isZeroExclusionary="False" type="Categorical"/>
 
           </Scores>
         </CategoricalRasterStat>
