@@ -398,8 +398,8 @@ def polygonBuilder(aoiPolygon, epsg="3857", wkt="POLYGON ((0 0, 400 0, 400 800, 
         rotationSpacing (float): Increment of rotation to evaluate
 
     Returns:
-        airfieldList (GeoPandas GeoDataFrame): Each row represents a candidate site
-            for evaluation
+        evaluationDF (GeoPandas GeoDataFrame): Each row represents a candidate
+        site for evaluation
 
     Raises:
         None
@@ -445,8 +445,39 @@ def polygonBuilder(aoiPolygon, epsg="3857", wkt="POLYGON ((0 0, 400 0, 400 800, 
     evaluationDF.columns = ['geometry']
     return evaluationDF
 
-def filterByVectorBufferDistance(vectorFilePath,solutionDF,removeIntersected=True):
-    return 0
+def filterByVectorBufferDistance(dfToFilter,vectorFilePath,bufferDistance,removeIntersected=True):
+    """ Utilizes shapely hack to include/exclude buffers faster than Euclidean distance
+
+    This produces the fundamental solution data structure of First Pass, a
+    GeoPandas GeoDataFrame sized and rotated as specified, and falling exclusively
+    within the aoiPolygon, ideally which has already had no-build areas removed.
+    Can take arbitrary polygon definitions in WKT.
+
+    Args:
+        dfToFilter (GeoPandas GeoDataFrame): The dataframe to be filtered
+        vectorFilePath (str): Path to a vector geometry
+        bufferDistance (float): Distance to buffer vectorDF
+        removeIntersected (Bool): If True, removes any rows in dfToFilter
+            which intersect vectorDF.  If False, removes any rows which do not.
+
+    Returns:
+        filteredDF (GeoPandas GeoDataFrame): A subset of dfToFilter
+
+    Raises:
+        None
+
+    Todo:
+        * Implement units and rotationUnits
+
+    Tests:
+        None
+    """
+    vectorDF = gpd.read_file(vectorFilePath)
+    if removeIntersected:
+        filteredDF = dfToFilter[~dfToFilter.intersects(vectorDF.buffer(bufferDistance).unary_union)]
+    else:
+        filteredDF = dfToFilter[dfToFilter.intersects(vectorDF.buffer(bufferDistance).unary_union)]
+    return filteredDF
 
 def convertRasterToNumpyArray(raster_path):
     """ Generates a numpy array from a GeoTiff
