@@ -1,9 +1,9 @@
 <Input resultDir="" studyObjectiveID="" EPSG="3857">
   <SiteSearches>
-    <SiteSearch Type="Airfield" studyObjectiveID="0">
-      <AreaOfInterest EPSG="4326" WKT="POLYGON ((-92.0420407203899771 37.8786674360582936, -91.9278626441980151 37.8792673513784450, -91.9272790878007129 37.8100408421962086, -92.0414571639926606 37.8094403634696405, -92.0420407203899771 37.8786674360582936))"/>
+    <SiteSearch type="Airfield" studyObjectiveID="0">
+      <AreaOfInterest epsg="4326" wkt="POLYGON ((-92.0420407203899771 37.8786674360582936, -91.9278626441980151 37.8792673513784450, -91.9272790878007129 37.8100408421962086, -92.0414571639926606 37.8094403634696405, -92.0420407203899771 37.8786674360582936))"/>
       <SiteSuitability>
-        <DistanceFromWKT EPSG="4326" WKT="POINT (-92.16726947722954 37.7405720468603)" distanceUnits="m" minDistance="0" maxDistance="3200" Note="Maximum distance from CBITEC"/>
+        <DistanceFromWKT epsg="4326" wkt="POINT (-92.16726947722954 37.7405720468603)" distanceUnits="m" minDistance="0" maxDistance="3200" note="Maximum distance from CBITEC"/>
         <DistanceFromVectorLayer layerPath="./test_data/tgc.shp" distanceUnits="m" minDistance="400" maxDistance="1600" note="Suitable distance from roads"/>
       </SiteSuitability>
       <SiteConfiguration>
@@ -19,19 +19,16 @@
           </Scores>
         </ContinuousRasterStat>
         <CategoricalRasterStat layerPath="../FLW_Missouri Mission Folder/RASTER/LC_LandCover_GeoCover_proj.tif" stat="mean" colName="land_cover" isZeroExclusionary="False" weight="0.3" note="Average slope between 2 and 7 degrees">
-          <ContinuiousScores>
+          <Scores>
             <DefaultScore score="0"/>
 
           </Scores>
-
-        </ContinuiousScores>
-
+        </CategoricalRasterStat>
       </SiteEvaluation>
-    </CategoricalRasterStat>
     </SiteSearch>
 
-    <SiteSearch Type="Contingency Base" studyObjectiveID="1">
-      <AreaOfInterest EPSG="4326" WKT="POLYGON ((-92.2937812277846774 37.7353612509118079, -92.2020132175820066 37.7364461384693683, -92.2007296144230253 37.6685084584884251, -92.2924976246256676 37.6674225761625934, -92.2937812277846774 37.7353612509118079))"/>
+    <SiteSearch type="Contingency Base" studyObjectiveID="1">
+      <AreaOfInterest epsg="4326" wkt="POLYGON ((-92.2937812277846774 37.7353612509118079, -92.2020132175820066 37.7364461384693683, -92.2007296144230253 37.6685084584884251, -92.2924976246256676 37.6674225761625934, -92.2937812277846774 37.7353612509118079))"/>
       <SiteSuitability>
 
       </SiteSuitability>
@@ -55,8 +52,8 @@
       </SiteEvaluation>
     </SiteSearch>
 
-    <SiteSearch Type="Contingency Base" studyObjectiveID="2">
-      <AreaOfInterest EPSG="4326" WKT="POLYGON ((-92.0852172668016209 37.7407181466318420, -91.9877289887035090 37.7398891889496539, -91.9887410491910629 37.6654206226553256, -92.0862293272891321 37.6662504135641640, -92.0852172668016209 37.7407181466318420))"/>
+    <SiteSearch type="Contingency Base" studyObjectiveID="2">
+      <AreaOfInterest epsg="4326" wkt="POLYGON ((-92.0852172668016209 37.7407181466318420, -91.9877289887035090 37.7398891889496539, -91.9887410491910629 37.6654206226553256, -92.0862293272891321 37.6662504135641640, -92.0852172668016209 37.7407181466318420))"/>
       <SiteSuitability>
 
       </SiteSuitability>
@@ -71,6 +68,6 @@
   <SiteRelationalConstraints>
     <SiteRelationalConstraint studyObjectiveList="0,1" constraintType="routingDistance" constraintParameters="less than,3200,m" note="CB access to airfield"/>
     <SiteRelationalConstraint studyObjectiveList="0,2" constraintType="routingDistance" constraintParameters="less than,3200,m" note="CB access to airfield"/>
-    <SiteRelationalConstraint studyObjectiveList="1,2" constraintType="euclideanDistance" constraintParameters="greater than,800,m" note="CB Standoff from each other/>
+    <SiteRelationalConstraint studyObjectiveList="1,2" constraintType="euclideanDistance" constraintParameters="greater than,800,m" note="CB Standoff from each other"/>
   </SiteRelationalConstraints>
 </Input>
