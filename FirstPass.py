@@ -313,6 +313,47 @@ def generateEvaluationGridDataFrame(polygon,gridSpacing):
     evaluationDF.columns = ['geometry']
     return evaluationDF
 
+def airfieldBuilder(aoiPolygon,units="m", length="1981", width="97.50", gridSpacing="800",
+                    rotationUnits="degrees", rotationStart="0", rotationStop="180",
+                    rotationSpacing="90"):
+    """ Produces a GeoPandas GeoDataFrame of airfields similar to the TASS methodology
+
+    This produces the fundamental solution data structure of First Pass, a
+    GeoPandas GeoDataFrame sized and rotated as specified, and falling exclusively
+    within the aoiPolygon, ideally which has already had no-build areas removed.
+
+    Args:
+        aoiPolygon (Shapely Polygon): A representation of the area of interest,
+            ideally with holes removed for areas which should not fall within
+            candidate solutions
+        units (str): The distance units to utilize, typically 'm' for meters
+        length (float): Length of the airfield, passed as a string from XML but
+            converted to float.  Includes any buffer areas.
+        width (float): Width of the airfield, passed as a string from XML but
+            converted to float.  Includes any buffer areas.
+        gridSpacing (float): Distance between lower left corners of evaluation sites,
+            may be replaced in the future with centroids once PolygonBuilder is
+            implemented.  Converted to float.
+        rotationUnits (str): Defines how rotation is treated, typically degrees
+        rotationStart (float): Starting rotation, with 0 defined as due North,
+            and incrementing clockwise
+        rotationStop (float): Ending rotation, with 0 defined as due North,
+            and incrementing clockwise
+        rotationSpacing (float): Increment of rotation to evaluate
+
+    Returns:
+        airfieldList (GeoPandas GeoDataFrame): Each row represents a candidate site
+            for evaluation
+
+    Raises:
+        None
+
+    Tests:
+        None
+    """
+
+    # enforce conversions to correct types
+    return None
 
 def convertRasterToNumpyArray(raster_path):
     """ Generates a numpy array from a GeoTiff
