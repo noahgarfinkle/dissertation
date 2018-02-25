@@ -1,7 +1,22 @@
 <Input resultDir="" studyObjectiveID="" EPSG="3857">
   <SiteSearches>
-    <SiteSearch Type="Contingency Base" studyObjectiveID="0">
-      <AreaOfInterest CRS="3857" WKT=""/>
+    <SiteSearch Type="Airfield" studyObjectiveID="0">
+      <AreaOfInterest EPSG="4326" WKT="POLYGON ((-92.0420407203899771 37.8786674360582936, -91.9278626441980151 37.8792673513784450, -91.9272790878007129 37.8100408421962086, -92.0414571639926606 37.8094403634696405, -92.0420407203899771 37.8786674360582936))"/>
+      <SiteSuitability>
+        <DistanceFromWKT EPSG="4326" WKT="POINT (-92.16726947722954 37.7405720468603)" DistanceUnits="m" MinDistance="0" MaxDistance="3200"/>
+        <DistanceFromVectorLayer layerPath="./test_data/tgc.shp" DistanceUnits="m" minDistance="400" maxDistance="1600"/>
+
+      </SiteSuitability>
+      <SiteConfiguration>
+
+      </SiteConfiguration>
+      <SiteEvaluation>
+
+      </SiteEvaluation>
+    </SiteSearch>
+
+    <SiteSearch Type="Contingency Base" studyObjectiveID="1">
+      <AreaOfInterest EPSG="4326" WKT="POLYGON ((-92.2937812277846774 37.7353612509118079, -92.2020132175820066 37.7364461384693683, -92.2007296144230253 37.6685084584884251, -92.2924976246256676 37.6674225761625934, -92.2937812277846774 37.7353612509118079))"/>
       <SiteSuitability cellSize="30" cellSizeUnits="m">
         <SiteSuitabilityCriteria layerPath="./test_data/elevation.tif" layerName="slope" operation="slope" operationParameters="degrees,30,m" layerType="Raster" weight="" exclusionary="False" note="prioritize average slope over 30m between 2 and 8 degrees">
           <EvalFallBack score = "0"/>
@@ -25,60 +40,8 @@
       </SiteEvaluation>
     </SiteSearch>
 
-    <SiteSearch Type="Airfield" studyObjectiveID="1">
-      <AreaOfInterest CRS="3857" WKT=""/>
-      <SiteSuitability>
-
-      </SiteSuitability>
-      <SiteConfiguration>
-
-      </SiteConfiguration>
-      <SiteEvaluation>
-
-      </SiteEvaluation>
-    </SiteSearch>
-
-    <SiteSearch Type="FARP" studyObjectiveID="2">
-      <AreaOfInterest CRS="3857" WKT=""/>
-      <SiteSuitability>
-
-      </SiteSuitability>
-      <SiteConfiguration>
-
-      </SiteConfiguration>
-      <SiteEvaluation>
-
-      </SiteEvaluation>
-    </SiteSearch>
-
-    <SiteSearch Type="TAA" studyObjectiveID="3">
-      <AreaOfInterest CRS="3857" WKT=""/>
-      <SiteSuitability>
-
-      </SiteSuitability>
-      <SiteConfiguration>
-
-      </SiteConfiguration>
-      <SiteEvaluation>
-
-      </SiteEvaluation>
-    </SiteSearch>
-
-    <SiteSearch Type="TAA" studyObjectiveID="4">
-      <AreaOfInterest CRS="3857" WKT=""/>
-      <SiteSuitability>
-
-      </SiteSuitability>
-      <SiteConfiguration>
-
-      </SiteConfiguration>
-      <SiteEvaluation>
-
-      </SiteEvaluation>
-    </SiteSearch>
-
-    <SiteSearch Type="TAA" studyObjectiveID="5">
-      <AreaOfInterest CRS="3857" WKT=""/>
+    <SiteSearch Type="Contingency Base" studyObjectiveID="2">
+      <AreaOfInterest EPSG="4326" WKT="POLYGON ((-92.0852172668016209 37.7407181466318420, -91.9877289887035090 37.7398891889496539, -91.9887410491910629 37.6654206226553256, -92.0862293272891321 37.6662504135641640, -92.0852172668016209 37.7407181466318420))"/>
       <SiteSuitability>
 
       </SiteSuitability>
