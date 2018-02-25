@@ -429,11 +429,13 @@ def polygonBuilder(aoiPolygon, epsg="3857", wkt="POLYGON ((0 0, 400 0, 400 800, 
     start = datetime.datetime.now()
     for x in floatrange(ll[0],ur[0],gridSpacing):
         for y in floatrange(ll[1],ur[1],gridSpacing):
-            xoffset = templateCentroid.x - x
-            yoffset = templateCentroid.y - y
+            xoffset = x - templateCentroid.x
+            yoffset = y-  templateCentroid.y
             candidate = shapely.affinity.translate(template,xoff=xoffset,yoff=yoffset)
-            if candidate.within(aoiPolygon):
-                candidatesList.append(candidate)
+            for rotation in floatrange(rotationStart,rotationStop+1,rotationSpacing):
+                rotatedCandidate = shapely.affinity.rotate(candidate, -rotation, origin='centroid', use_radians=False)
+                if rotatedCandidate.within(aoiPolygon):
+                    candidatesList.append(rotatedCandidate)
     end = datetime.datetime.now()
     end - start
     timeElapsed = end - start
