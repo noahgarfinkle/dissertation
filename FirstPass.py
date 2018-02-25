@@ -66,47 +66,6 @@ setting up blank raster: dst_ds.SetGeoTransform([topLeftX,pixel_width,0,topLeftY
 """
 
 ## CLASSES
-class SiteSearch:
-    """ Stores the individual study objective
-
-        Corresponds to a study objective in ENSITE, such as a contingency base or an
-        airfield
-
-        Attributes:
-            crs (Enum): The projection for the study
-            AreaOfInterest (Shapely polygon): The area of the overall study objective
-    """
-
-    def __init__(self):
-        self.crs = None
-        self.AreaOfInterest = None
-
-class SiteSuitabilityCriteria:
-    """ An individual geospatial evaluation
-
-        Sets of site suitability criteria and scores comprise a site search
-
-        Attributes:
-            None
-    """
-
-    def __init__(self):
-        return None
-
-
-class SiteRelationalConstraint:
-    """ Encodes the relationship between two study objectives
-
-        For instance, routing distance or topological relationships between study
-        objectives
-
-        Attributes:
-            None
-    """
-
-    def __init__(self):
-        return None
-
 class Input:
     """ Python data structure for parsing the XML data structure
 
@@ -655,7 +614,7 @@ def generateRandomCandidateDataFrame(nCandidates,latMin,latMax,lonMin,lonMax):
         candidateDF = gpd.GeoDataFrame({""})
         return 0
 
-        
+
 ## CURRENT TEST
 # First pass implementation for class
 """
