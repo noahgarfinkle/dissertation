@@ -38,7 +38,7 @@
       <SiteEvaluation>
         <ContinuousRasterStat layerPath="../FLW_Missouri Mission Folder/RASTER/slope_proj.tif" stat="mean" colName="slope_mean" weight="0.5" note="Average slope between 2 and 7 degrees">
           <Scores default="0" isZeroExclusionary="False">
-            <Score lowerBoundInclusive="1" upperBoundExclusive="2" score="40"/>
+            <Score lowerBoundInclusive="1" upperBoundExclusive="2" score="60"/>
             <Score lowerBoundInclusive="2" upperBoundExclusive="7" score="100"/>
             <Score lowerBoundInclusive="7" upperBoundExclusive="12" score="20"/>
           </Scores>
