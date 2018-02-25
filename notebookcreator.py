@@ -24,6 +24,24 @@ import nbformat as nbf
 https://gist.github.com/fperez/9716279
 """
 
+class Notebook:
+    def __init__(self):
+        self.notebook = nbf.v4.new_notebook()
+
+    def addMarkdown(self,text):
+        self.notebook['cells'].append(nbf.v4.new_markdown_cell(text))
+
+    def saveNotebook(self,filePath):
+        with open(filePath, 'w') as f:
+            nbf.write(self.notebook, f)
+
+    def runNotebook(self):
+        return None
+
+notebook = Notebook()
+notebook.addMarkdown("Test notebook from a class")
+notebook.saveNotebook("./results/acreatednotebook.ipynb")
+
 nb = nbf.v4.new_notebook()
 text = """\
 # My first automatic Jupyter Notebook
@@ -36,9 +54,12 @@ hist(normal(size=2000), bins=50);"""
 nb['cells'] = [nbf.v4.new_markdown_cell(text),
                nbf.v4.new_code_cell(code) ]
 
+nb['cells'].append(nbf.v4.new_code_cell(code))
 
 
 fname = 'test.ipynb'
 
 with open(fname, 'w') as f:
     nbf.write(nb, f)
+
+nb['cells']
