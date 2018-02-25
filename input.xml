@@ -7,7 +7,7 @@
         <BufferDistanceFromVectorLayer layerPath="./test_data/tgc.shp" distanceUnits="m" minDistance="400" maxDistance="1600" note="Suitable distance from roads"/>
       </SiteSuitability>
       <SiteConfiguration>
-        <AirfieldBuilder/>
+        <AirfieldBuilder units="m" length="1981" width="97.50" gridSpacing="800" rotationUnits="degrees" rotationStart="0" rotationStop="180" rotationSpacing="90"/>
       </SiteConfiguration>
       <SiteEvaluation>
         <ContinuousRasterStat layerPath="../FLW_Missouri Mission Folder/RASTER/slope_proj.tif" stat="mean" colName="slope_mean" weight="0.3" note="Average slope between 2 and 7 degrees">
@@ -33,7 +33,7 @@
         <BufferDistanceFromVectorLayer layerPath="./test_data/tgc.shp" distanceUnits="m" minDistance="400" maxDistance="1600" note="Suitable distance from roads"/>
       </SiteSuitability>
       <SiteConfiguration>
-        <RasterBuilder cellSize="100"/>
+        <RasterBuilder units="m" cellSize="100"/>
       </SiteConfiguration>
       <SiteEvaluation>
         <ContinuousRasterStat layerPath="../FLW_Missouri Mission Folder/RASTER/slope_proj.tif" stat="mean" colName="slope_mean" weight="0.5" note="Average slope between 2 and 7 degrees">
