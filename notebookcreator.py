@@ -28,7 +28,12 @@ class Notebook:
     def __init__(self):
         self.notebook = nbf.v4.new_notebook()
 
-    def addMarkdown(self,text):
+    def addMarkdown(self,text,headerLevel=0):
+        if headerLevel > 0:
+            prepend = ""
+            for i in range(0,headerLevel + 1):
+                prepend = prepend + "#"
+            text = prepend + " " + text
         self.notebook['cells'].append(nbf.v4.new_markdown_cell(text))
 
     def saveNotebook(self,filePath):
