@@ -1,7 +1,7 @@
 <Input resultDir="" studyObjectiveID="" EPSG="3857">
   <SiteSearches>
     <SiteSearch Type="Contingency Base" studyObjectiveID="0">
-      <AreaOfInterest CRS="3857" GeoJson=""/>
+      <AreaOfInterest CRS="3857" WKT=""/>
       <SiteSuitability cellSize="30" cellSizeUnits="m">
         <SiteSuitabilityCriteria layerPath="./test_data/elevation.tif" layerName="slope" operation="slope" operationParameters="degrees,30,m" layerType="Raster" weight="" exclusionary="False" note="prioritize average slope over 30m between 2 and 8 degrees">
           <EvalFallBack score = "0"/>
@@ -26,7 +26,7 @@
     </SiteSearch>
 
     <SiteSearch Type="Airfield" studyObjectiveID="1">
-      <AreaOfInterest CRS="3857" GeoJson=""/>
+      <AreaOfInterest CRS="3857" WKT=""/>
       <SiteSuitability>
 
       </SiteSuitability>
@@ -39,7 +39,7 @@
     </SiteSearch>
 
     <SiteSearch Type="FARP" studyObjectiveID="2">
-      <AreaOfInterest CRS="3857" GeoJson=""/>
+      <AreaOfInterest CRS="3857" WKT=""/>
       <SiteSuitability>
 
       </SiteSuitability>
@@ -52,7 +52,7 @@
     </SiteSearch>
 
     <SiteSearch Type="TAA" studyObjectiveID="3">
-      <AreaOfInterest CRS="3857" GeoJson=""/>
+      <AreaOfInterest CRS="3857" WKT=""/>
       <SiteSuitability>
 
       </SiteSuitability>
@@ -65,7 +65,7 @@
     </SiteSearch>
 
     <SiteSearch Type="TAA" studyObjectiveID="4">
-      <AreaOfInterest CRS="3857" GeoJson=""/>first
+      <AreaOfInterest CRS="3857" WKT=""/>
       <SiteSuitability>
 
       </SiteSuitability>
@@ -78,7 +78,7 @@
     </SiteSearch>
 
     <SiteSearch Type="TAA" studyObjectiveID="5">
-      <AreaOfInterest CRS="3857" GeoJson=""/>
+      <AreaOfInterest CRS="3857" WKT=""/>
       <SiteSuitability>
 
       </SiteSuitability>
