@@ -445,6 +445,9 @@ def polygonBuilder(aoiPolygon, epsg="3857", wkt="POLYGON ((0 0, 400 0, 400 800, 
     evaluationDF.columns = ['geometry']
     return evaluationDF
 
+def filterByVectorBufferDistance(vectorFilePath,solutionDF,removeIntersected=True):
+    return 0
+
 def convertRasterToNumpyArray(raster_path):
     """ Generates a numpy array from a GeoTiff
 
