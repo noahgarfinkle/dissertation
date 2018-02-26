@@ -474,7 +474,7 @@ def filterByVectorBufferDistance(dfToFilter,vectorFilePath,bufferDistance,remove
     """
     start = datetime.datetime.now()
     vectorDF = gpd.read_file(vectorFilePath)
-    returnText = "Removed"
+    returnText = "Retained"
     if removeIntersected:
         filteredDF = dfToFilter[~dfToFilter.intersects(vectorDF.buffer(bufferDistance).unary_union)]
     else:
