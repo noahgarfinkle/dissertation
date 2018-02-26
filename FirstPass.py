@@ -521,7 +521,8 @@ def convertRasterToNumpyArray(raster_path):
     print np.mean(data)
     return data
 
-def generateRasterStatisticsForDataFrame(df,raster_path,stats="count majority minority unique mean",isCategorical=False):
+def generateRasterStatisticsForDataFrame(df,raster_path,stats="count majority minority unique mean",
+                                            colName="slope",isCategorical=False):
     """ Produces neighborhood statistics for a raster based on each feature in a
         GeoPandas GeoDataFrame
 
@@ -533,6 +534,8 @@ def generateRasterStatisticsForDataFrame(df,raster_path,stats="count majority mi
             generate neighborhood statistics for
         raster_path (str): Filepath of a GeoTiff raster
         stats (str): space-separated list of valid statistics from validStats
+        colName (str): What to prepend to the statistic column in the new dataframe,
+            done in order to avoid repeated column names
         isCategorical (bool): Raster values will be interpreted as categorical if
             True, continuous if False.  Defaults False.
 
@@ -548,6 +551,10 @@ def generateRasterStatisticsForDataFrame(df,raster_path,stats="count majority mi
     """
     start = datetime.datetime.now()
     row_stats_df = gpd.GeoDataFrame(raster_stats(vectors=df['geometry'],raster=raster_path,stats=stats, copy_properties=True, nodata_value=0, categorical=isCategorical))
+    # rename the columns
+    for stat in stats.split(' '):
+        newColName = "%s_%s" %(colName,stat)
+        row_stats_df.rename(columns={stat:newColName}, inplace=True)
     newDF = gpd.GeoDataFrame(pd.concat([df,row_stats_df],axis=1))
     end = datetime.datetime.now()
     end - start
