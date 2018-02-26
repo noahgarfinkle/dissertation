@@ -546,8 +546,14 @@ def generateRasterStatisticsForDataFrame(df,raster_path,stats="count majority mi
     Tests:
         None
     """
+    start = datetime.datetime.now()
     row_stats_df = gpd.GeoDataFrame(raster_stats(vectors=df['geometry'],raster=raster_path,stats=stats, copy_properties=True, nodata_value=0, categorical=isCategorical))
     newDF = gpd.GeoDataFrame(pd.concat([df,row_stats_df],axis=1))
+    end = datetime.datetime.now()
+    end - start
+    timeElapsed = end - start
+    processedFeatures = len(df.index)
+    print "Processed %s candidates in %s seconds" %(processedFeatures,timeElapsed.seconds)
     return newDF
 
 def queryRasterValueForPoint(x,y,raster_path,pointCRS=None,rasterCRS=None):
