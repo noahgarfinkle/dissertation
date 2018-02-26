@@ -440,7 +440,7 @@ def polygonBuilder(aoiPolygon, epsg="3857", wkt="POLYGON ((0 0, 400 0, 400 800, 
     end - start
     timeElapsed = end - start
     nFeatures = len(candidatesList)
-    print "Generated %s squares in %s seconds" %(nFeatures,timeElapsed.seconds)
+    print "Generated %s candidate polygons in %s seconds" %(nFeatures,timeElapsed.seconds)
     evaluationDF = gpd.GeoDataFrame(candidatesList)
     evaluationDF.columns = ['geometry']
     return evaluationDF
@@ -472,11 +472,20 @@ def filterByVectorBufferDistance(dfToFilter,vectorFilePath,bufferDistance,remove
     Tests:
         None
     """
+    start = datetime.datetime.now()
     vectorDF = gpd.read_file(vectorFilePath)
+    returnText = "Removed"
     if removeIntersected:
         filteredDF = dfToFilter[~dfToFilter.intersects(vectorDF.buffer(bufferDistance).unary_union)]
     else:
+        returnText = "Retained"
         filteredDF = dfToFilter[dfToFilter.intersects(vectorDF.buffer(bufferDistance).unary_union)]
+    end = datetime.datetime.now()
+    end - start
+    timeElapsed = end - start
+    initialFeatures = len(dfToFilter.index)
+    filteredFeatures = len(filteredDF.index)
+    print "%s %s of %s candidates in %s seconds" %(returnText,filteredFeatures,initialFeatures,timeElapsed.seconds)
     return filteredDF
 
 def convertRasterToNumpyArray(raster_path):
