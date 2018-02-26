@@ -33,6 +33,7 @@ import shapely
 from shapely.geometry import Point, Polygon
 from shapely.wkt import loads
 import shapely.geometry as geom
+import shapely.affinity
 from rasterstats import zonal_stats, raster_stats, point_query, utils
 import matplotlib.pyplot as plt
 import datetime
@@ -66,47 +67,6 @@ setting up blank raster: dst_ds.SetGeoTransform([topLeftX,pixel_width,0,topLeftY
 """
 
 ## CLASSES
-class SiteSearch:
-    """ Stores the individual study objective
-
-        Corresponds to a study objective in ENSITE, such as a contingency base or an
-        airfield
-
-        Attributes:
-            crs (Enum): The projection for the study
-            AreaOfInterest (Shapely polygon): The area of the overall study objective
-    """
-
-    def __init__(self):
-        self.crs = None
-        self.AreaOfInterest = None
-
-class SiteSuitabilityCriteria:
-    """ An individual geospatial evaluation
-
-        Sets of site suitability criteria and scores comprise a site search
-
-        Attributes:
-            None
-    """
-
-    def __init__(self):
-        return None
-
-
-class SiteRelationalConstraint:
-    """ Encodes the relationship between two study objectives
-
-        For instance, routing distance or topological relationships between study
-        objectives
-
-        Attributes:
-            None
-    """
-
-    def __init__(self):
-        return None
-
 class Input:
     """ Python data structure for parsing the XML data structure
 
@@ -354,6 +314,179 @@ def generateEvaluationGridDataFrame(polygon,gridSpacing):
     evaluationDF.columns = ['geometry']
     return evaluationDF
 
+def airfieldBuilder(aoiPolygon, units="m", length="1981", width="97.50", gridSpacing="800",
+                    rotationUnits="degrees", rotationStart="0", rotationStop="180",
+                    rotationSpacing="90"):
+    """ Produces a GeoPandas GeoDataFrame of airfields similar to the TASS methodology
+
+    This produces the fundamental solution data structure of First Pass, a
+    GeoPandas GeoDataFrame sized and rotated as specified, and falling exclusively
+    within the aoiPolygon, ideally which has already had no-build areas removed.
+
+    Args:
+        aoiPolygon (Shapely Polygon): A representation of the area of interest,
+            ideally with holes removed for areas which should not fall within
+            candidate solutions
+        units (str): The distance units to utilize, typically 'm' for meters
+        length (float): Length of the airfield, passed as a string from XML but
+            converted to float.  Includes any buffer areas.
+        width (float): Width of the airfield, passed as a string from XML but
+            converted to float.  Includes any buffer areas.
+        gridSpacing (float): Distance between lower left corners of evaluation sites,
+            may be replaced in the future with centroids once PolygonBuilder is
+            implemented.  Converted to float.
+        rotationUnits (str): Defines how rotation is treated, typically degrees
+        rotationStart (float): Starting rotation, with 0 defined as due North,
+            and incrementing clockwise
+        rotationStop (float): Ending rotation, with 0 defined as due North,
+            and incrementing clockwise
+        rotationSpacing (float): Increment of rotation to evaluate
+
+    Returns:
+        airfieldList (GeoPandas GeoDataFrame): Each row represents a candidate site
+            for evaluation
+
+    Raises:
+        None
+
+    Todo:
+        * Implement units and rotationUnits
+
+    Tests:
+        None
+    """
+    try:
+        # Ensure correct types, converting units of measure to float
+        length=float(length)
+        width=float(width)
+        gridSpacing=float(gridSpacing)
+        rotationStart=float(rotationStart)
+        rotationStop=float(rotationStop)
+        rotationSpacing=float(rotationSpacing)
+
+    except Exception, e:
+        pass
+
+    # enforce conversions to correct types
+    return None
+
+def polygonBuilder(aoiPolygon, epsg="3857", wkt="POLYGON ((0 0, 400 0, 400 800, 0 800, 0 0))",
+                    units="m", gridSpacing="800", rotationUnits="degrees",
+                    rotationStart="0", rotationStop="180", rotationSpacing="90"):
+    """ Produces a GeoPandas GeoDataFrame of arbitrary polygons on a test grid
+
+    This produces the fundamental solution data structure of First Pass, a
+    GeoPandas GeoDataFrame sized and rotated as specified, and falling exclusively
+    within the aoiPolygon, ideally which has already had no-build areas removed.
+    Can take arbitrary polygon definitions in WKT.
+
+    Args:
+        aoiPolygon (Shapely Polygon): A representation of the area of interest,
+            ideally with holes removed for areas which should not fall within
+            candidate solutions
+        epsg (int): The projection of the aoiPolygon
+        wkt (str): A well-known-text representation of the polygon being built
+        units (str): The distance units to utilize, typically 'm' for meters
+        gridSpacing (float): Distance between lower left corners of evaluation sites,
+            may be replaced in the future with centroids once PolygonBuilder is
+            implemented.  Converted to float.
+        rotationUnits (str): Defines how rotation is treated, typically degrees
+        rotationStart (float): Starting rotation, with 0 defined as due North,
+            and incrementing clockwise
+        rotationStop (float): Ending rotation, with 0 defined as due North,
+            and incrementing clockwise
+        rotationSpacing (float): Increment of rotation to evaluate
+
+    Returns:
+        evaluationDF (GeoPandas GeoDataFrame): Each row represents a candidate
+        site for evaluation
+
+    Raises:
+        None
+
+    Todo:
+        * Implement units and rotationUnits
+
+    Tests:
+        None
+    """
+    epsg = int(epsg)
+    gridSpacing=float(gridSpacing)
+    rotationStart=float(rotationStart)
+    rotationStop=float(rotationStop)
+    rotationSpacing=float(rotationSpacing)
+
+    # build the polygon template
+    template = loads(wkt)
+    templateCentroid = template.centroid
+
+    # loop over the grid and rotations
+    candidatesList = []
+    bounds = aoiPolygon.bounds
+    ll = bounds[:2]
+    ur = bounds[2:]
+    # https://stackoverflow.com/questions/30457089/how-to-create-a-polygon-given-its-point-vertices
+    start = datetime.datetime.now()
+    for x in floatrange(ll[0],ur[0],gridSpacing):
+        for y in floatrange(ll[1],ur[1],gridSpacing):
+            xoffset = x - templateCentroid.x
+            yoffset = y-  templateCentroid.y
+            candidate = shapely.affinity.translate(template,xoff=xoffset,yoff=yoffset)
+            for rotation in floatrange(rotationStart,rotationStop+1,rotationSpacing):
+                rotatedCandidate = shapely.affinity.rotate(candidate, -rotation, origin='centroid', use_radians=False)
+                if rotatedCandidate.within(aoiPolygon):
+                    candidatesList.append(rotatedCandidate)
+    end = datetime.datetime.now()
+    end - start
+    timeElapsed = end - start
+    nFeatures = len(candidatesList)
+    print "Generated %s candidate polygons in %s seconds" %(nFeatures,timeElapsed.seconds)
+    evaluationDF = gpd.GeoDataFrame(candidatesList)
+    evaluationDF.columns = ['geometry']
+    return evaluationDF
+
+def filterByVectorBufferDistance(dfToFilter,vectorFilePath,bufferDistance,removeIntersected=True):
+    """ Utilizes shapely hack to include/exclude buffers faster than Euclidean distance
+
+    This produces the fundamental solution data structure of First Pass, a
+    GeoPandas GeoDataFrame sized and rotated as specified, and falling exclusively
+    within the aoiPolygon, ideally which has already had no-build areas removed.
+    Can take arbitrary polygon definitions in WKT.
+
+    Args:
+        dfToFilter (GeoPandas GeoDataFrame): The dataframe to be filtered
+        vectorFilePath (str): Path to a vector geometry
+        bufferDistance (float): Distance to buffer vectorDF
+        removeIntersected (Bool): If True, removes any rows in dfToFilter
+            which intersect vectorDF.  If False, removes any rows which do not.
+
+    Returns:
+        filteredDF (GeoPandas GeoDataFrame): A subset of dfToFilter
+
+    Raises:
+        None
+
+    Todo:
+        * Implement units and rotationUnits
+
+    Tests:
+        None
+    """
+    start = datetime.datetime.now()
+    vectorDF = gpd.read_file(vectorFilePath)
+    returnText = "Removed"
+    if removeIntersected:
+        filteredDF = dfToFilter[~dfToFilter.intersects(vectorDF.buffer(bufferDistance).unary_union)]
+    else:
+        returnText = "Retained"
+        filteredDF = dfToFilter[dfToFilter.intersects(vectorDF.buffer(bufferDistance).unary_union)]
+    end = datetime.datetime.now()
+    end - start
+    timeElapsed = end - start
+    initialFeatures = len(dfToFilter.index)
+    filteredFeatures = len(filteredDF.index)
+    print "%s %s of %s candidates in %s seconds" %(returnText,filteredFeatures,initialFeatures,timeElapsed.seconds)
+    return filteredDF
 
 def convertRasterToNumpyArray(raster_path):
     """ Generates a numpy array from a GeoTiff
@@ -388,7 +521,8 @@ def convertRasterToNumpyArray(raster_path):
     print np.mean(data)
     return data
 
-def generateRasterStatisticsForDataFrame(df,raster_path,stats="count majority minority unique mean",isCategorical=False):
+def generateRasterStatisticsForDataFrame(df,raster_path,stats="count majority minority unique mean",
+                                            colName="slope",isCategorical=False):
     """ Produces neighborhood statistics for a raster based on each feature in a
         GeoPandas GeoDataFrame
 
@@ -400,6 +534,8 @@ def generateRasterStatisticsForDataFrame(df,raster_path,stats="count majority mi
             generate neighborhood statistics for
         raster_path (str): Filepath of a GeoTiff raster
         stats (str): space-separated list of valid statistics from validStats
+        colName (str): What to prepend to the statistic column in the new dataframe,
+            done in order to avoid repeated column names
         isCategorical (bool): Raster values will be interpreted as categorical if
             True, continuous if False.  Defaults False.
 
@@ -413,8 +549,28 @@ def generateRasterStatisticsForDataFrame(df,raster_path,stats="count majority mi
     Tests:
         None
     """
+    start = datetime.datetime.now()
     row_stats_df = gpd.GeoDataFrame(raster_stats(vectors=df['geometry'],raster=raster_path,stats=stats, copy_properties=True, nodata_value=0, categorical=isCategorical))
+    # rename the columns
+    for stat in stats.split(' '):
+        newColName = "%s_%s" %(colName,stat)
+        row_stats_df.rename(columns={stat:newColName}, inplace=True)
+    # rename any remaining columns, such as those created using count
+    # this can be accomplished because the only columsn should be geometry or colName_preceeded
+    for columnName in row_stats_df.columns:
+        originalName = columnName
+        columnName = str(columnName)
+        if columnName == "geometry" or colName in columnName:
+            pass
+        else:
+            newColName = "%s_%s" %(colName,columnName)
+            row_stats_df.rename(columns={originalName:newColName}, inplace=True)
     newDF = gpd.GeoDataFrame(pd.concat([df,row_stats_df],axis=1))
+    end = datetime.datetime.now()
+    end - start
+    timeElapsed = end - start
+    processedFeatures = len(df.index)
+    print "Processed %s candidates in %s seconds" %(processedFeatures,timeElapsed.seconds)
     return newDF
 
 def queryRasterValueForPoint(x,y,raster_path,pointCRS=None,rasterCRS=None):
@@ -655,7 +811,7 @@ def generateRandomCandidateDataFrame(nCandidates,latMin,latMax,lonMin,lonMax):
         candidateDF = gpd.GeoDataFrame({""})
         return 0
 
-        
+
 ## CURRENT TEST
 # First pass implementation for class
 """

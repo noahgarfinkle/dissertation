@@ -1,99 +1,88 @@
 <Input resultDir="" studyObjectiveID="" EPSG="3857">
   <SiteSearches>
-    <SiteSearch Type="Contingency Base" studyObjectiveID="0">
-      <AreaOfInterest CRS="3857" GeoJson=""/>
-      <SiteSuitability cellSize="30" cellSizeUnits="m">
-        <SiteSuitabilityCriteria layerPath="./test_data/elevation.tif" layerName="slope" operation="slope" operationParameters="degrees,30,m" layerType="Raster" weight="" exclusionary="False" note="prioritize average slope over 30m between 2 and 8 degrees">
-          <EvalFallBack score = "0"/>
-          <SiteSuitabilityCriteriaEvaluation lowerBound="0" upperBound="2" score="40"/>
-          <SiteSuitabilityCriteriaEvaluation lowerBound="2" upperBound="8" score="100"/>
-          <SiteSuitabilityCriteriaEvaluation lowerBound="8" upperBound="12" score="20"/>
-        </SiteSuitabilityCriteria>
-        <SiteSuitabilityCriteria layerPath="./test_data/land_cover.tif" layerName="land_cover" operation="mode" operationParameters="30,m" layerType="Raster" weight="" exclusionary="False" note="">
-          <EvalFallBack score = "0"/>
-          <SiteSuitabilityCriteriaEvaluation value="3" score="60"/>
-          <SiteSuitabilityCriteriaEvaluation value="4" score="60"/>
-          <SiteSuitabilityCriteriaEvaluation value="5" score="100"/>
-          <SiteSuitabilityCriteriaEvaluation value="27" score="60"/>
-        </SiteSuitabilityCriteria>
+    <SiteSearch type="Airfield" studyObjectiveID="0" name="Gold">
+      <AreaOfInterest epsg="4326" wkt="POLYGON ((-92.0420407203899771 37.8786674360582936, -91.9278626441980151 37.8792673513784450, -91.9272790878007129 37.8100408421962086, -92.0414571639926606 37.8094403634696405, -92.0420407203899771 37.8786674360582936))"/>
+      <SiteSuitability>
+        <DistanceFromWKT epsg="4326" wkt="POINT (-92.16726947722954 37.7405720468603)" distanceUnits="m" minDistance="0" maxDistance="3200" note="Maximum distance from CBITEC"/>
+        <BufferDistanceFromVectorLayer layerPath="./test_data/tgc.shp" distanceUnits="m" minDistance="400" maxDistance="1600" note="Suitable distance from roads"/>
       </SiteSuitability>
       <SiteConfiguration>
-
+        <AirfieldBuilder units="m" length="1981" width="97.50" gridSpacing="800" rotationUnits="degrees" rotationStart="0" rotationStop="180" rotationSpacing="90"/>
       </SiteConfiguration>
       <SiteEvaluation>
+        <ContinuousRasterStat layerPath="../FLW_Missouri Mission Folder/RASTER/slope_proj.tif" stat="mean" colName="slope_mean" weight="0.3" note="Average slope between 2 and 7 degrees">
+          <Scores default="0" isZeroExclusionary="False">
+            <Score lowerBoundInclusive="1" upperBoundExclusive="2" score="40"/>
+            <Score lowerBoundInclusive="2" upperBoundExclusive="7" score="100"/>
+            <Score lowerBoundInclusive="7" upperBoundExclusive="12" score="20"/>
+          </Scores>
+        </ContinuousRasterStat>
+        <CutFill layerPath="../FLW_Missouri Mission Folder/RASTER/DEM_CMB_ELV_SRTMVF2_proj.tif" finalElevation="mean" colName="cut_fill_volume" weight="0.7" note="Quantity of cut and fill">
+          <Scores default="0" isZeroExclusionary="True">
+            <Score lowerBoundInclusive="0" upperBoundExclusive="1000" score="100"/>
+            <Score lowerBoundInclusive="1000" upperBoundExclusive="10000" score="40"/>
+            <Score lowerBoundInclusive="10000" upperBoundExclusive="INF" score="0"/>
+          </Scores>
+        </CutFill>
+      </SiteEvaluation>
+    </SiteSearch>
+
+    <SiteSearch type="Contingency Base" studyObjectiveID="1" name="Red">
+      <AreaOfInterest epsg="4326" wkt="POLYGON ((-92.2937812277846774 37.7353612509118079, -92.2020132175820066 37.7364461384693683, -92.2007296144230253 37.6685084584884251, -92.2924976246256676 37.6674225761625934, -92.2937812277846774 37.7353612509118079))"/>
+      <SiteSuitability>
+        <BufferDistanceFromVectorLayer layerPath="./test_data/tgc.shp" distanceUnits="m" minDistance="400" maxDistance="1600" note="Suitable distance from roads"/>
+      </SiteSuitability>
+      <SiteConfiguration>
+        <RasterBuilder units="m" cellSize="100"/>
+      </SiteConfiguration>
+      <SiteEvaluation>
+        <ContinuousRasterStat layerPath="../FLW_Missouri Mission Folder/RASTER/slope_proj.tif" stat="mean" colName="slope_mean" weight="0.5" note="Average slope between 2 and 7 degrees">
+          <Scores default="0" isZeroExclusionary="False">
+            <Score lowerBoundInclusive="1" upperBoundExclusive="2" score="60"/>
+            <Score lowerBoundInclusive="2" upperBoundExclusive="7" score="100"/>
+            <Score lowerBoundInclusive="7" upperBoundExclusive="12" score="20"/>
+          </Scores>
+        </ContinuousRasterStat>
+        <DistanceFromVectorLayer layerPath="./test_data/tgc.shp" distanceUnits="m" colName="roads_distance" weight="0.5" note="Suitable distance from roads">
+          <Scores default="0" isZeroExclusionary="False">
+            <Score lowerBoundInclusive="400" upperBoundExclusive="800" score="40"/>
+            <Score lowerBoundInclusive="800" upperBoundExclusive="1600" score="100"/>
+          </Scores>
+        </DistanceFromVectorLayer>
 
       </SiteEvaluation>
     </SiteSearch>
 
-    <SiteSearch Type="Airfield" studyObjectiveID="1">
-      <AreaOfInterest CRS="3857" GeoJson=""/>
+    <SiteSearch type="Contingency Base" studyObjectiveID="2" name="Blue">
+      <AreaOfInterest epsg="4326" wkt="POLYGON ((-92.0852172668016209 37.7407181466318420, -91.9877289887035090 37.7398891889496539, -91.9887410491910629 37.6654206226553256, -92.0862293272891321 37.6662504135641640, -92.0852172668016209 37.7407181466318420))"/>
       <SiteSuitability>
-
+        <BufferDistanceFromVectorLayer layerPath="./test_data/tgc.shp" distanceUnits="m" minDistance="400" maxDistance="1600" note="Suitable distance from roads"/>
       </SiteSuitability>
       <SiteConfiguration>
-
+        <PolygonBuilder units="m" wkt="POLYGON ((0 0, 800 0, 800 800, 0 800, 0 0))" gridSpacing="800" rotationUnits="degrees" rotationStart="0" rotationStop="180" rotationSpacing="90"/>
       </SiteConfiguration>
       <SiteEvaluation>
-
-      </SiteEvaluation>
-    </SiteSearch>
-
-    <SiteSearch Type="FARP" studyObjectiveID="2">
-      <AreaOfInterest CRS="3857" GeoJson=""/>
-      <SiteSuitability>
-
-      </SiteSuitability>
-      <SiteConfiguration>
-
-      </SiteConfiguration>
-      <SiteEvaluation>
-
-      </SiteEvaluation>
-    </SiteSearch>
-
-    <SiteSearch Type="TAA" studyObjectiveID="3">
-      <AreaOfInterest CRS="3857" GeoJson=""/>
-      <SiteSuitability>
-
-      </SiteSuitability>
-      <SiteConfiguration>
-
-      </SiteConfiguration>
-      <SiteEvaluation>
-
-      </SiteEvaluation>
-    </SiteSearch>
-
-    <SiteSearch Type="TAA" studyObjectiveID="4">
-      <AreaOfInterest CRS="3857" GeoJson=""/>first
-      <SiteSuitability>
-
-      </SiteSuitability>
-      <SiteConfiguration>
-
-      </SiteConfiguration>
-      <SiteEvaluation>
-
-      </SiteEvaluation>
-    </SiteSearch>
-
-    <SiteSearch Type="TAA" studyObjectiveID="5">
-      <AreaOfInterest CRS="3857" GeoJson=""/>
-      <SiteSuitability>
-
-      </SiteSuitability>
-      <SiteConfiguration>
-
-      </SiteConfiguration>
-      <SiteEvaluation>
-
+        <ContinuousRasterStat layerPath="../FLW_Missouri Mission Folder/RASTER/slope_proj.tif" stat="mean" colName="slope_mean" weight="0.5" note="Average slope between 2 and 7 degrees">
+          <Scores default="0" isZeroExclusionary="False">
+            <Score lowerBoundInclusive="1" upperBoundExclusive="2" score="40"/>
+            <Score lowerBoundInclusive="2" upperBoundExclusive="7" score="100"/>
+            <Score lowerBoundInclusive="7" upperBoundExclusive="12" score="20"/>
+          </Scores>
+        </ContinuousRasterStat>
+        <CategoricalRasterStat layerPath="../FLW_Missouri Mission Folder/RASTER/LC_LandCover_GeoCover_proj.tif" stat="mode" colName="land_cover" weight="0.5" note="Land Cover Categorization">
+          <Scores default="0" isZeroExclusionary="False">
+            <SiteEvaluationCriteriaEvaluation value="3" score="60"/>
+            <SiteEvaluationCriteriaEvaluation value="4" score="60"/>
+            <SiteEvaluationCriteriaEvaluation value="5" score="100"/>
+            <SiteEvaluationCriteriaEvaluation value="27" score="60"/>
+          </Scores>
+        </CategoricalRasterStat>
       </SiteEvaluation>
     </SiteSearch>
   </SiteSearches>
   <SiteRelationalConstraints>
     <SiteRelationalConstraint studyObjectiveList="0,1" constraintType="routingDistance" constraintParameters="less than,3200,m" note="CB access to airfield"/>
-    <SiteRelationalConstraint studyObjectiveList="0,3" constraintType="routingDistance" constraintParameters="less than,3200,m" note="CB access to airfield"/>
-    <SiteRelationalConstraint studyObjectiveList="2,3,4,5" constraintType="euclideanDistance" constraintParameters="less than,1600,m" note="Golden Hour"/>
-    <SiteRelationalConstraint studyObjectiveList="1,2" constraintType="euclideanDistance" constraintParameters="greater than,800,m" note="Airfield standoff from FARP"/>
+    <SiteRelationalConstraint studyObjectiveList="0,2" constraintType="routingDistance" constraintParameters="less than,3200,m" note="CB access to airfield"/>
+    <SiteRelationalConstraint studyObjectiveList="1,2" constraintType="euclideanDistance" constraintParameters="greater than,800,m" note="CB Standoff from each other"/>
   </SiteRelationalConstraints>
 </Input>

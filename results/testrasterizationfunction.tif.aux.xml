@@ -1,0 +1,23 @@
+<PAMDataset>
+  <Metadata domain="rio_creation_kwds">
+    <MDI key="compress">lzw</MDI>
+  </Metadata>
+  <PAMRasterBand band="1">
+    <Histograms>
+      <HistItem>
+        <HistMin>-0.495</HistMin>
+        <HistMax>99.495</HistMax>
+        <BucketCount>100</BucketCount>
+        <IncludeOutOfRange>0</IncludeOutOfRange>
+        <Approximate>1</Approximate>
+        <HistCounts>19629|316|309|310|300|332|314|313|373|315|299|305|301|298|302|322|317|314|329|319|336|336|336|302|334|308|329|309|371|318|311|288|307|328|319|309|301|330|337|314|279|320|308|302|296|326|313|279|305|342|327|320|327|326|315|319|320|301|312|337|323|285|315|311|300|325|296|350|321|306|347|351|321|325|306|322|305|289|321|275|298|334|301|284|320|331|328|319|331|313|301|331|287|316|283|305|335|314|335|348</HistCounts>
+      </HistItem>
+    </Histograms>
+    <Metadata>
+      <MDI key="STATISTICS_MAXIMUM">99</MDI>
+      <MDI key="STATISTICS_MEAN">30.694748831546</MDI>
+      <MDI key="STATISTICS_MINIMUM">0</MDI>
+      <MDI key="STATISTICS_STDDEV">33.0682356966</MDI>
+    </Metadata>
+  </PAMRasterBand>
+</PAMDataset>
