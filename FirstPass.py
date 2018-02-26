@@ -555,6 +555,16 @@ def generateRasterStatisticsForDataFrame(df,raster_path,stats="count majority mi
     for stat in stats.split(' '):
         newColName = "%s_%s" %(colName,stat)
         row_stats_df.rename(columns={stat:newColName}, inplace=True)
+    # rename any remaining columns, such as those created using count
+    # this can be accomplished because the only columsn should be geometry or colName_preceeded
+    for columnName in row_stats_df.columns:
+        originalName = columnName
+        columnName = str(columnName)
+        if columnName == "geometry" or colName in columnName:
+            pass
+        else:
+            newColName = "%s_%s" %(colName,columnName)
+            row_stats_df.rename(columns={originalName:newColName}, inplace=True)
     newDF = gpd.GeoDataFrame(pd.concat([df,row_stats_df],axis=1))
     end = datetime.datetime.now()
     end - start
