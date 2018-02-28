@@ -306,7 +306,6 @@ def generateEvaluationGridDataFrame(polygon,gridSpacing):
             if square.within(polygon):
                 squareList.append(square)
     end = datetime.datetime.now()
-    end - start
     timeElapsed = end - start
     nFeatures = len(squareList)
     print "Generated %s squares in %s seconds" %(nFeatures,timeElapsed.seconds)
@@ -437,7 +436,6 @@ def polygonBuilder(aoiPolygon, epsg="3857", wkt="POLYGON ((0 0, 400 0, 400 800, 
                 if rotatedCandidate.within(aoiPolygon):
                     candidatesList.append(rotatedCandidate)
     end = datetime.datetime.now()
-    end - start
     timeElapsed = end - start
     nFeatures = len(candidatesList)
     print "Generated %s candidate polygons in %s seconds" %(nFeatures,timeElapsed.seconds)
@@ -481,7 +479,6 @@ def filterByVectorBufferDistance(dfToFilter,vectorFilePath,bufferDistance,remove
         returnText = "Retained"
         filteredDF = dfToFilter[dfToFilter.intersects(vectorDF.buffer(bufferDistance).unary_union)]
     end = datetime.datetime.now()
-    end - start
     timeElapsed = end - start
     initialFeatures = len(dfToFilter.index)
     filteredFeatures = len(filteredDF.index)
@@ -567,7 +564,6 @@ def generateRasterStatisticsForDataFrame(df,raster_path,stats="count majority mi
             row_stats_df.rename(columns={originalName:newColName}, inplace=True)
     newDF = gpd.GeoDataFrame(pd.concat([df,row_stats_df],axis=1))
     end = datetime.datetime.now()
-    end - start
     timeElapsed = end - start
     processedFeatures = len(df.index)
     print "Processed %s candidates in %s seconds" %(processedFeatures,timeElapsed.seconds)
