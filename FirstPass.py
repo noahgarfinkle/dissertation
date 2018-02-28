@@ -468,6 +468,22 @@ def polygonBuilder(aoiPolygon, epsg="3857", wkt="POLYGON ((0 0, 400 0, 400 800, 
     evaluationDF.columns = ['geometry']
     return evaluationDF
 
+def xmlBuildPolygonBuilder(aoiWKT,polygonBuilderXMLElement):
+    if (polygonBuilderXMLElement.tag != "PolygonBuilder"):
+        raise TypeError('Invalid Type','Expected Parameters for Polygon Builder')
+    wkt = polygonBuilderXMLElement.attrib['wkt']
+    gridSpacing = float(polygonBuilderXMLElement.attrib['gridSpacing'])
+    units = polygonBuilderXMLElement.attrib['units']
+    rotationStart = float(polygonBuilderXMLElement.attrib['rotationStart'])
+    rotationStop = float(polygonBuilderXMLElement.attrib['rotationStop'])
+    rotationUnits = polygonBuilderXMLElement.attrib['rotationUnits']
+    rotationSpacing = float(polygonBuilderXMLElement.attrib['rotationSpacing'])
+    wktPolygon = wktToShapelyPolygon(aoiWKT,4326,to_epsg=3857)
+    df = polygonBuilder(wktPolygon,wkt=wkt,units=units,gridSpacing=gridSpacing,
+                        rotationUnits=rotationUnits,rotationStart=rotationStart,
+                        rotationStop=rotationStop,rotationSpacing=rotationSpacing)
+    return df
+
 def filterByVectorBufferDistance(dfToFilter,vectorFilePath,bufferDistance,removeIntersected=True):
     """ Utilizes shapely hack to include/exclude buffers faster than Euclidean distance
 
