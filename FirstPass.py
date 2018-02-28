@@ -244,7 +244,7 @@ def projectWKT(wkt,from_epsg,to_epsg):
     df_to_project = gpd.GeoDataFrame([feat])
     df_to_project.columns = ['geometry']
     df_to_project.crs = {'init':'EPSG:' + str(from_epsg)}
-    df_to_project.to_crs({'init':'EPSG:' + str(to_epsg)})
+    df_to_project = df_to_project.to_crs({'init':'EPSG:' + str(to_epsg)})
     reprojectedWKT = df_to_project.geometry[0].to_wkt()
     return reprojectedWKT
 
@@ -267,12 +267,11 @@ def wktToShapelyPolygon(wkt,epsg,to_epsg=None):
     """
     wktPolygon = loads(wkt)
     if to_epsg:
-        df_to_project = gpd.GeoDataFrame([feat])
+        df_to_project = gpd.GeoDataFrame([wktPolygon])
         df_to_project.columns = ['geometry']
-        df_to_project.crs = {'init':'EPSG:' + str(from_epsg)}
-        df_to_project.to_crs({'init':'EPSG:' + str(to_epsg)})
+        df_to_project.crs = {'init':'EPSG:' + str(epsg)}
+        df_to_project = df_to_project.to_crs({'init':'EPSG:' + str(to_epsg)})
         wktPolygon = df_to_project.geometry[0]
-
     return wktPolygon
 
 def floatrange(start, stop, step):
