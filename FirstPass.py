@@ -469,6 +469,31 @@ def polygonBuilder(aoiPolygon, epsg="3857", wkt="POLYGON ((0 0, 400 0, 400 800, 
     return evaluationDF
 
 def xmlBuildPolygonBuilder(aoiWKT,polygonBuilderXMLElement):
+    """ Builds candidate data frame from the elements included in input.xml
+
+    Allows polygon builder to be built from the current version of the input
+    XML file
+
+    Args:
+        aoiWKT (str): Well-known-text representation of the AOI, currently assumes
+            it is passed in WGS1984 (EPSG:4326)
+        polygonBuilderXMLElement (lxml.etree._Element): The parameters for
+            polygonBuilder
+
+    Returns:
+        df (GeoPandas GeoDataFrame): A regularly spaced and rotated candidate
+            solution dataframe, in EPSG:3857
+
+    Raises:
+        TypeError: If the XML element tag does not reflect that the input
+            parameter is for the function polygonBuilder
+
+    Todo:
+        * Implement ability to project
+
+    Tests:
+        None
+    """
     if (polygonBuilderXMLElement.tag != "PolygonBuilder"):
         raise TypeError('Invalid Type','Expected Parameters for Polygon Builder')
     wkt = polygonBuilderXMLElement.attrib['wkt']
