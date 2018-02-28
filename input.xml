@@ -69,14 +69,6 @@
             <Score lowerBoundInclusive="7" upperBoundExclusive="12" score="20"/>
           </Scores>
         </ContinuousRasterStat>
-        <CategoricalRasterStat layerPath="../FLW_Missouri Mission Folder/RASTER/LC_LandCover_GeoCover_proj.tif" stat="mode" colName="land_cover" weight="0.5" note="Land Cover Categorization">
-          <Scores default="0" isZeroExclusionary="False">
-            <SiteEvaluationCriteriaEvaluation value="3" score="60"/>
-            <SiteEvaluationCriteriaEvaluation value="4" score="60"/>
-            <SiteEvaluationCriteriaEvaluation value="5" score="100"/>
-            <SiteEvaluationCriteriaEvaluation value="27" score="60"/>
-          </Scores>
-        </CategoricalRasterStat>
       </SiteEvaluation>
     </SiteSearch>
   </SiteSearches>
