@@ -1,4 +1,4 @@
-<Input resultDir="" studyObjectiveID="" EPSG="3857">
+<Input resultDir="" studyObjectiveID="" epsg="3857">
   <SiteSearches>
     <SiteSearch type="Airfield" studyObjectiveID="0" name="Gold">
       <AreaOfInterest epsg="4326" wkt="POLYGON ((-92.0420407203899771 37.8786674360582936, -91.9278626441980151 37.8792673513784450, -91.9272790878007129 37.8100408421962086, -92.0414571639926606 37.8094403634696405, -92.0420407203899771 37.8786674360582936))"/>
