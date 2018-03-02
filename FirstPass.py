@@ -394,7 +394,7 @@ def airfieldBuilder(aoiPolygon, units="m", length="1981", width="97.50", gridSpa
     # enforce conversions to correct types
     return None
 
-def polygonBuilder(aoiPolygon, epsg="3857", wkt="POLYGON ((0 0, 400 0, 400 800, 0 800, 0 0))",
+def polygonBuilder(aoiPolygon, epsg="3857", wkt="POLYGON ((0 0, 91 0, 91 1700, 0 1700, 0 0))",
                     units="m", gridSpacing="800", rotationUnits="degrees",
                     rotationStart="0", rotationStop="180", rotationSpacing="90"):
     """ Produces a GeoPandas GeoDataFrame of arbitrary polygons on a test grid
