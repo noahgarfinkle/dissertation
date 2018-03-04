@@ -10,16 +10,12 @@
       <SiteEvaluation>
         <DistanceFromVectorLayer layerPath="C:/Users/RDCERNWG/Documents/GIT/FLW_Missouri Mission Folder/VECTOR/OSM_Roads.shp" distanceUnits="m" lowerBound="400" upperBound="1600" criteriaName="OSM_Roads_Distance_between" note="Suitable distance from roads">
           <Scores default="0" isZeroExclusionary="True" weight="0.1">
-            <Score lowerBoundInclusive="400" upperBoundExclusive="600" score="40"/>
-            <Score lowerBoundInclusive="600" upperBoundExclusive="1000" score="100"/>
-            <Score lowerBoundInclusive="1000" upperBoundExclusive="1600" score="20"/>
+            <Score lowerBoundInclusive="400" upperBoundExclusive="1600" score="100"/>
           </Scores>
         </DistanceFromVectorLayer>
         <ContinuousRasterStat layerPath="C:/Users/RDCERNWG/Documents/GIT/FLW_Missouri Mission Folder/RASTER/slope_proj.tif" stat="mean" criteriaName="slope_mean_between" lowerBound="2.0" upperBound="7.0" note="Average slope between 2 and 7 degrees">
           <Scores default="0" isZeroExclusionary="False"  weight="0.1">
-            <Score lowerBoundInclusive="2" upperBoundExclusive="3" score="40"/>
-            <Score lowerBoundInclusive="3" upperBoundExclusive="5" score="100"/>
-            <Score lowerBoundInclusive="5" upperBoundExclusive="7" score="20"/>
+            <Score lowerBoundInclusive="2" upperBoundExclusive="7" score="100"/>
           </Scores>
         </ContinuousRasterStat>
         <CategoricalRasterStat layerPath="C:/Users/RDCERNWG/Documents/GIT/FLW_Missouri Mission Folder/RASTER/LC_LandCover_GeoCover_proj.tif" lowerBound="90" upperBound="INF" criteriaName="LC_LandCover_GeoCover_proj_Percent_greater_than" note="Land cover is suitable">
@@ -29,8 +25,7 @@
         </CategoricalRasterStat>
         <CutFill layerPath="C:/Users/RDCERNWG/Documents/GIT/FLW_Missouri Mission Folder/RASTER/DEM_CMB_ELV_SRTMVF2_proj.tif" finalElevation="mean" lowerBound="-INF" upperBound="10000" criteriaName="CutFill_Volume_Less_Than" note="Quantity of cut and fill">
           <Scores default="0" isZeroExclusionary="True"  weight="0.1">
-            <Score lowerBoundInclusive="-INF" upperBoundExclusive="1000" score="100"/>
-            <Score lowerBoundInclusive="1000" upperBoundExclusive="10000" score="60"/>
+            <Score lowerBoundInclusive="-INF" upperBoundExclusive="10000" score="100"/>
           </Scores>
         </CutFill>
       </SiteEvaluation>
