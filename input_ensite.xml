@@ -27,7 +27,7 @@
             <Score lowerBoundInclusive="90" upperBoundExclusive="INF" score="100"/>
           </Scores>
         </CategoricalRasterStat>
-        <CutFill layerPath="../FLW_Missouri Mission Folder/RASTER/DEM_CMB_ELV_SRTMVF2_proj.tif" finalElevation="mean" lowerBound="-INF" upperBound="10000" criteriaName="CutFill_Volume_Less_Than" note="Quantity of cut and fill">
+        <CutFill layerPath="C:/Users/RDCERNWG/Documents/GIT/FLW_Missouri Mission Folder/RASTER/DEM_CMB_ELV_SRTMVF2_proj.tif" finalElevation="mean" lowerBound="-INF" upperBound="10000" criteriaName="CutFill_Volume_Less_Than" note="Quantity of cut and fill">
           <Scores default="0" isZeroExclusionary="True"  weight="0.1">
             <Score lowerBoundInclusive="-INF" upperBoundExclusive="1000" score="100"/>
             <Score lowerBoundInclusive="1000" upperBoundExclusive="10000" score="60"/>
