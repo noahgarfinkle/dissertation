@@ -1,4 +1,4 @@
-<Input resultDir="C:/Users/RDCERNWG/Documents/GIT/FLW_Missouri Mission Folder/Results/" studyID="1" epsg="3857">
+<Input resultDir="C:/Users/RDCERNWG/Documents/GIT/FLW_Missouri Mission Folder/Results/" studyID="1" epsg="3857" nReturn="100">
   <SiteSearches>
     <SiteSearch type="Airfield" layerID="1" studyObjectiveID="0" name="Gold" note="Testing an airfield">
       <SiteConfiguration>
@@ -18,7 +18,7 @@
             <Score lowerBoundInclusive="2" upperBoundExclusive="7" score="100"/>
           </Scores>
         </ContinuousRasterStat>
-        <CategoricalRasterStat layerPath="C:/Users/RDCERNWG/Documents/GIT/FLW_Missouri Mission Folder/RASTER/LC_LandCover_GeoCover_proj.tif" lowerBound="90" upperBound="INF" criteriaName="LC_LandCover_GeoCover_proj_Percent_greater_than" note="Land cover is suitable">
+        <CategoricalRasterStat layerPath="C:/Users/RDCERNWG/Documents/GIT/FLW_Missouri Mission Folder/RASTER/LC_LandCover_GeoCover_proj.tif" lowerBound="90" upperBound="INF" valueList="1,2" criteriaName="LC_LandCover_GeoCover_proj_Percent_greater_than" note="Land cover is suitable">
           <Scores default="0" isZeroExclusionary="True"  weight="0.1">
             <Score lowerBoundInclusive="90" upperBoundExclusive="INF" score="100"/>
           </Scores>
