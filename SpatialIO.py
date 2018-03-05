@@ -1016,7 +1016,8 @@ def dataFrameToENSITEDatabase(df,studyID,layerName,layerID=None):
 
 
     # insert the layer
-    geometryType = df.loc[0]["geometry"].type #TODO try catch type thing
+    #geometryType = df.loc[0]["geometry"].type #TODO try catch type thing
+    geometryType = "Polygon"
 
     if not layerID:
         insertStatement = "INSERT INTO ensite_layer (ensite_study_id,projection,name, geometry_type,primary_color,secondary_color) VALUES (%s,'%s','%s', '%s','rgba(0,0,0,.6)', 'rgba(150,150,150,.25)') RETURNING id;" %(studyID,projection,layerName, geometryType) # todo, make sure studyID remains an integer
