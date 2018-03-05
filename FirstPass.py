@@ -1048,6 +1048,8 @@ def buildContinuousRasterStatFromXML(evaluationDF,criteriaRow):
 
     evaluationDF = generateRasterStatisticsForDataFrame(evaluationDF,layerPath,stats=stat,colName=criteriaName,isCategorical=False)
     evaluationColumnName = "%s_%s" %(criteriaName,stat)
+    # KLUDGE- copy the evaluation column
+    evaluationDF[criteriaName] = evaluationDF[evaluationColumnName] # in the future replace instead of copy
 
     scores = criteriaRow.find("Scores")
     weight = scores.attrib['weight']
@@ -1060,7 +1062,7 @@ def buildContinuousRasterStatFromXML(evaluationDF,criteriaRow):
         score = str(scoreRow.attrib['score'])
         scoreSet = [lowerBoundInclusive,upperBoundExclusive,score]
         scoreStructure.append(scoreSet)
-    evaluationDF = scoreDF(evaluationDF,evaluationColumnName,scoreStructure,isZeroExclusionary=isZeroExclusionary)
+    evaluationDF = scoreDF(evaluationDF,criteriaName,scoreStructure,isZeroExclusionary=isZeroExclusionary)
     print "Retained %s of %s candidates" %(len(evaluationDF.index),initialDataFrameSize)
     #print "Retained %s of %s candidates, with %s removed for being too low and %s removed for being too high" %(numberAfterUpperBoundFilter,initialDataFrameSize,initialDataFrameSize-numberAfterLowerBoundFilter,numberAfterLowerBoundFilter-numberAfterUpperBoundFilter)
     return evaluationDF
@@ -1114,6 +1116,8 @@ def buildDistanceFromVectorLayerFromXML(evaluationDF,criteriaRow):
 
     evaluationDF = filterByVectorBufferDistance(evaluationDF,layerPath,lowerBound,removeIntersected=True)
     evaluationDF = filterByVectorBufferDistance(evaluationDF,layerPath,upperBound,removeIntersected=False)
+    vectorQAFNameKludge = "%s_QAF" %(criteriaName)
+    evaluationDF[vectorQAFNameKludge] = 100 # KLUDGE, because so expensive to actually calculate
     return evaluationDF
 
 """ Currently does not actually provide a score for vector distance
@@ -1166,8 +1170,9 @@ def buildCutFillFromXML(evaluationDF,criteriaRow):
         upperBound = float(upperBound)
 
     evaluationDF = calculateCutFill(evaluationDF,layerPath,finalElevation='mean',rasterResolution=1)
+    evaluationDF[criteriaName] = evaluationDF["totalCutFillVolume"] # KLUDGE, in the future replace the column name
     initialNumber = len(evaluationDF.index)
-    evaluationDF = evaluationDF[evaluationDF["totalCutFillVolume"] < upperBound]
+    #evaluationDF = evaluationDF[evaluationDF["totalCutFillVolume"] < upperBound]
     finalNumber = len(evaluationDF.index)
     scores = criteriaRow.find("Scores")
     weight = scores.attrib['weight']
@@ -1180,7 +1185,7 @@ def buildCutFillFromXML(evaluationDF,criteriaRow):
         score = str(scoreRow.attrib['score'])
         scoreSet = [lowerBoundInclusive,upperBoundExclusive,score]
         scoreStructure.append(scoreSet)
-    evaluationDF = scoreDF(evaluationDF,"totalCutFillVolume",scoreStructure)
+    evaluationDF = scoreDF(evaluationDF,criteriaName,scoreStructure)
 
     print "Retained %s of %s candidates, with %s removed for cut fill being too high" %(finalNumber,initialNumber,initialNumber-finalNumber)
 
@@ -1237,6 +1242,13 @@ def writeDataFrameToENSITEDB(df,studyID,layerName,layerID=None):
     layerID = io.dataFrameToENSITEDatabase(df,studyID,layerName,layerID=layerID)
     return layerID
 
+def returnCriteriaMetadataForMCDA(criteriaRow):
+    criteriaName = criteriaRow.attrib["criteriaName"]
+    scores = criteriaRow.find("Scores")
+    weight = scores.attrib["weight"]
+    isZeroExclusionary = scores.attrib["isZeroExclusionary"]
+    return criteriaName,weight,isZeroExclusionary
+
 def runMSSPIX(xmlPath):
     """ Runs site search for a given xml document
 
@@ -1285,12 +1297,20 @@ def runMSSPIX(xmlPath):
             evaluationDF = buildGriddedSearchFromXML(siteConfiguration,searchParameters)
 
         siteEvaluation = siteSearch.find("SiteEvaluation")
+        weights = []
+        qafNames = []
         criteriaCount = 0
         for criteriaRow in siteEvaluation:
             criteriaCount += 1
             # set the column name if none
             if criteriaRow.attrib["criteriaName"] == "None":
                 criteriaRow.attrib["criteriaName"] = "Criteria_%s" %(criteriaCount)
+
+            # Get the metadata needed for scoring
+            criteriaName,weight,isZeroExclusionary = returnCriteriaMetadataForMCDA(criteriaRow)
+            qafName = "%s_QAF" %(criteriaName)
+            weights.append(weight)
+            qafNames.append(qafName)
 
             # Parse based on type of criteria
             if criteriaRow.tag == "CategoricalRasterStat":
