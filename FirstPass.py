@@ -876,6 +876,395 @@ def generateRandomCandidateDataFrame(nCandidates,latMin,latMax,lonMin,lonMax):
         return 0
 
 
+## ENSITE FUNCTIONS
+
+def buildGriddedSearchFromXML(siteConfiguration,searchParameters):
+    """ ENSITE MSSPIX gridded search builder
+
+    Builds the evaluation DF for a gridded search with unrpojected WKT AOI
+
+    Args:
+        siteConfiguration (lxml): Definition of site to be searched for
+        searchParameters (lxml): Definition of AOI and gridded search behavior
+
+    Returns:
+        evaluationDF (GeoPandas GeoDataFrame): A set of polygons based on the
+            template wkt in siteConfiguration, falling within the AOI wkt
+            in searchParameters, on a grid and rotation as specified in
+            searchParameters
+
+    Raises:
+        None
+
+    Tests:
+        None
+    """
+    print "Gridded Search"
+
+    siteConfiguration_WKT = siteConfiguration.attrib['wkt']
+    siteConfiguration_Units = siteConfiguration.attrib['units']
+
+    aoi_WKT = searchParameters.attrib['wkt']
+    aoi_units = searchParameters.attrib['units']
+    aoi_EPSG = searchParameters.attrib['wkt_epsg']
+    # Reproject aoiPolygon
+    if aoi_EPSG != "3857":
+        aoi_WKT = projectWKT(aoi_WKT,aoi_EPSG,3857)
+    aoiPolygon = loads(aoi_WKT)
+
+    gridSpacing = searchParameters.attrib['gridSpacing']
+    rotationStart = searchParameters.attrib['rotationStart']
+    rotationStop = searchParameters.attrib['rotationStop']
+    rotationSpacing = searchParameters.attrib['rotationSpacing']
+
+    evaluationDF = polygonBuilder(aoiPolygon,gridSpacing=gridSpacing,rotationStart=rotationStart,rotationStop=rotationStop,rotationSpacing=rotationSpacing, wkt=siteConfiguration_WKT)
+
+    return evaluationDF
+
+def buildCategoricalRasterStatFromXML(evaluationDF,criteriaRow):
+    """ Converts XML into categorical raster statistic evaluation
+
+        Evaluation function
+
+    Args:
+        evaluationDF (lxml): Set of candidate solutions
+        criteriaRow (lxml): CategoricalRasterStat
+
+    Returns:
+        evaluationDF (GeoPandas GeoDataFrame): Scored and subsetted dataframe
+            based upon analysis
+
+    Raises:
+        None
+
+    Tests:
+        None
+    """
+    print "Categorical Raster Stat: %s.  Evaluating %s candidates." %(criteriaRow.attrib['criteriaName'],len(evaluationDF.index))
+    criteriaName = criteriaRow.attrib['criteriaName']
+    layerPath = criteriaRow.attrib['layerPath']
+    lowerBound = str(criteriaRow.attrib['lowerBound'])
+    upperBound = str(criteriaRow.attrib['upperBound'])
+
+    if lowerBound == "-INF":
+        lowerBound = -1.0
+    else:
+        lowerBound = float(lowerBound)
+    if upperBound == "INF":
+        upperBound = 101.0
+    else:
+        upperBound = float(upperBound)
+
+    valueList = criteriaRow.attrib['valueList']
+
+    scores = criteriaRow.find("Scores")
+    weight = scores.attrib['weight']
+    isZeroExclusionary = scores.attrib['isZeroExclusionary']
+    default = scores.attrib['default']
+    scoringCriteria = {}
+    for scoreRow in scores:
+        lowerBoundInclusive = scoreRow.attrib['lowerBoundInclusive']
+        upperBoundExclusive = scoreRow.attrib['upperBoundExclusive']
+        score = scoreRow.attrib['score']
+
+    evaluationDF = generateRasterStatisticsForDataFrame(evaluationDF,layerPath,stats="count",colName=criteriaName,isCategorical=True)
+    # replace NA values with zero, note this may need to be moved into the first pass function to make sure I do not unintentionally overwrite other data
+    evaluationDF = evaluationDF.fillna(0)
+
+    # calculate percentages
+    values = valueList.split(',')
+    totalCountColumnName = "%s_count" %(criteriaName)
+    countColumnNames = []
+    for value in values:
+        countColumnName = "%s_%s" %(criteriaName,value)
+        countColumnNames.append(countColumnName)
+
+    evaluationDF[criteriaName] = 0
+    for countColumnName in countColumnNames:
+        if evaluationDF.columns.contains(countColumnName):
+            evaluationDF[criteriaName] += evaluationDF[countColumnName]
+
+    evaluationDF[criteriaName] = evaluationDF[criteriaName] / evaluationDF[totalCountColumnName] * 100.0
+
+
+        # trim the dataframe
+    if isZeroExclusionary == "True":
+        initialDataFrameSize = len(evaluationDF.index)
+        evaluationDF = evaluationDF[evaluationDF[criteriaName] > lowerBound]
+        numberAfterLowerBoundFilter = len(evaluationDF.index)
+        evaluationDF = evaluationDF[evaluationDF[criteriaName] < upperBound]
+        numberAfterUpperBoundFilter = len(evaluationDF.index)
+
+    print "Retained %s of %s candidates, with %s removed for being too low and %s removed for being too high" %(numberAfterUpperBoundFilter,initialDataFrameSize,initialDataFrameSize-numberAfterLowerBoundFilter,numberAfterLowerBoundFilter-numberAfterUpperBoundFilter)
+
+
+
+    return evaluationDF
+
+def buildContinuousRasterStatFromXML(evaluationDF,criteriaRow):
+    """ Converts XML into continuous raster statistic evaluation
+
+        Evaluation function
+
+    Args:
+        evaluationDF (lxml): Set of candidate solutions
+        criteriaRow (lxml): ContinuousRasterStat
+
+    Returns:
+        evaluationDF (GeoPandas GeoDataFrame): Scored and subsetted dataframe
+            based upon analysis
+
+    Raises:
+        None
+
+    Tests:
+        None
+    """
+    print "Continuous Raster Stat: %s.  Evaluating %s candidates." %(criteriaRow.attrib['criteriaName'],len(evaluationDF.index))
+
+    criteriaName = criteriaRow.attrib['criteriaName']
+    layerPath = criteriaRow.attrib['layerPath']
+    lowerBound = str(criteriaRow.attrib['lowerBound'])
+    upperBound = str(criteriaRow.attrib['upperBound'])
+
+    if lowerBound == "-INF":
+        lowerBound = -1.0
+    else:
+        lowerBound = float(lowerBound)
+    if upperBound == "INF":
+        upperBound = 100000.0
+    else:
+        upperBound = float(upperBound)
+
+    stat = criteriaRow.attrib['stat']
+
+    evaluationDF = generateRasterStatisticsForDataFrame(evaluationDF,layerPath,stats=stat,colName=criteriaName,isCategorical=False)
+
+    scores = criteriaRow.find("Scores")
+    weight = scores.attrib['weight']
+    isZeroExclusionary = scores.attrib['isZeroExclusionary']
+    default = scores.attrib['default']
+    scoringCriteria = {}
+    for scoreRow in scores:
+        lowerBoundInclusive = scoreRow.attrib['lowerBoundInclusive']
+        upperBoundExclusive = scoreRow.attrib['upperBoundExclusive']
+        score = scoreRow.attrib['score']
+
+    # trim the dataframe
+    if isZeroExclusionary == "True":
+        initialDataFrameSize = len(evaluationDF.index)
+        evaluationColumnName = "%s_%s" %(criteriaName,stat)
+        evaluationDF = evaluationDF[evaluationDF[evaluationColumnName] > lowerBound]
+        numberAfterLowerBoundFilter = len(evaluationDF.index)
+        evaluationDF = evaluationDF[evaluationDF[evaluationColumnName] < upperBound]
+        numberAfterUpperBoundFilter = len(evaluationDF.index)
+
+    print "Retained %s of %s candidates, with %s removed for being too low and %s removed for being too high" %(numberAfterUpperBoundFilter,initialDataFrameSize,initialDataFrameSize-numberAfterLowerBoundFilter,numberAfterLowerBoundFilter-numberAfterUpperBoundFilter)
+    return evaluationDF
+
+
+def buildDistanceFromVectorLayerFromXML(evaluationDF,criteriaRow):
+    """ Converts XML into vector distance evaluation
+
+        Evaluation function
+
+    Args:
+        evaluationDF (lxml): Set of candidate solutions
+        criteriaRow (lxml): filterByVectorBufferDistance
+
+    Returns:
+        evaluationDF (GeoPandas GeoDataFrame): Scored and subsetted dataframe
+            based upon analysis
+
+    Raises:
+        None
+
+    Tests:
+        None
+    """
+    print "Distance From Vector Layer: %s.  Evaluating %s candidates." %(criteriaRow.attrib['criteriaName'],len(evaluationDF.index))
+    criteriaName = criteriaRow.attrib['criteriaName']
+    layerPath = criteriaRow.attrib['layerPath']
+    lowerBound = str(criteriaRow.attrib['lowerBound'])
+    upperBound = str(criteriaRow.attrib['upperBound'])
+
+    if lowerBound == "-INF":
+        lowerBound = -1.0
+    else:
+        lowerBound = float(lowerBound)
+    if upperBound == "INF":
+        upperBound = 100000.0
+    else:
+        upperBound = float(upperBound)
+
+    evaluationDF = filterByVectorBufferDistance(evaluationDF,layerPath,lowerBound,removeIntersected=True)
+    evaluationDF = filterByVectorBufferDistance(evaluationDF,layerPath,upperBound,removeIntersected=False)
+
+    scores = criteriaRow.find("Scores")
+    weight = scores.attrib['weight']
+    isZeroExclusionary = scores.attrib['isZeroExclusionary']
+    default = scores.attrib['default']
+    scoringCriteria = {}
+    for scoreRow in scores:
+        lowerBoundInclusive = scoreRow.attrib['lowerBoundInclusive']
+        upperBoundExclusive = scoreRow.attrib['upperBoundExclusive']
+        score = scoreRow.attrib['score']
+
+    return evaluationDF
+
+def buildCutFillFromXML(evaluationDF,criteriaRow):
+    """ Converts XML into cut/fill evaluation
+
+        Evaluation function
+
+    Args:
+        evaluationDF (lxml): Set of candidate solutions
+        criteriaRow (lxml): CutFill
+
+    Returns:
+        evaluationDF (GeoPandas GeoDataFrame): Scored and subsetted dataframe
+            based upon analysis
+
+    Raises:
+        None
+
+    Tests:
+        None
+    """
+    print "Cut Fill: %s.  Evaluating %s candidates." %(criteriaRow.attrib['criteriaName'],len(evaluationDF.index))
+    criteriaName = criteriaRow.attrib['criteriaName']
+    layerPath = criteriaRow.attrib['layerPath']
+    lowerBound = str(criteriaRow.attrib['lowerBound'])
+    upperBound = str(criteriaRow.attrib['upperBound'])
+
+    if lowerBound == "-INF":
+        lowerBound = -1.0
+    else:
+        lowerBound = float(lowerBound)
+    if upperBound == "INF":
+        upperBound = 10000000.0
+    else:
+        upperBound = float(upperBound)
+
+    scores = criteriaRow.find("Scores")
+    weight = scores.attrib['weight']
+    isZeroExclusionary = scores.attrib['isZeroExclusionary']
+    default = scores.attrib['default']
+    scoringCriteria = {}
+    for scoreRow in scores:
+        lowerBoundInclusive = scoreRow.attrib['lowerBoundInclusive']
+        upperBoundExclusive = scoreRow.attrib['upperBoundExclusive']
+        score = scoreRow.attrib['score']
+
+
+
+    return evaluationDF
+
+def scoreDF():
+    return 0
+
+def writeDataFrameToENSITEDB(df,studyID,layerName,layerID=None):
+    """ Writes results into ENSITE database
+
+        Evaluation function
+
+    Args:
+        df (GeoPandas GeoDataFrame): Set of candidate solutions
+        studyID (int): ID of ENITE study the layer should belong to
+        layerName (str): Pretty-print name to display in ENSITE
+        layerID (int): If None, a new layer is created.  If provided, the data
+            is added to an existing layer
+
+    Returns:
+        layerID (int): The returned layer id in the database
+
+    Raises:
+        None
+
+    Todo:
+        * Currently rewritten to only write polygon layers
+
+    Tests:
+        None
+    """
+    layerID = io.dataFrameToENSITEDatabase(df,studyID,layerName,layerID=layerID)
+    return layerID
+
+def runMSSPIX(xmlPath):
+    """ Runs site search for a given xml document
+
+        Evaluation function
+
+    Args:
+        xmlPath (str): Path to input.xml
+
+    Returns
+        layerID (list<int>): The returned layer id for each evaluation in the
+            database
+
+    Raises:
+        None
+
+    Todo:
+        * Currently rewritten to only write polygon layers
+
+    Tests:
+        > layerIDs = runMSSPIX("C:/Users/RDCERNWG/Documents/GIT/FLW_Missouri Mission Folder/RESULTS/Airfield 7.xml")
+    """
+    tree = ET.parse(xmlPath)
+    root = tree.getroot()
+
+    resultDir = root.attrib['resultDir']
+    studyID = root.attrib['studyID']
+    epsg = root.attrib['epsg']
+    print "%s %s %s" %(resultDir,studyID,epsg)
+
+    siteSearches = root.find("SiteSearches")
+    layerIDs = []
+    for siteSearch in siteSearches:
+        siteSearch_studyObjectiveID = siteSearch.attrib['studyObjectiveID']
+        siteSearch_layerID = siteSearch.attrib['layerID']
+        siteSearch_type = siteSearch.attrib['type']
+        siteSearch_name = siteSearch.attrib['name']
+        siteSearch_note = siteSearch.attrib['note']
+        siteSearch_nReturn = siteSearch.attrib['nReturn']
+
+        siteConfiguration = siteSearch.find("SiteConfiguration")[0]
+        if siteConfiguration.tag == "WKTTemplate":
+            print "WKT Template"
+
+        searchParameters = siteSearch.find("SearchParameters")[0]
+        if searchParameters.tag == "GriddedSearch":
+            evaluationDF = buildGriddedSearchFromXML(siteConfiguration,searchParameters)
+
+        siteEvaluation = siteSearch.find("SiteEvaluation")
+        criteriaCount = 0
+        for criteriaRow in siteEvaluation:
+            criteriaCount += 1
+            # set the column name if none
+            if criteriaRow.attrib["criteriaName"] == "None":
+                criteriaRow.attrib["criteriaName"] = "Criteria_%s" %(criteriaCount)
+
+            # Parse based on type of criteria
+            if criteriaRow.tag == "CategoricalRasterStat":
+                evaluationDF = buildCategoricalRasterStatFromXML(evaluationDF,criteriaRow)
+                criteria1DF = evaluationDF
+            if criteriaRow.tag == "ContinuousRasterStat":
+                evaluationDF = buildContinuousRasterStatFromXML(evaluationDF,criteriaRow)
+                criteria2DF = evaluationDF
+                # TODO: The bug is here.  Some of the rows in the dataset returned here have no geometry
+            if criteriaRow.tag == "DistanceFromVectorLayer":
+                evaluationDF = buildDistanceFromVectorLayerFromXML(evaluationDF,criteriaRow)
+                criteria3DF = evaluationDF
+            if criteriaRow.tag == "CutFill":
+                evaluationDF = buildCutFillFromXML(evaluationDF,criteriaRow)
+                criteria4DF = evaluationDF
+
+        layerID = io.dataFrameToENSITEDatabase(evaluationDF,studyID,"My First First Pass")
+        layerIDs.append(layerID)
+    return layerIDs
+
+
 ## CURRENT TEST
 # First pass implementation for class
 """
