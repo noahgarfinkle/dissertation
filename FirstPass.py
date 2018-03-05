@@ -37,6 +37,7 @@ import shapely.affinity
 from rasterstats import zonal_stats, raster_stats, point_query, utils
 import matplotlib.pyplot as plt
 import datetime
+import time
 
 import SpatialIO as io
 
@@ -957,15 +958,8 @@ def buildCategoricalRasterStatFromXML(evaluationDF,criteriaRow):
 
     valueList = criteriaRow.attrib['valueList']
 
-    scores = criteriaRow.find("Scores")
-    weight = scores.attrib['weight']
-    isZeroExclusionary = scores.attrib['isZeroExclusionary']
-    default = scores.attrib['default']
-    scoringCriteria = {}
-    for scoreRow in scores:
-        lowerBoundInclusive = scoreRow.attrib['lowerBoundInclusive']
-        upperBoundExclusive = scoreRow.attrib['upperBoundExclusive']
-        score = scoreRow.attrib['score']
+
+    initialDataFrameSize = len(evaluationDF.index)
 
     evaluationDF = generateRasterStatisticsForDataFrame(evaluationDF,layerPath,stats="count",colName=criteriaName,isCategorical=True)
     # replace NA values with zero, note this may need to be moved into the first pass function to make sure I do not unintentionally overwrite other data
@@ -986,7 +980,20 @@ def buildCategoricalRasterStatFromXML(evaluationDF,criteriaRow):
 
     evaluationDF[criteriaName] = evaluationDF[criteriaName] / evaluationDF[totalCountColumnName] * 100.0
 
+    scores = criteriaRow.find("Scores")
+    weight = scores.attrib['weight']
+    isZeroExclusionary = scores.attrib['isZeroExclusionary']
+    default = scores.attrib['default']
+    scoreStructure = []
+    for scoreRow in scores:
+        lowerBoundInclusive = str(scoreRow.attrib['lowerBoundInclusive'])
+        upperBoundExclusive = str(scoreRow.attrib['upperBoundExclusive'])
+        score = str(scoreRow.attrib['score'])
+        scoreSet = [lowerBoundInclusive,upperBoundExclusive,score]
+        scoreStructure.append(scoreSet)
+    evaluationDF = scoreDF(evaluationDF,criteriaName,scoreStructure,isZeroExclusionary=isZeroExclusionary)
 
+    """
         # trim the dataframe
     if isZeroExclusionary == "True":
         initialDataFrameSize = len(evaluationDF.index)
@@ -994,11 +1001,11 @@ def buildCategoricalRasterStatFromXML(evaluationDF,criteriaRow):
         numberAfterLowerBoundFilter = len(evaluationDF.index)
         evaluationDF = evaluationDF[evaluationDF[criteriaName] < upperBound]
         numberAfterUpperBoundFilter = len(evaluationDF.index)
+        """
 
-    print "Retained %s of %s candidates, with %s removed for being too low and %s removed for being too high" %(numberAfterUpperBoundFilter,initialDataFrameSize,initialDataFrameSize-numberAfterLowerBoundFilter,numberAfterLowerBoundFilter-numberAfterUpperBoundFilter)
+    print "Retained %s of %s candidates" %(len(evaluationDF.index),initialDataFrameSize)
 
-
-
+#    print "Retained %s of %s candidates, with %s removed for being too low and %s removed for being too high" %(numberAfterUpperBoundFilter,initialDataFrameSize,initialDataFrameSize-numberAfterLowerBoundFilter,numberAfterLowerBoundFilter-numberAfterUpperBoundFilter)
     return evaluationDF
 
 def buildContinuousRasterStatFromXML(evaluationDF,criteriaRow):
@@ -1037,20 +1044,28 @@ def buildContinuousRasterStatFromXML(evaluationDF,criteriaRow):
         upperBound = float(upperBound)
 
     stat = criteriaRow.attrib['stat']
+    initialDataFrameSize = len(evaluationDF.index)
 
     evaluationDF = generateRasterStatisticsForDataFrame(evaluationDF,layerPath,stats=stat,colName=criteriaName,isCategorical=False)
+    evaluationColumnName = "%s_%s" %(criteriaName,stat)
 
     scores = criteriaRow.find("Scores")
     weight = scores.attrib['weight']
     isZeroExclusionary = scores.attrib['isZeroExclusionary']
     default = scores.attrib['default']
-    scoringCriteria = {}
+    scoreStructure = []
     for scoreRow in scores:
-        lowerBoundInclusive = scoreRow.attrib['lowerBoundInclusive']
-        upperBoundExclusive = scoreRow.attrib['upperBoundExclusive']
-        score = scoreRow.attrib['score']
+        lowerBoundInclusive = str(scoreRow.attrib['lowerBoundInclusive'])
+        upperBoundExclusive = str(scoreRow.attrib['upperBoundExclusive'])
+        score = str(scoreRow.attrib['score'])
+        scoreSet = [lowerBoundInclusive,upperBoundExclusive,score]
+        scoreStructure.append(scoreSet)
+    evaluationDF = scoreDF(evaluationDF,evaluationColumnName,scoreStructure,isZeroExclusionary=isZeroExclusionary)
+    print "Retained %s of %s candidates" %(len(evaluationDF.index),initialDataFrameSize)
+    #print "Retained %s of %s candidates, with %s removed for being too low and %s removed for being too high" %(numberAfterUpperBoundFilter,initialDataFrameSize,initialDataFrameSize-numberAfterLowerBoundFilter,numberAfterLowerBoundFilter-numberAfterUpperBoundFilter)
+    return evaluationDF
 
-    # trim the dataframe
+    """# trim the dataframe
     if isZeroExclusionary == "True":
         initialDataFrameSize = len(evaluationDF.index)
         evaluationColumnName = "%s_%s" %(criteriaName,stat)
@@ -1058,9 +1073,9 @@ def buildContinuousRasterStatFromXML(evaluationDF,criteriaRow):
         numberAfterLowerBoundFilter = len(evaluationDF.index)
         evaluationDF = evaluationDF[evaluationDF[evaluationColumnName] < upperBound]
         numberAfterUpperBoundFilter = len(evaluationDF.index)
+        """
 
-    print "Retained %s of %s candidates, with %s removed for being too low and %s removed for being too high" %(numberAfterUpperBoundFilter,initialDataFrameSize,initialDataFrameSize-numberAfterLowerBoundFilter,numberAfterLowerBoundFilter-numberAfterUpperBoundFilter)
-    return evaluationDF
+
 
 
 def buildDistanceFromVectorLayerFromXML(evaluationDF,criteriaRow):
@@ -1099,18 +1114,22 @@ def buildDistanceFromVectorLayerFromXML(evaluationDF,criteriaRow):
 
     evaluationDF = filterByVectorBufferDistance(evaluationDF,layerPath,lowerBound,removeIntersected=True)
     evaluationDF = filterByVectorBufferDistance(evaluationDF,layerPath,upperBound,removeIntersected=False)
+    return evaluationDF
 
+""" Currently does not actually provide a score for vector distance
     scores = criteriaRow.find("Scores")
     weight = scores.attrib['weight']
     isZeroExclusionary = scores.attrib['isZeroExclusionary']
     default = scores.attrib['default']
-    scoringCriteria = {}
+    scoreStructure = []
     for scoreRow in scores:
-        lowerBoundInclusive = scoreRow.attrib['lowerBoundInclusive']
-        upperBoundExclusive = scoreRow.attrib['upperBoundExclusive']
-        score = scoreRow.attrib['score']
-
-    return evaluationDF
+        lowerBoundInclusive = str(scoreRow.attrib['lowerBoundInclusive'])
+        upperBoundExclusive = str(scoreRow.attrib['upperBoundExclusive'])
+        score = str(scoreRow.attrib['score'])
+        scoreSet = [lowerBoundInclusive,upperBoundExclusive,score]
+        scoreStructure.append(scoreSet)
+    evaluationDF = scoreDF(evaluationDF,"totalCutFillVolume",scoreStructure,isZeroExclusionary=False)
+"""
 
 def buildCutFillFromXML(evaluationDF,criteriaRow):
     """ Converts XML into cut/fill evaluation
@@ -1146,7 +1165,7 @@ def buildCutFillFromXML(evaluationDF,criteriaRow):
     else:
         upperBound = float(upperBound)
 
-    evaluationDF = firstpass.calculateCutFill(evaluationDF,layerPath,finalElevation='mean',rasterResolution=1)
+    evaluationDF = calculateCutFill(evaluationDF,layerPath,finalElevation='mean',rasterResolution=1)
     initialNumber = len(evaluationDF.index)
     evaluationDF = evaluationDF[evaluationDF["totalCutFillVolume"] < upperBound]
     finalNumber = len(evaluationDF.index)
@@ -1154,18 +1173,42 @@ def buildCutFillFromXML(evaluationDF,criteriaRow):
     weight = scores.attrib['weight']
     isZeroExclusionary = scores.attrib['isZeroExclusionary']
     default = scores.attrib['default']
-    scoringCriteria = {}
+    scoreStructure = []
     for scoreRow in scores:
-        lowerBoundInclusive = scoreRow.attrib['lowerBoundInclusive']
-        upperBoundExclusive = scoreRow.attrib['upperBoundExclusive']
-        score = scoreRow.attrib['score']
+        lowerBoundInclusive = str(scoreRow.attrib['lowerBoundInclusive'])
+        upperBoundExclusive = str(scoreRow.attrib['upperBoundExclusive'])
+        score = str(scoreRow.attrib['score'])
+        scoreSet = [lowerBoundInclusive,upperBoundExclusive,score]
+        scoreStructure.append(scoreSet)
+    evaluationDF = scoreDF(evaluationDF,"totalCutFillVolume",scoreStructure)
 
     print "Retained %s of %s candidates, with %s removed for cut fill being too high" %(finalNumber,initialNumber,initialNumber-finalNumber)
 
     return evaluationDF
 
-def scoreDF():
-    return 0
+def scoreDF(df,criteriaColumnName,scoreStructure,isZeroExclusionary = False):
+    # score data structure is list of [loweBoundInclusive,upperBoundExclusive,score], everything outside should default to 0
+    initialSize = len(df.index)
+    qafName = "%s_QAF" %(criteriaColumnName)
+    df[qafName] = 0 # this also sets the fallback position
+    for scoreSet in scoreStructure:
+        lowerBound = scoreSet[0]
+        upperBound = scoreSet[1]
+        score = scoreSet[2]
+        if lowerBound == "-INF":
+            lowerBound = -1
+        if upperBound == "INF":
+            upperBound = 100000000
+        lowerBound = float(lowerBound)
+        upperBound = float(upperBound)
+        score = float(score)
+        affectedRows =(df[criteriaColumnName] >= lowerBound) & (df[criteriaColumnName] <= upperBound)# upper bound should actually be exclusive
+        df.loc[affectedRows,qafName] = score
+        if isZeroExclusionary == "True":
+            df = df[df[qafName] != 0]
+        filteredSize = len(df.index)
+        print "scoreDF for column %s retained %s of %s candidates" %(criteriaColumnName,filteredSize,initialSize)
+    return df
 
 def writeDataFrameToENSITEDB(df,studyID,layerName,layerID=None):
     """ Writes results into ENSITE database
@@ -1263,8 +1306,8 @@ def runMSSPIX(xmlPath):
             if criteriaRow.tag == "CutFill":
                 evaluationDF = buildCutFillFromXML(evaluationDF,criteriaRow)
                 criteria4DF = evaluationDF
-
-        layerID = io.dataFrameToENSITEDatabase(evaluationDF,studyID,"My First First Pass")
+        ensiteLayerName = "%s_%s" %(siteSearch_name,time.strftime("%Y_%m_%d_%H_%M_%S"))
+        layerID = io.dataFrameToENSITEDatabase(evaluationDF,studyID,ensiteLayerName)
         layerIDs.append(layerID)
     return layerIDs
 
