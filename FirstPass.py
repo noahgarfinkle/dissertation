@@ -614,6 +614,8 @@ def generateRasterStatisticsForDataFrame(df,raster_path,stats="count majority mi
     """
     start = datetime.datetime.now()
     row_stats_df = gpd.GeoDataFrame(raster_stats(vectors=df['geometry'],raster=raster_path,stats=stats, copy_properties=True, nodata_value=0, categorical=isCategorical))
+    row_stats_df.index = df.index
+
     # rename the columns
     for stat in stats.split(' '):
         newColName = "%s_%s" %(colName,stat)
