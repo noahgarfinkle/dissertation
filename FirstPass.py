@@ -1146,6 +1146,10 @@ def buildCutFillFromXML(evaluationDF,criteriaRow):
     else:
         upperBound = float(upperBound)
 
+    evaluationDF = firstpass.calculateCutFill(evaluationDF,layerPath,finalElevation='mean',rasterResolution=1)
+    initialNumber = len(evaluationDF.index)
+    evaluationDF = evaluationDF[evaluationDF["totalCutFillVolume"] < upperBound]
+    finalNumber = len(evaluationDF.index)
     scores = criteriaRow.find("Scores")
     weight = scores.attrib['weight']
     isZeroExclusionary = scores.attrib['isZeroExclusionary']
@@ -1156,7 +1160,7 @@ def buildCutFillFromXML(evaluationDF,criteriaRow):
         upperBoundExclusive = scoreRow.attrib['upperBoundExclusive']
         score = scoreRow.attrib['score']
 
-
+    print "Retained %s of %s candidates, with %s removed for cut fill being too high" %(finalNumber,initialNumber,initialNumber-finalNumber)
 
     return evaluationDF
 
