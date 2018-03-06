@@ -1212,7 +1212,7 @@ def scoreDF(df,criteriaColumnName,scoreStructure,isZeroExclusionary = False):
         if isZeroExclusionary == "True":
             df = df[df[qafName] != 0]
         filteredSize = len(df.index)
-        print "scoreDF for column %s retained %s of %s candidates" %(criteriaColumnName,filteredSize,initialSize)
+    print "scoreDF for column %s retained %s of %s candidates" %(criteriaColumnName,filteredSize,initialSize)
     return df
 
 def writeDataFrameToENSITEDB(df,studyID,layerName,layerID=None):
@@ -1249,7 +1249,7 @@ def returnCriteriaMetadataForMCDA(criteriaRow):
     isZeroExclusionary = scores.attrib["isZeroExclusionary"]
     return criteriaName,weight,isZeroExclusionary
 
-def runMSSPIX(xmlPath):
+def runMSSPIX(xmlPath,returnDFInsteadOfLayerID=False):
     """ Runs site search for a given xml document
 
         Evaluation function
@@ -1280,6 +1280,7 @@ def runMSSPIX(xmlPath):
 
     siteSearches = root.find("SiteSearches")
     layerIDs = []
+    evaluationDFs = []
     for siteSearch in siteSearches:
         siteSearch_studyObjectiveID = siteSearch.attrib['studyObjectiveID']
         siteSearch_layerID = siteSearch.attrib['layerID']
@@ -1299,6 +1300,7 @@ def runMSSPIX(xmlPath):
         siteEvaluation = siteSearch.find("SiteEvaluation")
         weights = []
         qafNames = []
+        scoringDict = {}
         criteriaCount = 0
         for criteriaRow in siteEvaluation:
             criteriaCount += 1
@@ -1309,8 +1311,9 @@ def runMSSPIX(xmlPath):
             # Get the metadata needed for scoring
             criteriaName,weight,isZeroExclusionary = returnCriteriaMetadataForMCDA(criteriaRow)
             qafName = "%s_QAF" %(criteriaName)
-            weights.append(weight)
+            weights.append(float(weight))
             qafNames.append(qafName)
+            scoringDict[qafName] = float(weight)
 
             # Parse based on type of criteria
             if criteriaRow.tag == "CategoricalRasterStat":
@@ -1319,17 +1322,40 @@ def runMSSPIX(xmlPath):
             if criteriaRow.tag == "ContinuousRasterStat":
                 evaluationDF = buildContinuousRasterStatFromXML(evaluationDF,criteriaRow)
                 criteria2DF = evaluationDF
-                # TODO: The bug is here.  Some of the rows in the dataset returned here have no geometry
             if criteriaRow.tag == "DistanceFromVectorLayer":
                 evaluationDF = buildDistanceFromVectorLayerFromXML(evaluationDF,criteriaRow)
                 criteria3DF = evaluationDF
             if criteriaRow.tag == "CutFill":
                 evaluationDF = buildCutFillFromXML(evaluationDF,criteriaRow)
                 criteria4DF = evaluationDF
+
+        # build the weights
+        totalWeight = sum(weights)
+        weightedMCDAColumns = []
+        for qafName in qafNames:
+            scoringDict[qafName] /= totalWeight
+            assignedWeight = scoringDict[qafName]
+            weightedMCDAColumn = "%s_weighted" %(qafName)
+            weightedMCDAColumns.append(weightedMCDAColumn)
+            evaluationDF[weightedMCDAColumn] = evaluationDF[qafName] * assignedWeight
+
+        # Build the total score
+        evaluationDF["MCDA_SCORE"] = 0
+        for weightedMCDAColumn in weightedMCDAColumns:
+            evaluationDF["MCDA_SCORE"] += evaluationDF[weightedMCDAColumn]
+
+        # Build the standardized score
+        maxScore = max(evaluationDF["MCDA_SCORE"])
+        evaluationDF["MCDA_SCORE_STANDARDIZED"] = evaluationDF["MCDA_SCORE"] / maxScore * 100.0
+        evaluationDFs.append(evaluationDF)
+
         ensiteLayerName = "%s_%s" %(siteSearch_name,time.strftime("%Y_%m_%d_%H_%M_%S"))
         layerID = io.dataFrameToENSITEDatabase(evaluationDF,studyID,ensiteLayerName)
         layerIDs.append(layerID)
-    return layerIDs
+    if returnDFInsteadOfLayerID:
+        return evaluationDFs
+    else:
+        return layerIDs
 
 
 ## CURRENT TEST
