@@ -978,7 +978,7 @@ def rasterizeGeodataFrameColumn(df,column,outputRasterPath,resolution=30,crs=Non
     return outputRasterPath
 
 
-def dataFrameToENSITEDatabase(df,studyID,layerName,layerID=None):
+def dataFrameToENSITEDatabase(df,studyID,layerName,layerID=None,geometryType = "Polygon"):
     """ Writes a Vector GeoDataFrame into the ENSITE database
 
     This code is mirrored from the ENSITE ImportExportLibrary, and is necessary
@@ -992,6 +992,8 @@ def dataFrameToENSITEDatabase(df,studyID,layerName,layerID=None):
         layerName (str): The pretty-print name to refer to this layer as
         layerID (int): Passed if a layer has already been creaed by the ENSITE
             user interface, otherwise this is sest during insertion
+        geometryType (str): Right now used as a kludge to make sure the layer ends
+            up in the correct database in ENSITE
 
     Returns:
         None
@@ -1017,7 +1019,7 @@ def dataFrameToENSITEDatabase(df,studyID,layerName,layerID=None):
 
     # insert the layer
     #geometryType = df.loc[0]["geometry"].type #TODO try catch type thing
-    geometryType = "Polygon"
+    #geometryType = "Polygon"
 
     if not layerID:
         insertStatement = "INSERT INTO ensite_layer (ensite_study_id,projection,name, geometry_type,primary_color,secondary_color) VALUES (%s,'%s','%s', '%s','rgba(0,0,0,.6)', 'rgba(150,150,150,.25)') RETURNING id;" %(studyID,projection,layerName, geometryType) # todo, make sure studyID remains an integer
@@ -1083,6 +1085,11 @@ def dataFrameToENSITEDatabase(df,studyID,layerName,layerID=None):
 
     con.commit()
     return layerID
+
+def loadFGDB(fgdbPath):
+    fgdbPath = "C:/Users/RDCERNWG/Documents/GIT/FLW_Missouri Mission Folder/RECON/enfire.gdb"
+    with fiona.open(fgdbPath, driver="OpenFileGDB") as src:
+        return 0
 
 
 ## CURRENT TEST
