@@ -760,7 +760,7 @@ def calculateCutFill(df,dem_path,finalElevation='mean',rasterResolution=10):
         elevationChangeArrays.append(requiredHeightChange)
         totalCutFillVolumes.append(totalCutFillVolume)
 
-    appendedDF['elevationChangeArray'] = elevationChangeArrays
+    #appendedDF['elevationChangeArray'] = elevationChangeArrays
     appendedDF['totalCutFillVolume'] = totalCutFillVolumes
     return appendedDF
 

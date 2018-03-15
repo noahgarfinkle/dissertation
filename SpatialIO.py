@@ -978,6 +978,10 @@ def rasterizeGeodataFrameColumn(df,column,outputRasterPath,resolution=30,crs=Non
     return outputRasterPath
 
 
+def enfireToENSITEDatabase(df):
+    return 0
+
+
 def dataFrameToENSITEDatabase(df,studyID,layerName,layerID=None,geometryType = "Polygon"):
     """ Writes a Vector GeoDataFrame into the ENSITE database
 
