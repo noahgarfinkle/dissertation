@@ -2,7 +2,7 @@ import sys
 
 import SpatialIO as io
 import FirstPass as firstpass
-import pgdissroute as pgdissroute
+#import pgdissroute as pgdissroute
 
 def main():
     xmlPath = str(sys.argv[1:][0])

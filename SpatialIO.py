@@ -978,9 +978,15 @@ def rasterizeGeodataFrameColumn(df,column,outputRasterPath,resolution=30,crs=Non
     return outputRasterPath
 
 
-def enfireToENSITEDatabase(df):
-    return 0
-
+def ensiteLayertoDF(layerID):
+    con = psycopg2.connect(database="ensite", user="postgres",password="postgres",host="127.0.0.1")
+    cur = con.cursor()
+    queryStatement = "SELECT ensite_study_id,projection,name, geometry_type FROM ensite_layer WHERE id = %s;" %(layerID) # todo, make sure studyID remains an integer
+    cur.execute(queryStatement)
+    for row in cur:
+        #do something with every single row here
+        #optionally print the row
+        print row
 
 def dataFrameToENSITEDatabase(df,studyID,layerName,layerID=None,geometryType = "Polygon"):
     """ Writes a Vector GeoDataFrame into the ENSITE database

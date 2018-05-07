@@ -946,6 +946,8 @@ def buildCategoricalRasterStatFromXML(evaluationDF,criteriaRow):
     layerPath = criteriaRow.attrib['layerPath']
     lowerBound = str(criteriaRow.attrib['lowerBound'])
     upperBound = str(criteriaRow.attrib['upperBound'])
+    start = datetime.datetime.now()
+
 
     if lowerBound == "-INF":
         lowerBound = -1.0
@@ -962,9 +964,14 @@ def buildCategoricalRasterStatFromXML(evaluationDF,criteriaRow):
     initialDataFrameSize = len(evaluationDF.index)
 
     evaluationDF = generateRasterStatisticsForDataFrame(evaluationDF,layerPath,stats="count",colName=criteriaName,isCategorical=True)
+    end_EvaluationDF = datetime.datetime.now()
+    timeElapsed = end_EvaluationDF - start
+    print "generateRasterStatisticsForDataFrame took %s seconds" %(timeElapsed.seconds)
     # replace NA values with zero, note this may need to be moved into the first pass function to make sure I do not unintentionally overwrite other data
     evaluationDF = evaluationDF.fillna(0)
-
+    end_fillna = datetime.datetime.now()
+    timeElapsed = end_fillna - end_EvaluationDF
+    print "fillna took %s seconds" %(timeElapsed.seconds)
     # calculate percentages
     values = valueList.split(',')
     totalCountColumnName = "%s_count" %(criteriaName)
@@ -979,6 +986,9 @@ def buildCategoricalRasterStatFromXML(evaluationDF,criteriaRow):
             evaluationDF[criteriaName] += evaluationDF[countColumnName]
 
     evaluationDF[criteriaName] = evaluationDF[criteriaName] / evaluationDF[totalCountColumnName] * 100.0
+    end_CreatingCriteria = datetime.datetime.now()
+    timeElapsed = end_CreatingCriteria - end_fillna
+    print "creatingCriteriaName took %s seconds" %(timeElapsed.seconds)
 
     scores = criteriaRow.find("Scores")
     weight = scores.attrib['weight']
@@ -992,7 +1002,9 @@ def buildCategoricalRasterStatFromXML(evaluationDF,criteriaRow):
         scoreSet = [lowerBoundInclusive,upperBoundExclusive,score]
         scoreStructure.append(scoreSet)
     evaluationDF = scoreDF(evaluationDF,criteriaName,scoreStructure,isZeroExclusionary=isZeroExclusionary)
-
+    end_scoring = datetime.datetime.now()
+    timeElapsed = end_scoring - end_CreatingCriteria
+    print "scoring took %s seconds" %(timeElapsed.seconds)
     """
         # trim the dataframe
     if isZeroExclusionary == "True":
