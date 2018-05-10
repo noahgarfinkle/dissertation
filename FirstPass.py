@@ -1261,6 +1261,53 @@ def returnCriteriaMetadataForMCDA(criteriaRow):
     isZeroExclusionary = scores.attrib["isZeroExclusionary"]
     return criteriaName,weight,isZeroExclusionary
 
+def buildTestSet(xmlPath):
+    tree = ET.parse(xmlPath)
+    root = tree.getroot()
+
+    resultDir = root.attrib['resultDir']
+    studyID = root.attrib['studyID']
+    epsg = root.attrib['epsg']
+    print "%s %s %s" %(resultDir,studyID,epsg)
+
+    siteSearches = root.find("SiteSearches")
+    layerIDs = []
+    evaluationDFs = []
+    for siteSearch in siteSearches:
+        siteSearch_studyObjectiveID = siteSearch.attrib['studyObjectiveID']
+        siteSearch_layerID = siteSearch.attrib['layerID']
+        siteSearch_type = siteSearch.attrib['type']
+        siteSearch_name = siteSearch.attrib['name']
+        siteSearch_note = siteSearch.attrib['note']
+        siteSearch_nReturn = siteSearch.attrib['nReturn']
+
+        siteConfiguration = siteSearch.find("SiteConfiguration")[0]
+        if siteConfiguration.tag == "WKTTemplate":
+            print "WKT Template"
+
+        searchParameters = siteSearch.find("SearchParameters")[0]
+        if searchParameters.tag == "GriddedSearch":
+            evaluationDF = buildGriddedSearchFromXML(siteConfiguration,searchParameters)
+
+        siteEvaluation = siteSearch.find("SiteEvaluation")
+        weights = []
+        qafNames = []
+        scoringDict = {}
+        criteriaCount = 0
+        for criteriaRow in siteEvaluation:
+            criteriaCount += 1
+            # set the column name if none
+            if criteriaRow.attrib["criteriaName"] == "None":
+                criteriaRow.attrib["criteriaName"] = "Criteria_%s" %(criteriaCount)
+
+            # Get the metadata needed for scoring
+
+        evaluationDFs.append(evaluationDF)
+
+
+    return evaluationDFs,siteSearches
+
+
 def runMSSPIX(xmlPath,returnDFInsteadOfLayerID=False):
     """ Runs site search for a given xml document
 
@@ -1362,12 +1409,94 @@ def runMSSPIX(xmlPath,returnDFInsteadOfLayerID=False):
         evaluationDFs.append(evaluationDF)
 
         ensiteLayerName = "%s_%s" %(siteSearch_name,time.strftime("%Y_%m_%d_%H_%M_%S"))
+
+        start = datetime.datetime.now()
         layerID = io.dataFrameToENSITEDatabase(evaluationDF,studyID,ensiteLayerName)
+        end = datetime.datetime.now()
+        timeElapsed = end - start
+        print "writing to the database took %s seconds" %(timeElapsed.seconds)
+
         layerIDs.append(layerID)
     if returnDFInsteadOfLayerID:
-        return evaluationDFs
+        return evaluationDFs, siteEvaluation
     else:
         return layerIDs
+
+## NEW VERSIONS
+def dfFromPostGIS(layerID):
+    con = psycopg2.connect(database="ensite", user="postgres",password="postgres",host="127.0.0.1")
+    cur = con.cursor()
+    # get the layer information
+    geometryTable = "ensite_feature_point"
+    queryStatement = "SELECT ensite_study_id,projection,name, geometry_type FROM ensite_layer WHERE id = %s;" %(layerID) # todo, make sure studyID remains an integer
+    cur.execute(queryStatement)
+    for row in cur:
+        ensite_study_id = row[0]
+        projection = row[1]
+        name = row[2]
+        geometry_type = row[3]
+        if geometry_type == "Point":
+            pass
+        elif geometry_type == "Raster":
+            pass
+        else:
+            geometryTable = "ensite_feature_vector"
+
+
+    # get the property information
+    columns = {}
+    columnIDs = {}
+    columnData = {}
+    queryStatement = "SELECT id,name,type from ensite_feature_property_name WHERE ensite_layer_id = %s;" %(layerID)
+    cur.execute(queryStatement)
+    for row in cur:
+        columnID = row[0]
+        columnName = row[1]
+        columnType = row[2]
+        columns[columnName] = columnType
+        columnIDs[columnID] = columnName
+        columnData[columnName] = {}
+
+    # get the features
+    featureIDs = []
+    queryStatement = "SELECT id FROM ensite_feature WHERE ensite_layer_id = %s;" %(layerID)
+    cur.execute(queryStatement)
+    for row in cur:
+        featureID = row[0]
+        featureIDs.append(featureID)
+
+    # get the geometries
+    geometries = {}
+    for featureID in featureIDs:
+        queryStatement = "SELECT ST_AsText(geometry) FROM %s WHERE ensite_feature_id = %s;" %(geometryTable,featureID)
+        cur.execute(queryStatement)
+        for row in cur:
+            row_geometry = row[0]
+            geometries[featureID] = row_geometry
+            #print row_geometry
+
+    # get the properties
+        for columnID in columnIDs.iterkeys():
+            columnName = columnIDs[columnID]
+            queryStatement = "SELECT value,value_type FROM ensite_feature_property_value WHERE ensite_feature_id= %s AND ensite_feature_property_name_id = %s;" %(featureID,columnID)
+            cur.execute(queryStatement)
+            count = 0
+            for row in cur:
+                #print row
+                property_value = row[0]
+                property_type = row[1]
+                columnData[columnName][featureID] = property_value
+                count += 1
+            if count == 0:
+                columnData[columnName][featureID] = "None"
+
+    df = gpd.GeoDataFrame(columns=columns.keys())
+    df.geometry = [loads(x) for x in geometries.itervalues()]
+    for k,v in columnData.iteritems():
+        df[k] = v.values()
+
+    df.crs = {'init':'EPSG:%s' %(projection.split(':')[1])}
+    return df
 
 
 ## CURRENT TEST

@@ -267,7 +267,7 @@ class VectorLayer:
         Tests:
             None
         """
-        elf.df = gpd.read_postgis(sql,postgis.con,geom_col=geom_col,crs=crs,index_col=index_col,params=params)
+        self.df = gpd.read_postgis(sql,postgis.con,geom_col=geom_col,crs=crs,index_col=index_col,params=params)
 
     def addColumn(self,colName):
         """ Adds an empty column to the dataframe
