@@ -1101,6 +1101,80 @@ def loadFGDB(fgdbPath):
     with fiona.open(fgdbPath, driver="OpenFileGDB") as src:
         return 0
 
+def dfFromPostGIS(layerID):
+    con = psycopg2.connect(database="ensite", user="postgres",password="postgres",host="127.0.0.1")
+    cur = con.cursor()
+    # get the layer information
+    geometryTable = "ensite_feature_point"
+    queryStatement = "SELECT ensite_study_id,projection,name, geometry_type FROM ensite_layer WHERE id = %s;" %(layerID) # todo, make sure studyID remains an integer
+    cur.execute(queryStatement)
+    for row in cur:
+        ensite_study_id = row[0]
+        projection = row[1]
+        name = row[2]
+        geometry_type = row[3]
+        if geometry_type == "Point":
+            pass
+        elif geometry_type == "Raster":
+            pass
+        else:
+            geometryTable = "ensite_feature_vector"
+
+
+    # get the property information
+    columns = {}
+    columnIDs = {}
+    columnData = {}
+    queryStatement = "SELECT id,name,type from ensite_feature_property_name WHERE ensite_layer_id = %s;" %(layerID)
+    cur.execute(queryStatement)
+    for row in cur:
+        columnID = row[0]
+        columnName = row[1]
+        columnType = row[2]
+        columns[columnName] = columnType
+        columnIDs[columnID] = columnName
+        columnData[columnName] = {}
+
+    # get the features
+    featureIDs = []
+    queryStatement = "SELECT id FROM ensite_feature WHERE ensite_layer_id = %s;" %(layerID)
+    cur.execute(queryStatement)
+    for row in cur:
+        featureID = row[0]
+        featureIDs.append(featureID)
+
+    # get the geometries
+    geometries = {}
+    for featureID in featureIDs:
+        queryStatement = "SELECT ST_AsText(geometry) FROM %s WHERE ensite_feature_id = %s;" %(geometryTable,featureID)
+        cur.execute(queryStatement)
+        for row in cur:
+            row_geometry = row[0]
+            geometries[featureID] = row_geometry
+            #print row_geometry
+
+    # get the properties
+        for columnID in columnIDs.iterkeys():
+            columnName = columnIDs[columnID]
+            queryStatement = "SELECT value,value_type FROM ensite_feature_property_value WHERE ensite_feature_id= %s AND ensite_feature_property_name_id = %s;" %(featureID,columnID)
+            cur.execute(queryStatement)
+            count = 0
+            for row in cur:
+                #print row
+                property_value = row[0]
+                property_type = row[1]
+                columnData[columnName][featureID] = property_value
+                count += 1
+            if count == 0:
+                columnData[columnName][featureID] = "None"
+
+    df = gpd.GeoDataFrame(columns=columns.keys())
+    df.geometry = [loads(x) for x in geometries.itervalues()]
+    for k,v in columnData.iteritems():
+        df[k] = v.values()
+
+    df.crs = {'init':'EPSG:%s' %(projection.split(':')[1])}
+    return df
 
 ## CURRENT TEST
 def tryingToLearnToMapWIthTables():

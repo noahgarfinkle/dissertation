@@ -717,9 +717,6 @@ def buildContinuousRasterStatFromXML(evaluationDF,criteriaRow):
         numberAfterUpperBoundFilter = len(evaluationDF.index)
         """
 
-
-
-
 def buildDistanceFromVectorLayerFromXML(evaluationDF,criteriaRow):
     """ Converts XML into vector distance evaluation
 
@@ -888,53 +885,6 @@ def returnCriteriaMetadataForMCDA(criteriaRow):
     weight = scores.attrib["weight"]
     isZeroExclusionary = scores.attrib["isZeroExclusionary"]
     return criteriaName,weight,isZeroExclusionary
-
-def buildTestSet(xmlPath):
-    tree = ET.parse(xmlPath)
-    root = tree.getroot()
-
-    resultDir = root.attrib['resultDir']
-    studyID = root.attrib['studyID']
-    epsg = root.attrib['epsg']
-    print "%s %s %s" %(resultDir,studyID,epsg)
-
-    siteSearches = root.find("SiteSearches")
-    layerIDs = []
-    evaluationDFs = []
-    for siteSearch in siteSearches:
-        siteSearch_studyObjectiveID = siteSearch.attrib['studyObjectiveID']
-        siteSearch_layerID = siteSearch.attrib['layerID']
-        siteSearch_type = siteSearch.attrib['type']
-        siteSearch_name = siteSearch.attrib['name']
-        siteSearch_note = siteSearch.attrib['note']
-        siteSearch_nReturn = siteSearch.attrib['nReturn']
-
-        siteConfiguration = siteSearch.find("SiteConfiguration")[0]
-        if siteConfiguration.tag == "WKTTemplate":
-            print "WKT Template"
-
-        searchParameters = siteSearch.find("SearchParameters")[0]
-        if searchParameters.tag == "GriddedSearch":
-            evaluationDF = buildGriddedSearchFromXML(siteConfiguration,searchParameters)
-
-        siteEvaluation = siteSearch.find("SiteEvaluation")
-        weights = []
-        qafNames = []
-        scoringDict = {}
-        criteriaCount = 0
-        for criteriaRow in siteEvaluation:
-            criteriaCount += 1
-            # set the column name if none
-            if criteriaRow.attrib["criteriaName"] == "None":
-                criteriaRow.attrib["criteriaName"] = "Criteria_%s" %(criteriaCount)
-
-            # Get the metadata needed for scoring
-
-        evaluationDFs.append(evaluationDF)
-
-
-    return evaluationDFs,siteSearches
-
 
 def runMSSPIX(xmlPath,returnDFInsteadOfLayerID=False):
     """ Runs site search for a given xml document
