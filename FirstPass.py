@@ -95,53 +95,6 @@ def filterDataFrameByBounds(df,lx,ly,ux,uy,bufferDistance=0):
     filteredDF = df.cx[lx-bufferDistance:ux+bufferDistance,ly-bufferDistance:uy+bufferDistance]
     return filteredDF
 
-def filterDataFrameByValue(df,column,argument):
-    """ Returns a subset of a GeoPandas GeoDataframe
-
-    Currently only works for single instances of categorical variables.  For more
-    complicated cases, either code directly or update this function
-
-    Args:
-        df (GeoPandas DataFrame): The dataframe to be filtered
-        column (str): The string name of the dataframe column to be filtered
-        argument(var): The value determining which rows to return
-
-    Returns:
-        filteredDF (GeoPandas DataFrame): A filtered copy of the original df
-
-    Raises:
-        None
-
-    Tests:
-        None
-    """
-    filteredDF = df[df[column]==argument]
-    return filteredDF
-
-def minimumDistanceFromPointToDataFrameFeatures(x,y,crs,df):
-    """ Returns the minimum euclidean distance from a point to the dataframe
-
-    Currently CRS does not project the point
-
-    Args:
-        x (float): x-coordinate in the same projection as the dataframe
-        y (float): y-coordinate in the same projection as the dataframe
-        crs (ENUM CRS): The projection of the point
-        df (GeoPandas DataFrame): A dataframe of vector features
-
-    Returns:
-        minDistance (float): the smallest euclidean distance calculated
-
-    Raises:
-        None
-
-    Tests:
-        None
-    """
-    point = Point(x,y)
-    minDistance = df.distance(point).min()
-    return minDistance
-
 def projectWKT(wkt,from_epsg,to_epsg):
     """ Reprojects a string of well known text
 
@@ -258,62 +211,6 @@ def generateEvaluationGridDataFrame(polygon,gridSpacing):
     evaluationDF.columns = ['geometry']
     return evaluationDF
 
-def airfieldBuilder(aoiPolygon, units="m", length="1981", width="97.50", gridSpacing="800",
-                    rotationUnits="degrees", rotationStart="0", rotationStop="180",
-                    rotationSpacing="90"):
-    """ Produces a GeoPandas GeoDataFrame of airfields similar to the TASS methodology
-
-    This produces the fundamental solution data structure of First Pass, a
-    GeoPandas GeoDataFrame sized and rotated as specified, and falling exclusively
-    within the aoiPolygon, ideally which has already had no-build areas removed.
-
-    Args:
-        aoiPolygon (Shapely Polygon): A representation of the area of interest,
-            ideally with holes removed for areas which should not fall within
-            candidate solutions
-        units (str): The distance units to utilize, typically 'm' for meters
-        length (float): Length of the airfield, passed as a string from XML but
-            converted to float.  Includes any buffer areas.
-        width (float): Width of the airfield, passed as a string from XML but
-            converted to float.  Includes any buffer areas.
-        gridSpacing (float): Distance between lower left corners of evaluation sites,
-            may be replaced in the future with centroids once PolygonBuilder is
-            implemented.  Converted to float.
-        rotationUnits (str): Defines how rotation is treated, typically degrees
-        rotationStart (float): Starting rotation, with 0 defined as due North,
-            and incrementing clockwise
-        rotationStop (float): Ending rotation, with 0 defined as due North,
-            and incrementing clockwise
-        rotationSpacing (float): Increment of rotation to evaluate
-
-    Returns:
-        airfieldList (GeoPandas GeoDataFrame): Each row represents a candidate site
-            for evaluation
-
-    Raises:
-        None
-
-    Todo:
-        * Implement units and rotationUnits
-
-    Tests:
-        None
-    """
-    try:
-        # Ensure correct types, converting units of measure to float
-        length=float(length)
-        width=float(width)
-        gridSpacing=float(gridSpacing)
-        rotationStart=float(rotationStart)
-        rotationStop=float(rotationStop)
-        rotationSpacing=float(rotationSpacing)
-
-    except Exception, e:
-        pass
-
-    # enforce conversions to correct types
-    return None
-
 def polygonBuilder(aoiPolygon, epsg="3857", wkt="POLYGON ((0 0, 91 0, 91 1700, 0 1700, 0 0))",
                     units="m", gridSpacing="800", rotationUnits="degrees",
                     rotationStart="0", rotationStop="180", rotationSpacing="90"):
@@ -388,47 +285,6 @@ def polygonBuilder(aoiPolygon, epsg="3857", wkt="POLYGON ((0 0, 91 0, 91 1700, 0
     evaluationDF.columns = ['geometry']
     return evaluationDF
 
-def xmlBuildPolygonBuilder(aoiWKT,polygonBuilderXMLElement):
-    """ Builds candidate data frame from the elements included in input.xml
-
-    Allows polygon builder to be built from the current version of the input
-    XML file
-
-    Args:
-        aoiWKT (str): Well-known-text representation of the AOI, currently assumes
-            it is passed in WGS1984 (EPSG:4326)
-        polygonBuilderXMLElement (lxml.etree._Element): The parameters for
-            polygonBuilder
-
-    Returns:
-        df (GeoPandas GeoDataFrame): A regularly spaced and rotated candidate
-            solution dataframe, in EPSG:3857
-
-    Raises:
-        TypeError: If the XML element tag does not reflect that the input
-            parameter is for the function polygonBuilder
-
-    Todo:
-        * Implement ability to project
-
-    Tests:
-        None
-    """
-    if (polygonBuilderXMLElement.tag != "PolygonBuilder"):
-        raise TypeError('Invalid Type','Expected Parameters for Polygon Builder')
-    wkt = polygonBuilderXMLElement.attrib['wkt']
-    gridSpacing = float(polygonBuilderXMLElement.attrib['gridSpacing'])
-    units = polygonBuilderXMLElement.attrib['units']
-    rotationStart = float(polygonBuilderXMLElement.attrib['rotationStart'])
-    rotationStop = float(polygonBuilderXMLElement.attrib['rotationStop'])
-    rotationUnits = polygonBuilderXMLElement.attrib['rotationUnits']
-    rotationSpacing = float(polygonBuilderXMLElement.attrib['rotationSpacing'])
-    wktPolygon = wktToShapelyPolygon(aoiWKT,4326,to_epsg=3857)
-    df = polygonBuilder(wktPolygon,wkt=wkt,units=units,gridSpacing=gridSpacing,
-                        rotationUnits=rotationUnits,rotationStart=rotationStart,
-                        rotationStop=rotationStop,rotationSpacing=rotationSpacing)
-    return df
-
 def filterByVectorBufferDistance(dfToFilter,vectorFilePath,bufferDistance,removeIntersected=True):
     """ Utilizes shapely hack to include/exclude buffers faster than Euclidean distance
 
@@ -470,39 +326,6 @@ def filterByVectorBufferDistance(dfToFilter,vectorFilePath,bufferDistance,remove
     filteredFeatures = len(filteredDF.index)
     print "%s %s of %s candidates in %s seconds" %(returnText,filteredFeatures,initialFeatures,timeElapsed.seconds)
     return filteredDF
-
-def convertRasterToNumpyArray(raster_path):
-    """ Generates a numpy array from a GeoTiff
-
-
-    Args:
-        raster_path (str): Filepath of a GeoTiff
-
-    Returns:
-        data (Numpy Array): The first band of the raster, as an array
-
-    Raises:
-        None
-
-    Tests:
-        >>> raster_path = "./test_data/testelevunproj.tif"
-        >>> convertRasterToNumpyArray(raster_path)
-    """
-
-
-    dataset = gdal.Open(raster_path)
-    band = dataset.GetRasterBand(1)
-    geotransform = dataset.GetGeoTransform()
-    xinit = geotransform[0]
-    yinit = geotransform[3]
-
-    xsize = geotransform[1]
-    ysize = geotransform[5]
-    data = band.ReadAsArray() # whole band
-    # data = band.ReadAsArray(col1, row1, col2 - col1 + 1, row2 - row1 + 1) # partial band
-    print data.shape
-    print np.mean(data)
-    return data
 
 def generateRasterStatisticsForDataFrame(df,raster_path,stats="count majority minority unique mean",
                                             colName="slope",isCategorical=False):
@@ -556,35 +379,6 @@ def generateRasterStatisticsForDataFrame(df,raster_path,stats="count majority mi
     processedFeatures = len(df.index)
     print "Processed %s candidates in %s seconds" %(processedFeatures,timeElapsed.seconds)
     return newDF
-
-def queryRasterValueForPoint(x,y,raster_path,pointCRS=None,rasterCRS=None):
-    """ Returns the value of a GeoTiff at a specified point
-
-    pointCRS and rasterCRS are not yet implemented, and therefore both should
-    be in the same coordinate system
-
-    Args:
-        x (float): The x-coordinate, in the same CRS as the raster
-        y (float): The y-coordinate, in the same CRS as the raster
-        raster_path (str): Filepath to a GeoTiff
-        pointCRS (ENUM CRS): Not implemented
-        rasterCRS (ENUM CRS): Not implemented
-
-    Returns:
-        pointQuery (float): The value of the raster at location (x,y)
-
-    Raises:
-        None
-
-    Todo:
-        * Implement projections
-
-    Tests:
-        None
-    """
-    point = "POINT(%s %s)" %(x,y)
-    pointQuery = point_query(point,raster_path)
-    return pointQuery
 
 def rasterStatCroppedRaster(df,raster_path):
     """ Produces neighborhood statistics for a raster based on each feature in a
@@ -683,7 +477,6 @@ def calculateCutFill(df,dem_path,finalElevation='mean',rasterResolution=10):
     appendedDF['totalCutFillVolume'] = totalCutFillVolumes
     return appendedDF
 
-
 def minimumDistanceFromEvaluationToDataFrameFeatures(evaluationDF,vectorDF):
         """ Implements Euclidean distance from a data frame of candiate polygons
         to a vector data frame
@@ -713,91 +506,7 @@ def minimumDistanceFromEvaluationToDataFrameFeatures(evaluationDF,vectorDF):
         evaluationDF['distance'] = minDistances
         return evaluationDF
 
-def convertSubsettedEvaluationDFIntoPolygonGrid(evaluationDF, squareDimension):
-    polygonEvaluations = []
-    oldPolygons = []
-    for geometry in evaluationDF.geometry:
-        oldPolygons.append(geometry)
-        centroid_x = geometry.centroid.x
-        centroid_y = geometry.centroid.y
-        offset = squareDimension / 2
-        square = Polygon([[centroid_x - offset,centroid_y - offset],
-                          [centroid_x + offset,centroid_y - offset],
-                          [centroid_x + offset,centroid_y + offset],
-                          [centroid_x - offset,centroid_y + offset]])
-        polygonEvaluations.append(square)
-    evaluationDF = evaluationDF.drop('geometry',axis=1)
-    evaluationDF['geometry'] = polygonEvaluations
-    evaluationDF['old_geo'] = oldPolygons
-    return evaluationDF
-
-def generateRandomLatLonPair(latMin,latMax,lonMin,lonMax):
-    """ Creates random points to help test other functions
-
-    This code is a helper function
-
-    Args:
-        latMin (float): Lower bound of latitude
-        latMax (float): Upper bound of latitude
-        lonMin (float): Lower bound of longitude
-        lonMax (float): Upper bound of longitude
-
-    Returns:
-        lat (float): A random latitude within the specified range
-        lon (float): A random longitude within the specified range
-
-    Raises:
-        None
-
-    Tests:
-        None
-    """
-    lat = np.random.uniform(latMin,latMax)
-    lon = np.random.uniform(lonMin,lonMax)
-    return lat,lon
-
-def generateRandomCandidateDataFrame(nCandidates,latMin,latMax,lonMin,lonMax):
-        """ Creates random solutionDF to help test other functions
-
-        This code is a helper function
-
-        Args:
-            nCandidates (int): Number of candidate sites to create
-            latMin (float): Lower bound of latitude
-            latMax (float): Upper bound of latitude
-            lonMin (float): Lower bound of longitude
-            lonMax (float): Upper bound of longitude
-
-        Returns:
-            lat (float): A random latitude within the specified range
-            lon (float): A random longitude within the specified range
-
-        Raises:
-            None
-
-        Tests:
-            None
-        """
-        lats = []
-        lons = []
-        scores = []
-        geoms = []
-        for i in range(0,nCandidates):
-            lat,lon = generateRandomLatLonPair(latMin,latMax,lonMin,lonMax)
-            lats.append(lat)
-            lons.append(lon)
-            score = np.random.randint(0,101)
-            scores.append(score)
-            point = Point([lon,lat])
-            square = Polygon([[x,y],[x+gridSpacing,y],[x+gridSpacing,y+gridSpacing],[x,y+gridSpacing]])
-            if square.within(polygon):
-                squareList.append(square)
-        candidateDF = gpd.GeoDataFrame({""})
-        return 0
-
-
 ## ENSITE FUNCTIONS
-
 def buildGriddedSearchFromXML(siteConfiguration,searchParameters):
     """ ENSITE MSSPIX gridded search builder
 
