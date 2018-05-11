@@ -118,6 +118,7 @@ def evaluateXML(xmlPath,returnDFInsteadOfLayerID=True):
     siteSearches = root.find("SiteSearches")
     layerIDs = []
     evaluationDFs = []
+    searchID = 1
     for siteSearch in siteSearches:
         siteSearch_studyObjectiveID = siteSearch.attrib['studyObjectiveID']
         siteSearch_layerID = siteSearch.attrib['layerID']
@@ -126,6 +127,8 @@ def evaluateXML(xmlPath,returnDFInsteadOfLayerID=True):
         siteSearch_note = siteSearch.attrib['note']
         siteSearch_nReturn = siteSearch.attrib['nReturn']
 
+        print "Beginning site search %s of %s: %s" %(searchID,len(siteSearches),siteSearch_name)
+        searchID += 1
         siteConfiguration = siteSearch.find("SiteConfiguration")[0]
         if siteConfiguration.tag == "WKTTemplate":
             print "WKT Template"

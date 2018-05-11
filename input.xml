@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Input resultDir="C:/Users/RDCERNWG/Documents/GIT/FLW_Missouri Mission Folder/Results/" studyID="1" epsg="3857">
+  <SiteSearches>
+    <SiteSearch type="Airfield" layerID="1" studyObjectiveID="2" name="Airfield 1" note="my seventh airfield" nReturn="100">
+      <SiteConfiguration>
+        <WKTTemplate units="m" wkt="POLYGON ((0 0, 91 0, 91 1700, 0 1700, 0 0))" />
+      </SiteConfiguration>
+      <SearchParameters>
+        <GriddedSearch units="m" gridSpacing="800" rotationUnits="degrees" rotationStart="0" rotationStop="179" rotationSpacing="45" wkt_epsg="4326" wkt="POLYGON ((-92.17597961425781 37.85696502054439,-92.02217102050781 37.87431138542283,-91.95350646972655 37.87431138542283,-91.9390869140625 37.77885586164994,-92.010498046875 37.743571187449064,-92.05856323242188 37.664798586116596,-92.12379455566406 37.67077737288316,-92.17597961425781 37.85696502054439))" />
+      </SearchParameters>
+      <SiteEvaluation>
+        <CategoricalRasterStat layerPath="C:/Users/RDCERNWG/Documents/GIT/FLW_Missouri Mission Folder/RASTER/LC_LandCover_GeoCover_proj.tif" valueList="4,3,5,7" lowerBound="40" upperBound="INF" criteriaName="None" note="">
+          <Scores default="0" isZeroExclusionary="False" weight="3">
+            <Score lowerBoundInclusive="40" upperBoundExclusive="50" score="20" />
+            <Score lowerBoundInclusive="50" upperBoundExclusive="60" score="40" />
+            <Score lowerBoundInclusive="60" upperBoundExclusive="70" score="60" />
+            <Score lowerBoundInclusive="70" upperBoundExclusive="80" score="80" />
+            <Score lowerBoundInclusive="80" upperBoundExclusive="INF" score="100" />
+          </Scores>
+        </CategoricalRasterStat>
+        <ContinuousRasterStat layerPath="C:/Users/RDCERNWG/Documents/GIT/FLW_Missouri Mission Folder/RASTER/slope_proj.tif" stat="mean" lowerBound="2" upperBound="7" criteriaName="None" note="">
+          <Scores default="0" isZeroExclusionary="False" weight="3">
+            <Score lowerBoundInclusive="2" upperBoundExclusive="4" score="100" />
+            <Score lowerBoundInclusive="4" upperBoundExclusive="7" score="40" />
+          </Scores>
+        </ContinuousRasterStat>
+        <DistanceFromVectorLayer layerPath="C:/Users/RDCERNWG/Documents/GIT/FLW_Missouri Mission Folder/VECTOR/UtilityInfrastructureCrv.shp" lowerBound="100" upperBound="2000" criteriaName="None" note="">
+          <Scores default="0" isZeroExclusionary="False" weight="3">
+            <Score lowerBoundInclusive="100" upperBoundExclusive="2000" score="100" />
+          </Scores>
+        </DistanceFromVectorLayer>
+        <CutFill layerPath="C:/Users/RDCERNWG/Documents/GIT/FLW_Missouri Mission Folder/RASTER/DEM_CMB_ELV_SRTMVF2_proj.tif" finalElevation="mean" lowerBound="-INF" upperBound="10000" criteriaName="None" note="">
+          <Scores default="0" isZeroExclusionary="False" weight="3">
+            <Score lowerBoundInclusive="-INF" upperBoundExclusive="10000" score="100" />
+          </Scores>
+        </CutFill>
+      </SiteEvaluation>
+    </SiteSearch>
+    <SiteSearch type="Airfield" layerID="1" studyObjectiveID="4" name="airfield 2" note="" nReturn="100">
+     <SiteConfiguration>
+       <WKTTemplate units="m" wkt="POLYGON ((0 0, 91 0, 91 1700, 0 1700, 0 0))" />
+     </SiteConfiguration>
+     <SearchParameters>
+       <GriddedSearch units="m" gridSpacing="800" rotationUnits="degrees" rotationStart="0" rotationStop="179" rotationSpacing="90" wkt_epsg="4326" wkt="POLYGON ((-92.03556060791016 37.9183365413977,-92.01436042785643 37.91745629633874,-92.01839447021484 37.900187821111956,-92.03023910522461 37.901339178882395,-92.03556060791016 37.9183365413977))" />
+     </SearchParameters>
+     <SiteEvaluation>
+       <CategoricalRasterStat layerPath="C:/FLW_Missouri Mission Folder/RASTER/LC_LandCover_GeoCover_proj.tif" valueList="1,2,6,9,11" lowerBound="-INF" upperBound="20" criteriaName="LC_LandCover_GeoCover_proj_less than" note="">
+         <Scores default="0" isZeroExclusionary="False" weight="3">
+           <Score lowerBoundInclusive="-INF" upperBoundExclusive="20" score="80" />
+           <Score lowerBoundInclusive="20" upperBoundExclusive="INF" score="0" />
+         </Scores>
+       </CategoricalRasterStat>
+       <ContinuousRasterStat layerPath="C:/FLW_Missouri Mission Folder/RASTER/Road_Distance.tif" stat="min" lowerBound="400" upperBound="INF" criteriaName="Road_Distance_greater than" note="">
+         <Scores default="0" isZeroExclusionary="False" weight="3">
+           <Score lowerBoundInclusive="-INF" upperBoundExclusive="400" score="0" />
+           <Score lowerBoundInclusive="400" upperBoundExclusive="INF" score="80" />
+         </Scores>
+       </ContinuousRasterStat>
+       <ContinuousRasterStat layerPath="C:/FLW_Missouri Mission Folder/RASTER/Water_Distance.tif" stat="min" lowerBound="400" upperBound="INF" criteriaName="Water_Distance_greater than" note="">
+         <Scores default="0" isZeroExclusionary="False" weight="3">
+           <Score lowerBoundInclusive="-INF" upperBoundExclusive="400" score="0" />
+           <Score lowerBoundInclusive="400" upperBoundExclusive="INF" score="80" />
+         </Scores>
+       </ContinuousRasterStat>
+       <ContinuousRasterStat layerPath="C:/FLW_Missouri Mission Folder/RASTER/DVOF_Distance.tif" stat="min" lowerBound="400" upperBound="INF" criteriaName="DVOF_Distance_greater than" note="">
+         <Scores default="0" isZeroExclusionary="False" weight="3">
+           <Score lowerBoundInclusive="-INF" upperBoundExclusive="400" score="0" />
+           <Score lowerBoundInclusive="400" upperBoundExclusive="INF" score="80" />
+         </Scores>
+       </ContinuousRasterStat>
+       <ContinuousRasterStat layerPath="C:/FLW_Missouri Mission Folder/RASTER/Slope.tif" stat="mean" lowerBound="1" upperBound="7" criteriaName="Slope_between" note="">
+         <Scores default="0" isZeroExclusionary="False" weight="3">
+           <Score lowerBoundInclusive="-INF" upperBoundExclusive="1" score="0" />
+           <Score lowerBoundInclusive="1" upperBoundExclusive="7" score="80" />
+           <Score lowerBoundInclusive="7" upperBoundExclusive="INF" score="0" />
+         </Scores>
+       </ContinuousRasterStat>
+       <CutFill layerPath="C:/FLW_Missouri Mission Folder/RASTER/DEM_CMB_ELV_SRTMVF2_proj.tif" finalElevation="mean" lowerBound="-INF" upperBound="10000" criteriaName="Cut Fill_less than" note="">
+         <Scores default="0" isZeroExclusionary="False" weight="3">
+           <Score lowerBoundInclusive="-INF" upperBoundExclusive="10000" score="80" />
+           <Score lowerBoundInclusive="10000" upperBoundExclusive="INF" score="0" />
+         </Scores>
+       </CutFill>
+     </SiteEvaluation>
+   </SiteSearch>
+  </SiteSearches>
+</Input>
