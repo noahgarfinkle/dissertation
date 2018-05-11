@@ -53,7 +53,7 @@ setting up blank raster: dst_ds.SetGeoTransform([topLeftX,pixel_width,0,topLeftY
 """
 
 
-## FUNCTIONS
+## FUNCTION
 def filterDataFrameByBounds(df,lx,ly,ux,uy,bufferDistance=0):
     """ Subsets a GeoPandas DataFrame by bounding box
 
@@ -102,6 +102,32 @@ def filterDataFrameByValue(df,column,argument):
     """
     filteredDF = df[df[column]==argument]
     return filteredDF
+
+def wktToShapelyPolygon(wkt,epsg,to_epsg=None):
+    """ Creates a Shapely polygon from wkt, and projects if specified
+
+    Args:
+        wkt (str): A string of well-known-text
+        epsg (int): The current projection of wkt
+        to_epsg (int): The desired projection of wkt, not used if None
+
+    Returns:
+        wktPolygon (Shapely Geometry): Shapely representation of wkt
+
+    Raises:
+        None
+
+    Tests:
+        None
+    """
+    wktPolygon = loads(wkt)
+    if to_epsg:
+        df_to_project = gpd.GeoDataFrame([wktPolygon])
+        df_to_project.columns = ['geometry']
+        df_to_project.crs = {'init':'EPSG:' + str(epsg)}
+        df_to_project = df_to_project.to_crs({'init':'EPSG:' + str(to_epsg)})
+        wktPolygon = df_to_project.geometry[0]
+    return wktPolygon
 
 def minimumDistanceFromPointToDataFrameFeatures(x,y,crs,df):
     """ Returns the minimum euclidean distance from a point to the dataframe
