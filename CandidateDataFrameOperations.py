@@ -41,21 +41,12 @@ import datetime
 import time
 
 import ENSITEIO as eio
-reload(eio)
-import SiteSearch as sitesearch
-reload(sitesearch)
 import Objective_Analytic as objective_analytic
-reload(objective_analytic)
 import Objective_Raster as objective_raster
-reload(objective_raster)
 import Objective_Vector as objective_vector
-reload(objective_vector)
 import pgdissroute as pgdissroute
-reload(pgdissroute)
 import SpatialIO as io
-reload(io)
 import SpatialOpt as opt
-reload(opt)
 
 ## WKT MANAGEMENT
 def projectWKT(wkt,from_epsg,to_epsg):
@@ -247,3 +238,27 @@ def buildSingleSiteSearchFromXML(siteConfiguration,searchParameters):
     evaluationDF.columns = ['geometry']
 
     return evaluationDF
+
+def scoreDF(df,criteriaColumnName,scoreStructure,isZeroExclusionary = False):
+    # score data structure is list of [loweBoundInclusive,upperBoundExclusive,score], everything outside should default to 0
+    initialSize = len(df.index)
+    qafName = "%s_QAF" %(criteriaColumnName)
+    df[qafName] = 0 # this also sets the fallback position
+    for scoreSet in scoreStructure:
+        lowerBound = scoreSet[0]
+        upperBound = scoreSet[1]
+        score = scoreSet[2]
+        if lowerBound == "-INF":
+            lowerBound = -1
+        if upperBound == "INF":
+            upperBound = 100000000
+        lowerBound = float(lowerBound)
+        upperBound = float(upperBound)
+        score = float(score)
+        affectedRows =(df[criteriaColumnName] >= lowerBound) & (df[criteriaColumnName] <= upperBound)# upper bound should actually be exclusive
+        df.loc[affectedRows,qafName] = score
+        if isZeroExclusionary == "True":
+            df = df[df[qafName] != 0]
+        filteredSize = len(df.index)
+    print "scoreDF for column %s retained %s of %s candidates" %(criteriaColumnName,filteredSize,initialSize)
+    return df

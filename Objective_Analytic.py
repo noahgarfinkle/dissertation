@@ -40,21 +40,13 @@ import datetime
 import time
 
 import CandidateDataFrameOperations as candidates
-reload(candidates)
 import ENSITEIO as eio
-reload(eio)
-import SiteSearch as sitesearch
-reload(sitesearch)
 import Objective_Raster as objective_raster
-reload(objective_raster)
 import Objective_Vector as objective_vector
-reload(objective_vector)
 import pgdissroute as pgdissroute
-reload(pgdissroute)
 import SpatialIO as io
-reload(io)
 import SpatialOpt as opt
-reload(opt)
+
 ## CUT-FILL OPERATIONS
 def calculateCutFill(df,dem_path,finalElevation='mean',rasterResolution=10):
     """ Generates cut fill values based on a raster
@@ -99,7 +91,7 @@ def calculateCutFill(df,dem_path,finalElevation='mean',rasterResolution=10):
     if finalElevation in df.columns:
         df = df.drop(finalElevation,axis=1)
     df = df.reset_index()
-    croppedRasterDF = rasterStatCroppedRaster(df,dem_path)
+    croppedRasterDF = objective_raster.rasterStatCroppedRaster(df,dem_path)
     appendedDF = gpd.GeoDataFrame(pd.concat([df,croppedRasterDF],axis=1))
     elevationChangeArrays = []
     totalRequiredHeightChanges = []
@@ -173,7 +165,7 @@ def buildCutFillFromXML(evaluationDF,criteriaRow):
         score = str(scoreRow.attrib['score'])
         scoreSet = [lowerBoundInclusive,upperBoundExclusive,score]
         scoreStructure.append(scoreSet)
-    evaluationDF = scoreDF(evaluationDF,criteriaName,scoreStructure)
+    evaluationDF = candidates.scoreDF(evaluationDF,criteriaName,scoreStructure)
 
     print "Retained %s of %s candidates, with %s removed for cut fill being too high" %(finalNumber,initialNumber,initialNumber-finalNumber)
 
