@@ -49,6 +49,32 @@ import SpatialIO as io
 validStats = utils.VALID_STATS
 
 ## FUNCTIONS
+def filterDataFrameByBounds(df,lx,ly,ux,uy,bufferDistance=0):
+    """ Subsets a GeoPandas DataFrame by bounding box
+
+    Very useful for shrinking the number of features.  Currently assumes that the bounding
+    box and optional buffer distance is in the same projection as the dataframe.
+
+    Args:
+        df (GeoPandas DataFrame): The dataframe to be filtered
+        lx (float): Lower left x coordinate of the bounding box
+        ly (float): Lower left y coordinate of the bounding box
+        ux (float): Upper right x coordinate of the bounding box
+        uy (float): Upper right y coordinate of the bounding box
+        bufferDistance (float): Optional distance for buffering the bounding box
+
+    Returns:
+        filteredDF (GeoPandas DataFrame): A filtered copy of the original df
+
+    Raises:
+        None
+
+    Tests:
+        None
+    """
+    filteredDF = df.cx[lx-bufferDistance:ux+bufferDistance,ly-bufferDistance:uy+bufferDistance]
+    return filteredDF
+
 def filterDataFrameByValue(df,column,argument):
     """ Returns a subset of a GeoPandas GeoDataframe
 
