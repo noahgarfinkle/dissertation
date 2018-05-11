@@ -53,14 +53,22 @@ import os
 import pandas as pd
 import sys
 
-## HELPFUL FOR DEBUGGING
-# %matplotlib inline
-# pd.options.display.max_columns = 300
-
-## LIFESAVING RESOURCES
-# http://www.thisprogrammingthing.com/2013/fixing-the-this-exceeds-githubs-file-size-limit-of-100-mb-error/
-
-## SETUP
+import CandidateDataFrameOperations as candidates
+reload(candidates)
+import FirstPass as firstpass
+reload(firstpass)
+import Objective_Analytic as objective_analytic
+reload(objective_analytic)
+import Objective_Raster as objective_raster
+reload(objective_raster)
+import Objective_Vector as objective_vector
+reload(objective_vector)
+import pgdissroute as pgdissroute
+reload(pgdissroute)
+import SpatialIO as io
+reload(io)
+import SpatialOpt as opt
+reload(opt)
 
 def dfFromPostGIS(layerID):
     con = psycopg2.connect(database="ensite", user="postgres",password="postgres",host="127.0.0.1")

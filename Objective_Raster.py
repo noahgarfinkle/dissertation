@@ -39,14 +39,22 @@ import matplotlib.pyplot as plt
 import datetime
 import time
 
+import CandidateDataFrameOperations as candidates
+reload(candidates)
+import ENSITEIO as eio
+reload(eio)
+import FirstPass as firstpass
+reload(firstpass)
+import Objective_Analytic as objective_analytic
+reload(objective_analytic)
+import Objective_Vector as objective_vector
+reload(objective_vector)
+import pgdissroute as pgdissroute
+reload(pgdissroute)
 import SpatialIO as io
-
-## HELPFUL FOR DEBUGGING
-# %matplotlib inline
-# pd.options.display.max_columns = 300
-
-## SETUP
-validStats = utils.VALID_STATS
+reload(io)
+import SpatialOpt as opt
+reload(opt)
 
 
 ## RASTER OPERATIONS

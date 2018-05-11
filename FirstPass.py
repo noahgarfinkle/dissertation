@@ -40,13 +40,21 @@ import datetime
 import time
 
 import CandidateDataFrameOperations as candidates
+reload(candidates)
 import ENSITEIO as eio
+reload(eio)
 import Objective_Analytic as objective_analytic
+reload(objective_analytic)
 import Objective_Raster as objective_raster
+reload(objective_raster)
 import Objective_Vector as objective_vector
+reload(objective_vector)
 import pgdissroute as pgdissroute
+reload(pgdissroute)
 import SpatialIO as io
+reload(io)
 import SpatialOpt as opt
+reload(opt)
 
 ## HELPFUL FOR DEBUGGING
 # %matplotlib inline
