@@ -55,8 +55,8 @@ import sys
 
 import CandidateDataFrameOperations as candidates
 reload(candidates)
-import FirstPass as firstpass
-reload(firstpass)
+import SiteSearch as sitesearch
+reload(sitesearch)
 import Objective_Analytic as objective_analytic
 reload(objective_analytic)
 import Objective_Raster as objective_raster

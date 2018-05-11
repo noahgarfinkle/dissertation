@@ -43,8 +43,8 @@ import CandidateDataFrameOperations as candidates
 reload(candidates)
 import ENSITEIO as eio
 reload(eio)
-import FirstPass as firstpass
-reload(firstpass)
+import SiteSearch as sitesearch
+reload(sitesearch)
 import Objective_Raster as objective_raster
 reload(objective_raster)
 import Objective_Vector as objective_vector
