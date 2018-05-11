@@ -48,6 +48,11 @@ import SpatialIO as io
 ## SETUP
 validStats = utils.VALID_STATS
 
+""" REFERENCE CODE
+setting up blank raster: dst_ds.SetGeoTransform([topLeftX,pixel_width,0,topLeftY,0,-pixel_height])
+"""
+
+
 ## FUNCTIONS
 def filterDataFrameByBounds(df,lx,ly,ux,uy,bufferDistance=0):
     """ Subsets a GeoPandas DataFrame by bounding box

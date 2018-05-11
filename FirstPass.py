@@ -63,11 +63,6 @@ https://github.com/perrygeo/python-rasterstats/blob/master/src/rasterstats/utils
 https://github.com/SALib/SALib -> Sensitivity analysis software
 """
 
-""" REFERENCE CODE
-setting up blank raster: dst_ds.SetGeoTransform([topLeftX,pixel_width,0,topLeftY,0,-pixel_height])
-"""
-
-
 ## FUNCTIONS
 def projectWKT(wkt,from_epsg,to_epsg):
     """ Reprojects a string of well known text
@@ -973,11 +968,3 @@ def runMSSPIX(xmlPath,returnDFInsteadOfLayerID=False):
         return evaluationDFs, siteEvaluation
     else:
         return layerIDs
-
-## NEW VERSIONS
-
-
-
-## CURRENT TEST
-
-## TESTS
