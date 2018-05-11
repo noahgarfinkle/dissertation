@@ -90,7 +90,7 @@ def filterByVectorBufferDistance(dfToFilter,vectorFilePath,bufferDistance,remove
     print "%s %s of %s candidates in %s seconds" %(returnText,filteredFeatures,initialFeatures,timeElapsed.seconds)
     return filteredDF
 
-def minimumDistanceFromEvaluationToDataFrameFeatures(evaluationDF,vectorDF):
+def minimumDistanceFromEvaluationToDataFrameFeatures(evaluationDF,vectorDF,columnName='distance'):
         """ Implements Euclidean distance from a data frame of candiate polygons
         to a vector data frame
 
@@ -112,12 +112,15 @@ def minimumDistanceFromEvaluationToDataFrameFeatures(evaluationDF,vectorDF):
         Tests:Summary line
             None
         """
-        minDistances = []
-        for i,row in evaluationDF.iterrows():
-            minDistance = vectorDF.distance(row.geometry).min()
-            minDistances.append(minDistance)
-        evaluationDF['distance'] = minDistances
-        return evaluationDF
+        try:
+            minDistances = []
+            for i,row in evaluationDF.iterrows():
+                minDistance = vectorDF.distance(row.geometry).min()
+                minDistances.append(minDistance)
+            evaluationDF[columnName] = minDistances
+            return evaluationDF
+        except Exception as e:
+            print e
 
 def buildDistanceFromVectorLayerFromXML(evaluationDF,criteriaRow):
     """ Converts XML into vector distance evaluation
@@ -138,25 +141,44 @@ def buildDistanceFromVectorLayerFromXML(evaluationDF,criteriaRow):
     Tests:
         None
     """
-    criteriaName = criteriaRow.attrib['criteriaName']
-    layerPath = criteriaRow.attrib['layerPath']
-    lowerBound = str(criteriaRow.attrib['lowerBound'])
-    upperBound = str(criteriaRow.attrib['upperBound'])
+    try:
+        criteriaName = criteriaRow.attrib['criteriaName']
+        layerPath = criteriaRow.attrib['layerPath']
+        lowerBound = str(criteriaRow.attrib['lowerBound'])
+        upperBound = str(criteriaRow.attrib['upperBound'])
 
-    if lowerBound == "-INF":
-        lowerBound = -1.0
-    else:
-        lowerBound = float(lowerBound)
-    if upperBound == "INF":
-        upperBound = 100000.0
-    else:
-        upperBound = float(upperBound)
+        if lowerBound == "-INF":
+            lowerBound = -1.0
+        else:
+            lowerBound = float(lowerBound)
+        if upperBound == "INF":
+            upperBound = 100000.0
+        else:
+            upperBound = float(upperBound)
 
-    evaluationDF = filterByVectorBufferDistance(evaluationDF,layerPath,lowerBound,removeIntersected=True)
-    evaluationDF = filterByVectorBufferDistance(evaluationDF,layerPath,upperBound,removeIntersected=False)
-    vectorQAFNameKludge = "%s_QAF" %(criteriaName)
-    evaluationDF[vectorQAFNameKludge] = 100 # KLUDGE, because so expensive to actually calculate
-    return evaluationDF
+        vectorDF = gpd.read_file(layerPath)
+        vectorQAFNameKludge = "%s" %(criteriaName)
+        evaluationDF = minimumDistanceFromEvaluationToDataFrameFeatures(evaluationDF,vectorDF,columnName=vectorQAFNameKludge)
+
+        #evaluationDF = filterByVectorBufferDistance(evaluationDF,layerPath,lowerBound,removeIntersected=True)
+        #evaluationDF = filterByVectorBufferDistance(evaluationDF,layerPath,upperBound,removeIntersected=False)
+        #evaluationDF[vectorQAFNameKludge] = 100 # KLUDGE, because so expensive to actually calculate
+
+        scores = criteriaRow.find("Scores")
+        weight = scores.attrib['weight']
+        isZeroExclusionary = scores.attrib['isZeroExclusionary']
+        default = scores.attrib['default']
+        scoreStructure = []
+        for scoreRow in scores:
+            lowerBoundInclusive = str(scoreRow.attrib['lowerBoundInclusive'])
+            upperBoundExclusive = str(scoreRow.attrib['upperBoundExclusive'])
+            score = str(scoreRow.attrib['score'])
+            scoreSet = [lowerBoundInclusive,upperBoundExclusive,score]
+            scoreStructure.append(scoreSet)
+        evaluationDF = candidates.scoreDF(evaluationDF,vectorQAFNameKludge,scoreStructure,isZeroExclusionary=False)
+        return evaluationDF
+    except Exception as e:
+        print e
 
 """ Currently does not actually provide a score for vector distance
     scores = criteriaRow.find("Scores")

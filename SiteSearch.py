@@ -200,9 +200,10 @@ def evaluateXML(xmlPath,returnDFInsteadOfLayerID=True):
                     endingSize = len(evaluationDF.index)
                     timeElapsed = endingTime - startingTime
                     print "Cut Fill: %s. Processed %s candidates in %s seconds, retaining %s candidates" %(criteriaRow.attrib['criteriaName'], startingSize, timeElapsed.seconds, endingSize)
-            except:
+            except Exception as e:
                 print "exception hit on criteria row"
-                return "failed on criteria rows"
+                print e
+                return criteriaRow
 
         # build the weights
         totalWeight = sum(weights)

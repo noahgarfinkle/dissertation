@@ -41,7 +41,7 @@
        <WKTTemplate units="m" wkt="POLYGON ((0 0, 91 0, 91 1700, 0 1700, 0 0))" />
      </SiteConfiguration>
      <SearchParameters>
-       <GriddedSearch units="m" gridSpacing="800" rotationUnits="degrees" rotationStart="0" rotationStop="179" rotationSpacing="90" wkt_epsg="4326" wkt="POLYGON ((-92.03556060791016 37.9183365413977,-92.01436042785643 37.91745629633874,-92.01839447021484 37.900187821111956,-92.03023910522461 37.901339178882395,-92.03556060791016 37.9183365413977))" />
+       <GriddedSearch units="m" gridSpacing="800" rotationUnits="degrees" rotationStart="0" rotationStop="179" rotationSpacing="90" wkt_epsg="4326" wkt="POLYGON ((-92.17597961425781 37.85696502054439,-92.02217102050781 37.87431138542283,-91.95350646972655 37.87431138542283,-91.9390869140625 37.77885586164994,-92.010498046875 37.743571187449064,-92.05856323242188 37.664798586116596,-92.12379455566406 37.67077737288316,-92.17597961425781 37.85696502054439))" />
      </SearchParameters>
      <SiteEvaluation>
        <CategoricalRasterStat layerPath="C:/FLW_Missouri Mission Folder/RASTER/LC_LandCover_GeoCover_proj.tif" valueList="1,2,6,9,11" lowerBound="-INF" upperBound="20" criteriaName="LC_LandCover_GeoCover_proj_less than" note="">

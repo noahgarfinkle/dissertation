@@ -241,23 +241,26 @@ def buildSingleSiteSearchFromXML(siteConfiguration,searchParameters):
 
 def scoreDF(df,criteriaColumnName,scoreStructure,isZeroExclusionary = False):
     # score data structure is list of [loweBoundInclusive,upperBoundExclusive,score], everything outside should default to 0
-    initialSize = len(df.index)
-    qafName = "%s_QAF" %(criteriaColumnName)
-    df[qafName] = 0 # this also sets the fallback position
-    for scoreSet in scoreStructure:
-        lowerBound = scoreSet[0]
-        upperBound = scoreSet[1]
-        score = scoreSet[2]
-        if lowerBound == "-INF":
-            lowerBound = -1
-        if upperBound == "INF":
-            upperBound = 100000000
-        lowerBound = float(lowerBound)
-        upperBound = float(upperBound)
-        score = float(score)
-        affectedRows =(df[criteriaColumnName] >= lowerBound) & (df[criteriaColumnName] <= upperBound)# upper bound should actually be exclusive
-        df.loc[affectedRows,qafName] = score
-        if isZeroExclusionary == "True":
-            df = df[df[qafName] != 0]
-        filteredSize = len(df.index)
-    return df
+    try:
+        initialSize = len(df.index)
+        qafName = "%s_QAF" %(criteriaColumnName)
+        df[qafName] = 0 # this also sets the fallback position
+        for scoreSet in scoreStructure:
+            lowerBound = scoreSet[0]
+            upperBound = scoreSet[1]
+            score = scoreSet[2]
+            if lowerBound == "-INF":
+                lowerBound = -1
+            if upperBound == "INF":
+                upperBound = 100000000
+            lowerBound = float(lowerBound)
+            upperBound = float(upperBound)
+            score = float(score)
+            affectedRows =(df[criteriaColumnName] >= lowerBound) & (df[criteriaColumnName] <= upperBound)# upper bound should actually be exclusive
+            df.loc[affectedRows,qafName] = score
+            if isZeroExclusionary == "True":
+                df = df[df[qafName] != 0]
+            filteredSize = len(df.index)
+        return df
+    except Exception as e:
+        print e
