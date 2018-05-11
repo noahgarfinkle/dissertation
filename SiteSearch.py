@@ -79,30 +79,6 @@ https://github.com/SALib/SALib -> Sensitivity analysis software
 """
 
 ## FUNCTIONS
-def scoreDF(df,criteriaColumnName,scoreStructure,isZeroExclusionary = False):
-    # score data structure is list of [loweBoundInclusive,upperBoundExclusive,score], everything outside should default to 0
-    initialSize = len(df.index)
-    qafName = "%s_QAF" %(criteriaColumnName)
-    df[qafName] = 0 # this also sets the fallback position
-    for scoreSet in scoreStructure:
-        lowerBound = scoreSet[0]
-        upperBound = scoreSet[1]
-        score = scoreSet[2]
-        if lowerBound == "-INF":
-            lowerBound = -1
-        if upperBound == "INF":
-            upperBound = 100000000
-        lowerBound = float(lowerBound)
-        upperBound = float(upperBound)
-        score = float(score)
-        affectedRows =(df[criteriaColumnName] >= lowerBound) & (df[criteriaColumnName] <= upperBound)# upper bound should actually be exclusive
-        df.loc[affectedRows,qafName] = score
-        if isZeroExclusionary == "True":
-            df = df[df[qafName] != 0]
-        filteredSize = len(df.index)
-    print "scoreDF for column %s retained %s of %s candidates" %(criteriaColumnName,filteredSize,initialSize)
-    return df
-
 def returnCriteriaMetadataForMCDA(criteriaRow):
     criteriaName = criteriaRow.attrib["criteriaName"]
     scores = criteriaRow.find("Scores")
@@ -190,17 +166,37 @@ def evaluateXML(xmlPath,returnDFInsteadOfLayerID=True):
             # Parse based on type of criteria
             try:
                 if criteriaRow.tag == "CategoricalRasterStat":
+                    startingSize = len(evaluationDF.index)
+                    startingTime = datetime.datetime.now()
                     evaluationDF = objective_raster.buildCategoricalRasterStatFromXML(evaluationDF,criteriaRow)
-                    criteria1DF = evaluationDF
+                    endingTime = datetime.datetime.now()
+                    endingSize = len(evaluationDF.index)
+                    timeElapsed = endingTime - startingTime
+                    print "Processed %s candidates in %s seconds, retaining %s candidates" %(startingSize, timeElapsed.seconds, endingSize)
                 if criteriaRow.tag == "ContinuousRasterStat":
+                    startingSize = len(evaluationDF.index)
+                    startingTime = datetime.datetime.now()
                     evaluationDF = objective_raster.buildContinuousRasterStatFromXML(evaluationDF,criteriaRow)
-                    criteria2DF = evaluationDF
+                    endingTime = datetime.datetime.now()
+                    endingSize = len(evaluationDF.index)
+                    timeElapsed = endingTime - startingTime
+                    print "Processed %s candidates in %s seconds, retaining %s candidates" %(startingSize, timeElapsed.seconds, endingSize)
                 if criteriaRow.tag == "DistanceFromVectorLayer":
+                    startingSize = len(evaluationDF.index)
+                    startingTime = datetime.datetime.now()
                     evaluationDF = objective_vector.buildDistanceFromVectorLayerFromXML(evaluationDF,criteriaRow)
-                    criteria3DF = evaluationDF
+                    endingTime = datetime.datetime.now()
+                    endingSize = len(evaluationDF.index)
+                    timeElapsed = endingTime - startingTime
+                    print "Processed %s candidates in %s seconds, retaining %s candidates" %(startingSize, timeElapsed.seconds, endingSize)
                 if criteriaRow.tag == "CutFill":
+                    startingSize = len(evaluationDF.index)
+                    startingTime = datetime.datetime.now()
                     evaluationDF = objective_analytic.buildCutFillFromXML(evaluationDF,criteriaRow)
-                    criteria4DF = evaluationDF
+                    endingTime = datetime.datetime.now()
+                    endingSize = len(evaluationDF.index)
+                    timeElapsed = endingTime - startingTime
+                    print "Processed %s candidates in %s seconds, retaining %s candidates" %(startingSize, timeElapsed.seconds, endingSize)
             except:
                 print "exception hit on criteria row"
                 return "failed on criteria rows"
