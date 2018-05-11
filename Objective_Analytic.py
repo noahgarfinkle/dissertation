@@ -134,7 +134,6 @@ def buildCutFillFromXML(evaluationDF,criteriaRow):
     Tests:
         None
     """
-    print "Cut Fill: %s.  Evaluating %s candidates." %(criteriaRow.attrib['criteriaName'],len(evaluationDF.index))
     criteriaName = criteriaRow.attrib['criteriaName']
     layerPath = criteriaRow.attrib['layerPath']
     lowerBound = str(criteriaRow.attrib['lowerBound'])
@@ -166,7 +165,4 @@ def buildCutFillFromXML(evaluationDF,criteriaRow):
         scoreSet = [lowerBoundInclusive,upperBoundExclusive,score]
         scoreStructure.append(scoreSet)
     evaluationDF = candidates.scoreDF(evaluationDF,criteriaName,scoreStructure)
-
-    print "Retained %s of %s candidates, with %s removed for cut fill being too high" %(finalNumber,initialNumber,initialNumber-finalNumber)
-
     return evaluationDF

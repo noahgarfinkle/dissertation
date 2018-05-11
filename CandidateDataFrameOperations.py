@@ -260,5 +260,4 @@ def scoreDF(df,criteriaColumnName,scoreStructure,isZeroExclusionary = False):
         if isZeroExclusionary == "True":
             df = df[df[qafName] != 0]
         filteredSize = len(df.index)
-    print "scoreDF for column %s retained %s of %s candidates" %(criteriaColumnName,filteredSize,initialSize)
     return df

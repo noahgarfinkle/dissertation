@@ -172,7 +172,7 @@ def evaluateXML(xmlPath,returnDFInsteadOfLayerID=True):
                     endingTime = datetime.datetime.now()
                     endingSize = len(evaluationDF.index)
                     timeElapsed = endingTime - startingTime
-                    print "Processed %s candidates in %s seconds, retaining %s candidates" %(startingSize, timeElapsed.seconds, endingSize)
+                    print "Categorical Raster Stat: %s. Processed %s candidates in %s seconds, retaining %s candidates" %(criteriaRow.attrib['criteriaName'], startingSize, timeElapsed.seconds, endingSize)
                 if criteriaRow.tag == "ContinuousRasterStat":
                     startingSize = len(evaluationDF.index)
                     startingTime = datetime.datetime.now()
@@ -180,7 +180,7 @@ def evaluateXML(xmlPath,returnDFInsteadOfLayerID=True):
                     endingTime = datetime.datetime.now()
                     endingSize = len(evaluationDF.index)
                     timeElapsed = endingTime - startingTime
-                    print "Processed %s candidates in %s seconds, retaining %s candidates" %(startingSize, timeElapsed.seconds, endingSize)
+                    print "Continuous Raster Stat: %s. Processed %s candidates in %s seconds, retaining %s candidates" %(criteriaRow.attrib['criteriaName'], startingSize, timeElapsed.seconds, endingSize)
                 if criteriaRow.tag == "DistanceFromVectorLayer":
                     startingSize = len(evaluationDF.index)
                     startingTime = datetime.datetime.now()
@@ -188,7 +188,7 @@ def evaluateXML(xmlPath,returnDFInsteadOfLayerID=True):
                     endingTime = datetime.datetime.now()
                     endingSize = len(evaluationDF.index)
                     timeElapsed = endingTime - startingTime
-                    print "Processed %s candidates in %s seconds, retaining %s candidates" %(startingSize, timeElapsed.seconds, endingSize)
+                    print "Vector Layer: %s. Processed %s candidates in %s seconds, retaining %s candidates" %(criteriaRow.attrib['criteriaName'], startingSize, timeElapsed.seconds, endingSize)
                 if criteriaRow.tag == "CutFill":
                     startingSize = len(evaluationDF.index)
                     startingTime = datetime.datetime.now()
@@ -196,7 +196,7 @@ def evaluateXML(xmlPath,returnDFInsteadOfLayerID=True):
                     endingTime = datetime.datetime.now()
                     endingSize = len(evaluationDF.index)
                     timeElapsed = endingTime - startingTime
-                    print "Processed %s candidates in %s seconds, retaining %s candidates" %(startingSize, timeElapsed.seconds, endingSize)
+                    print "Cut Fill: %s. Processed %s candidates in %s seconds, retaining %s candidates" %(criteriaRow.attrib['criteriaName'], startingSize, timeElapsed.seconds, endingSize)
             except:
                 print "exception hit on criteria row"
                 return "failed on criteria rows"

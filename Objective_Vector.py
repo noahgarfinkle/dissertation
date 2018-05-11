@@ -138,7 +138,6 @@ def buildDistanceFromVectorLayerFromXML(evaluationDF,criteriaRow):
     Tests:
         None
     """
-    print "Distance From Vector Layer: %s.  Evaluating %s candidates." %(criteriaRow.attrib['criteriaName'],len(evaluationDF.index))
     criteriaName = criteriaRow.attrib['criteriaName']
     layerPath = criteriaRow.attrib['layerPath']
     lowerBound = str(criteriaRow.attrib['lowerBound'])

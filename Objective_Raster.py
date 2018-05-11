@@ -77,7 +77,6 @@ def generateRasterStatisticsForDataFrame(df,raster_path,stats="count majority mi
         None
     """
     try:
-        start = datetime.datetime.now()
         row_stats_df = gpd.GeoDataFrame(raster_stats(vectors=df['geometry'],raster=raster_path,stats=stats, copy_properties=True, nodata_value=0, categorical=isCategorical))
         row_stats_df.index = df.index
 
@@ -96,10 +95,6 @@ def generateRasterStatisticsForDataFrame(df,raster_path,stats="count majority mi
                 newColName = "%s_%s" %(colName,columnName)
                 row_stats_df.rename(columns={originalName:newColName}, inplace=True)
         newDF = gpd.GeoDataFrame(pd.concat([df,row_stats_df],axis=1))
-        end = datetime.datetime.now()
-        timeElapsed = end - start
-        processedFeatures = len(df.index)
-        print "Processed %s candidates in %s seconds" %(processedFeatures,timeElapsed.seconds)
         return newDF
     except Exception as e:
         print e
@@ -157,7 +152,6 @@ def buildCategoricalRasterStatFromXML(evaluationDF,criteriaRow):
         None
     """
     try:
-        print "Categorical Raster Stat: %s.  Evaluating %s candidates." %(criteriaRow.attrib['criteriaName'],len(evaluationDF.index))
         criteriaName = criteriaRow.attrib['criteriaName']
         layerPath = criteriaRow.attrib['layerPath']
         lowerBound = str(criteriaRow.attrib['lowerBound'])
@@ -182,12 +176,10 @@ def buildCategoricalRasterStatFromXML(evaluationDF,criteriaRow):
         evaluationDF = generateRasterStatisticsForDataFrame(evaluationDF,layerPath,stats="count",colName=criteriaName,isCategorical=True)
         end_EvaluationDF = datetime.datetime.now()
         timeElapsed = end_EvaluationDF - start
-        print "generateRasterStatisticsForDataFrame took %s seconds" %(timeElapsed.seconds)
         # replace NA values with zero, note this may need to be moved into the first pass function to make sure I do not unintentionally overwrite other data
         evaluationDF = evaluationDF.fillna(0)
         end_fillna = datetime.datetime.now()
         timeElapsed = end_fillna - end_EvaluationDF
-        print "fillna took %s seconds" %(timeElapsed.seconds)
         # calculate percentages
         values = valueList.split(',')
         totalCountColumnName = "%s_count" %(criteriaName)
@@ -204,7 +196,6 @@ def buildCategoricalRasterStatFromXML(evaluationDF,criteriaRow):
         evaluationDF[criteriaName] = evaluationDF[criteriaName] / evaluationDF[totalCountColumnName] * 100.0
         end_CreatingCriteria = datetime.datetime.now()
         timeElapsed = end_CreatingCriteria - end_fillna
-        print "creatingCriteriaName took %s seconds" %(timeElapsed.seconds)
 
         scores = criteriaRow.find("Scores")
         weight = scores.attrib['weight']
@@ -220,7 +211,6 @@ def buildCategoricalRasterStatFromXML(evaluationDF,criteriaRow):
         evaluationDF = candidates.scoreDF(evaluationDF,criteriaName,scoreStructure,isZeroExclusionary=isZeroExclusionary)
         end_scoring = datetime.datetime.now()
         timeElapsed = end_scoring - end_CreatingCriteria
-        print "scoring took %s seconds" %(timeElapsed.seconds)
         """
             # trim the dataframe
         if isZeroExclusionary == "True":
@@ -230,8 +220,6 @@ def buildCategoricalRasterStatFromXML(evaluationDF,criteriaRow):
             evaluationDF = evaluationDF[evaluationDF[criteriaName] < upperBound]
             numberAfterUpperBoundFilter = len(evaluationDF.index)
             """
-
-        print "Retained %s of %s candidates" %(len(evaluationDF.index),initialDataFrameSize)
 
     #    print "Retained %s of %s candidates, with %s removed for being too low and %s removed for being too high" %(numberAfterUpperBoundFilter,initialDataFrameSize,initialDataFrameSize-numberAfterLowerBoundFilter,numberAfterLowerBoundFilter-numberAfterUpperBoundFilter)
         return evaluationDF
@@ -258,8 +246,6 @@ def buildContinuousRasterStatFromXML(evaluationDF,criteriaRow):
         None
     """
     try:
-        print "Continuous Raster Stat: %s.  Evaluating %s candidates." %(criteriaRow.attrib['criteriaName'],len(evaluationDF.index))
-
         criteriaName = criteriaRow.attrib['criteriaName']
         layerPath = criteriaRow.attrib['layerPath']
         lowerBound = str(criteriaRow.attrib['lowerBound'])
@@ -294,8 +280,6 @@ def buildContinuousRasterStatFromXML(evaluationDF,criteriaRow):
             scoreSet = [lowerBoundInclusive,upperBoundExclusive,score]
             scoreStructure.append(scoreSet)
         evaluationDF = candidates.scoreDF(evaluationDF,criteriaName,scoreStructure,isZeroExclusionary=isZeroExclusionary)
-        print "Retained %s of %s candidates" %(len(evaluationDF.index),initialDataFrameSize)
-        #print "Retained %s of %s candidates, with %s removed for being too low and %s removed for being too high" %(numberAfterUpperBoundFilter,initialDataFrameSize,initialDataFrameSize-numberAfterLowerBoundFilter,numberAfterLowerBoundFilter-numberAfterUpperBoundFilter)
         return evaluationDF
     except Exception as e:
         print e
