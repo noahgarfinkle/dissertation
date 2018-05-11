@@ -39,7 +39,14 @@ import matplotlib.pyplot as plt
 import datetime
 import time
 
+import CandidateDataFrameOperations as candidates
+import ENSITEIO as eio
+import Objective_Analytic as objective_analytic
+import Objective_Raster as objective_raster
+import Objective_Vector as objective_vector
+import pgdissroute as pgdissroute
 import SpatialIO as io
+import SpatialOpt as opt
 
 ## HELPFUL FOR DEBUGGING
 # %matplotlib inline
@@ -64,15 +71,6 @@ https://github.com/SALib/SALib -> Sensitivity analysis software
 """
 
 ## FUNCTIONS
-
-
-## ENSITE FUNCTIONS
-
-
-
-
-
-
 def scoreDF(df,criteriaColumnName,scoreStructure,isZeroExclusionary = False):
     # score data structure is list of [loweBoundInclusive,upperBoundExclusive,score], everything outside should default to 0
     initialSize = len(df.index)
@@ -97,8 +95,6 @@ def scoreDF(df,criteriaColumnName,scoreStructure,isZeroExclusionary = False):
     print "scoreDF for column %s retained %s of %s candidates" %(criteriaColumnName,filteredSize,initialSize)
     return df
 
-
-
 def returnCriteriaMetadataForMCDA(criteriaRow):
     criteriaName = criteriaRow.attrib["criteriaName"]
     scores = criteriaRow.find("Scores")
@@ -106,7 +102,7 @@ def returnCriteriaMetadataForMCDA(criteriaRow):
     isZeroExclusionary = scores.attrib["isZeroExclusionary"]
     return criteriaName,weight,isZeroExclusionary
 
-def runMSSPIX(xmlPath,returnDFInsteadOfLayerID=False):
+def evaluateXML(xmlPath,returnDFInsteadOfLayerID=True):
     """ Runs site search for a given xml document
 
         Evaluation function
@@ -152,10 +148,10 @@ def runMSSPIX(xmlPath,returnDFInsteadOfLayerID=False):
 
         searchParameters = siteSearch.find("SearchParameters")[0]
         if searchParameters.tag == "GriddedSearch":
-            evaluationDF = buildGriddedSearchFromXML(siteConfiguration,searchParameters)
+            evaluationDF = candidates.buildGriddedSearchFromXML(siteConfiguration,searchParameters)
 
         if searchParameters.tag == "SingleSiteSearch":
-            evaluationDF = buildSingleSiteSearchFromXML(siteConfiguration,searchParameters)
+            evaluationDF = candidates.buildSingleSiteSearchFromXML(siteConfiguration,searchParameters)
 
         if len(evaluationDF.index) == 0:
             print "Area and search parameters did not generate any candidates"
@@ -186,16 +182,16 @@ def runMSSPIX(xmlPath,returnDFInsteadOfLayerID=False):
             # Parse based on type of criteria
             try:
                 if criteriaRow.tag == "CategoricalRasterStat":
-                    evaluationDF = buildCategoricalRasterStatFromXML(evaluationDF,criteriaRow)
+                    evaluationDF = objective_raster.buildCategoricalRasterStatFromXML(evaluationDF,criteriaRow)
                     criteria1DF = evaluationDF
                 if criteriaRow.tag == "ContinuousRasterStat":
-                    evaluationDF = buildContinuousRasterStatFromXML(evaluationDF,criteriaRow)
+                    evaluationDF = objective_raster.buildContinuousRasterStatFromXML(evaluationDF,criteriaRow)
                     criteria2DF = evaluationDF
                 if criteriaRow.tag == "DistanceFromVectorLayer":
-                    evaluationDF = buildDistanceFromVectorLayerFromXML(evaluationDF,criteriaRow)
+                    evaluationDF = objective_vector.buildDistanceFromVectorLayerFromXML(evaluationDF,criteriaRow)
                     criteria3DF = evaluationDF
                 if criteriaRow.tag == "CutFill":
-                    evaluationDF = buildCutFillFromXML(evaluationDF,criteriaRow)
+                    evaluationDF = objective_analytic.buildCutFillFromXML(evaluationDF,criteriaRow)
                     criteria4DF = evaluationDF
             except:
                 print "exception hit on criteria row"
@@ -222,8 +218,9 @@ def runMSSPIX(xmlPath,returnDFInsteadOfLayerID=False):
         evaluationDFs.append(evaluationDF)
 
         ensiteLayerName = "%s_%s" %(siteSearch_name,time.strftime("%Y_%m_%d_%H_%M_%S"))
-        layerID = io.dataFrameToENSITEDatabase(evaluationDF,studyID,ensiteLayerName)
-        layerIDs.append(layerID)
+        if not returnDFInsteadOfLayerID:
+            layerID = io.dataFrameToENSITEDatabase(evaluationDF,studyID,ensiteLayerName)
+            layerIDs.append(layerID)
     if returnDFInsteadOfLayerID:
         return evaluationDFs
     else:

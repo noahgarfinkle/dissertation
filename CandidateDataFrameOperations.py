@@ -216,3 +216,26 @@ def buildGriddedSearchFromXML(siteConfiguration,searchParameters):
     evaluationDF = polygonBuilder(aoiPolygon,gridSpacing=gridSpacing,rotationStart=rotationStart,rotationStop=rotationStop,rotationSpacing=rotationSpacing, wkt=siteConfiguration_WKT)
 
     return evaluationDF
+
+def buildSingleSiteSearchFromXML(siteConfiguration,searchParameters):
+    print "Single Site Search"
+
+    siteConfiguration_WKT = siteConfiguration.attrib['wkt']
+    siteConfiguration_Units = siteConfiguration.attrib['units']
+
+    aoi_WKT = searchParameters.attrib['wkt']
+    aoi_units = searchParameters.attrib['units']
+    aoi_EPSG = searchParameters.attrib['wkt_epsg']
+    # Reproject aoiPolygon
+    if aoi_EPSG != "3857":
+        aoi_WKT = projectWKT(aoi_WKT,aoi_EPSG,3857)
+    print aoi_WKT
+    aoiPolygon = loads(aoi_WKT)
+    aoiPolygonList = [aoiPolygon]
+
+
+
+    evaluationDF = gpd.GeoDataFrame(aoiPolygonList)
+    evaluationDF.columns = ['geometry']
+
+    return evaluationDF
