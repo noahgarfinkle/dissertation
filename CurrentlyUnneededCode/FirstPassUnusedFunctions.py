@@ -129,6 +129,47 @@ def wktToShapelyPolygon(wkt,epsg,to_epsg=None):
         wktPolygon = df_to_project.geometry[0]
     return wktPolygon
 
+def generateEvaluationGridDataFrame(polygon,gridSpacing):
+    """ Produces a GeoPandas GeoDataFrame of squares within an AOI polygon
+
+    This produces the fundamental solution data structure of First Pass.  Should
+    implement an option isSquare or isPoint to allow for faster production of both
+    rasters and square Areas of Interest.  Additionally, should implement automatic
+    optimization of gridSpacing.
+
+    Args:
+        polygon (Shapely Polygon): A representation of the area of interest
+        gridSpacing (float): The size of the area to discretize
+
+    Returns:
+        squareList (GeoPandas GeoDataFrame): Each row represents a candidate site
+            for evaluation
+
+    Raises:
+        None
+
+    Tests:
+        None
+    """
+    squareList = []
+    bounds = polygon.bounds
+    ll = bounds[:2]
+    ur = bounds[2:]
+    # https://stackoverflow.com/questions/30457089/how-to-create-a-polygon-given-its-point-vertices
+    start = datetime.datetime.now()
+    for x in floatrange(ll[0],ur[0],gridSpacing):
+        for y in floatrange(ll[1],ur[1],gridSpacing):
+            square = Polygon([[x,y],[x+gridSpacing,y],[x+gridSpacing,y+gridSpacing],[x,y+gridSpacing]])
+            if square.within(polygon):
+                squareList.append(square)
+    end = datetime.datetime.now()
+    timeElapsed = end - start
+    nFeatures = len(squareList)
+    print "Generated %s squares in %s seconds" %(nFeatures,timeElapsed.seconds)
+    evaluationDF = gpd.GeoDataFrame(squareList)
+    evaluationDF.columns = ['geometry']
+    return evaluationDF
+
 def minimumDistanceFromPointToDataFrameFeatures(x,y,crs,df):
     """ Returns the minimum euclidean distance from a point to the dataframe
 

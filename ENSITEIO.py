@@ -244,3 +244,30 @@ def dataFrameToENSITEDatabase(df,studyID,layerName,layerID=None,geometryType = "
 
     con.commit()
     return layerID
+
+def writeDataFrameToENSITEDB(df,studyID,layerName,layerID=None):
+    """ Writes results into ENSITE database
+
+        Evaluation function
+
+    Args:
+        df (GeoPandas GeoDataFrame): Set of candidate solutions
+        studyID (int): ID of ENITE study the layer should belong to
+        layerName (str): Pretty-print name to display in ENSITE
+        layerID (int): If None, a new layer is created.  If provided, the data
+            is added to an existing layer
+
+    Returns:
+        layerID (int): The returned layer id in the database
+
+    Raises:
+        None
+
+    Todo:
+        * Currently rewritten to only write polygon layers
+
+    Tests:
+        None
+    """
+    layerID = io.dataFrameToENSITEDatabase(df,studyID,layerName,layerID=layerID)
+    return layerID
