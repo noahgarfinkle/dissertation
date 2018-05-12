@@ -46,7 +46,7 @@ import Objective_Raster as objective_raster
 import pgdissroute as pgdissroute
 import SpatialIO as io
 
-## OBJECTIVE FUNCTIONS
+## OBJECTIVE FUNCTIONS BETWEEN CANDIDATES
 def evaluateCandidates_EuclideanDistance(df1,index1,df2,index2):
     geom1 = df1[index1:index1+1]
     geom1.crs = {'init':'EPSG:3857'}
@@ -71,3 +71,5 @@ def evaluateCandidates_DrivingDistance(df1,index1,df2,index2):
     # reproject the geometries
     totalDriveDistance = sitesearch.pgdissroute.calculateRouteDistance(geom1.centroid.x[index1],geom1.centroid.y[index1],geom2.centroid.x[index2],geom2.centroid.y[index2])
     return totalDriveDistance
+
+## OBJECTIVE FUNCTIONS BETWEEN A CANDIDATE AND SOURCE
