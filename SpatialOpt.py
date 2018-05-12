@@ -267,9 +267,9 @@ def convertLogBookIntoGenerationalCoordinates(logbookDF):
         heat_data.append(combinedLocations)
     return heat_data
 
-heat_data = convertLogBookIntoGenerationalCoordinates(logbookDF)
-
-m = io.Map()
-m.addTimeSeriesHeatMapFromArray(heat_data)
-m.saveMap("./results/gaforpresentation3.html")
-m.map
+def generateHeatMap(logbookDF,mapPath):
+    heat_data = convertLogBookIntoGenerationalCoordinates(logbookDF)
+    m = io.Map()
+    m.addTimeSeriesHeatMapFromArray(heat_data)
+    m.saveMap(mapPath)
+    m.map
