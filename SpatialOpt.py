@@ -48,11 +48,19 @@ import SpatialIO as io
 
 ## OBJECTIVE FUNCTIONS
 def evaluateCandidates_EuclideanDistance(df1,index1,df2,index2):
-    geom1 = df1[index1:index1+1]['geometry']
-    geom2 = df2[index2:index2+1]['geometry']
 
-    
-    return 0
 
 def evaluateCandidates_DrivingDistance(df1,index1,df2,index2):
-    return 0
+    geom1 = df1[index1:index1+1]
+    geom1.crs = {'init':'EPSG:3857'}
+    geom1 = geom1.to_crs({'init':'EPSG:4326'})
+    geom1 = geom1['geometry']
+
+    geom2 = df2[index2:index2+1]
+    geom2.crs = {'init':'EPSG:3857'}
+    geom2 = geom2.to_crs({'init':'EPSG:4326'})
+    geom2 = geom2['geometry']
+
+    # reproject the geometries
+    totalDriveDistance = sitesearch.pgdissroute.calculateRouteDistance(geom1.centroid.x[index1],geom1.centroid.y[index1],geom2.centroid.x[index2],geom2.centroid.y[index2])
+    return totalDriveDistance
