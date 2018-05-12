@@ -84,4 +84,8 @@
      </SiteEvaluation>
    </SiteSearch>
   </SiteSearches>
+  <SiteRelationalConstraints>
+    <SiteRelationalConstraint studyObjectiveList="0,1" constraintType="routingDistance" constraintParameters="less than,3200,m" note="CB access to airfield"/>
+    <SiteRelationalConstraint studyObjectiveList="1,0" constraintType="euclideanDistance" constraintParameters="less than,3200,m" note="CB access to airfield"/>
+  </SiteRelationalConstraints>
 </Input>
