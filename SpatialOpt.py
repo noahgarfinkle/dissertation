@@ -48,7 +48,14 @@ import SpatialIO as io
 
 ## OBJECTIVE FUNCTIONS
 def evaluateCandidates_EuclideanDistance(df1,index1,df2,index2):
+    geom1 = df1[index1:index1+1]
+    geom1.crs = {'init':'EPSG:3857'}
 
+    geom2 = df2[index2:index2+1]
+    geom2.crs = {'init':'EPSG:3857'}
+
+    euclideanDistance = geom2.distance(geom1.geometry[index1]).min()
+    return euclideanDistance
 
 def evaluateCandidates_DrivingDistance(df1,index1,df2,index2):
     geom1 = df1[index1:index1+1]
