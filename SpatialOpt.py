@@ -69,7 +69,7 @@ def evaluateCandidates_DrivingDistance(df1,index1,df2,index2):
     geom2 = geom2['geometry']
 
     # reproject the geometries
-    totalDriveDistance = sitesearch.pgdissroute.calculateRouteDistance(geom1.centroid.x[index1],geom1.centroid.y[index1],geom2.centroid.x[index2],geom2.centroid.y[index2])
+    totalDriveDistance = pgdissroute.calculateRouteDistance(geom1.centroid.x[index1],geom1.centroid.y[index1],geom2.centroid.x[index2],geom2.centroid.y[index2])
     return totalDriveDistance
 
 ## OBJECTIVE FUNCTIONS BETWEEN A CANDIDATE AND SOURCE

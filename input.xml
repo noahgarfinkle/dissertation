@@ -85,7 +85,17 @@
    </SiteSearch>
   </SiteSearches>
   <SiteRelationalConstraints>
-    <SiteRelationalConstraint studyObjectiveList="0,1" constraintType="routingDistance" constraintParameters="less than,3200,m" note="CB access to airfield"/>
-    <SiteRelationalConstraint studyObjectiveList="1,0" constraintType="euclideanDistance" constraintParameters="less than,3200,m" note="CB access to airfield"/>
+    <SiteRelationalConstraint_Routing constraintName="Routing" candidate1TableIndex="0" candidate1Index="22" candidate2TableIndex="1" candidate2Index="4" note="CB access to airfield">
+      <Scores default="0" isZeroExclusionary="False" weight="3">
+        <Score lowerBoundInclusive="-INF" upperBoundExclusive="10000" score="100" />
+        <Score lowerBoundInclusive="10000" upperBoundExclusive="INF" score="0" />
+      </Scores>
+    </SiteRelationalConstraint_Routing>
+    <SiteRelationalConstraint_Euclidean constraintName="Euclidean" candidate1TableIndex="0" candidate1Index="22" candidate2TableIndex="1" candidate2Index="4" note="CB access to airfield">
+      <Scores default="0" isZeroExclusionary="False" weight="3">
+        <Score lowerBoundInclusive="-INF" upperBoundExclusive="10000" score="100" />
+        <Score lowerBoundInclusive="10000" upperBoundExclusive="INF" score="0" />
+      </Scores>
+    </SiteRelationalConstraint_Euclidean>
   </SiteRelationalConstraints>
 </Input>
