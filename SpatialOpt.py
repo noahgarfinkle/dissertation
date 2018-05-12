@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Manages simple objective functions for vector data layers
+Implements the spatial optimization algorithms
 """
 
 __author__ = "Noah W. Garfinkle"
@@ -15,7 +15,7 @@ __maintainer__ = "Noah Garfinkle"
 __email__ = "garfink2@illinois.edu"
 __status__ = "Development"
 __python_version__ = "2.7"
-__date_created__ = "10 May 2018"
+__date_created__ = "12 May 2018"
 
 ## IMPORTS
 from lxml import etree as ET
@@ -45,4 +45,14 @@ import Objective_Analytic as objective_analytic
 import Objective_Raster as objective_raster
 import pgdissroute as pgdissroute
 import SpatialIO as io
-import SpatialOpt as opt
+
+## OBJECTIVE FUNCTIONS
+def evaluateCandidates_EuclideanDistance(df1,index1,df2,index2):
+    geom1 = df1[index1:index1+1]['geometry']
+    geom2 = df2[index2:index2+1]['geometry']
+
+    
+    return 0
+
+def evaluateCandidates_DrivingDistance(df1,index1,df2,index2):
+    return 0
