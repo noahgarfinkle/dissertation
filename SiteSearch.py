@@ -129,7 +129,6 @@ def evaluateXML(xmlPath,returnDFInsteadOfLayerID=True,limitReturn=True):
         siteSearch_nReturn = siteSearch.attrib['nReturn']
 
         print "Beginning site search %s of %s: %s" %(searchID,len(siteSearches),siteSearch_name)
-        searchID += 1
         siteConfiguration = siteSearch.find("SiteConfiguration")[0]
         if siteConfiguration.tag == "WKTTemplate":
             print "WKT Template"
@@ -228,14 +227,15 @@ def evaluateXML(xmlPath,returnDFInsteadOfLayerID=True,limitReturn=True):
         # implement nreturn
         if limitReturn:
             evaluationDF = evaluationDF.sort_values(by="MCDA_SCORE",ascending=False).head(int(siteSearch_nReturn))
-            evaluationDF = evaluationDF.reset_index()
-            print "Completed site search %s for %s.  Returned top %s candidates of %s." %(searchID,siteSearch_name,int(siteSearch_nReturn),endingSize)
+            evaluationDF.reset_index()
+            print "Completed site search %s of %s for %s.  Returned top %s candidates of %s." %(searchID,len(siteSearches),siteSearch_name,int(siteSearch_nReturn),endingSize)
         evaluationDFs.append(evaluationDF)
 
         ensiteLayerName = "%s_%s" %(siteSearch_name,time.strftime("%Y_%m_%d_%H_%M_%S"))
         if not returnDFInsteadOfLayerID:
             layerID = io.dataFrameToENSITEDatabase(evaluationDF,studyID,ensiteLayerName)
             layerIDs.append(layerID)
+        searchID += 1
 
     # SITE RELATIONAL CONSTRAINTS
     print "Section: Site Relational Constraints"
