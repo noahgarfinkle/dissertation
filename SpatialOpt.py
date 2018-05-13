@@ -87,43 +87,50 @@ class CandidateSolution:
         self.geom3 = geom3
 
 def evaluate(individual,listOfDataframes,siteRelationalConstraints):
-    print individual
     try:
-        i = 0
-        for gene in individual:
-            print "i = %s.  gene = %s" %(i,gene)
-            candidate = listOfDataframes[i].iloc[gene,:]
-            print candidate
-            i += 1
-
-
+        mcdaColumns = ['MCDA_SCORE']
         for siteRelationalConstraint in siteRelationalConstraints:
-            if siteRelationalConstraint.tag == "SiteRelationalConstraint_Routing":
-                print "Routing distance test"
-                siteRelationalConstraint_constraintName = siteRelationalConstraint.attrib['constraintName']
-                siteRelationalConstraint_candidate1TableIndex = int(siteRelationalConstraint.attrib['candidate1TableIndex'])
-                siteRelationalConstraint_candidate1Index = int(siteRelationalConstraint.attrib['candidate1Index'])
-                siteRelationalConstraint_candidate2TableIndex = int(siteRelationalConstraint.attrib['candidate2TableIndex'])
-                siteRelationalConstraint_candidate2Index = int(siteRelationalConstraint.attrib['candidate2Index'])
-                siteRelationalConstraint_note = siteRelationalConstraint.attrib['note']
-                routingDistance = opt.evaluateCandidates_DrivingDistance(evaluationDFs[siteRelationalConstraint_candidate1TableIndex],siteRelationalConstraint_candidate1Index,evaluationDFs[siteRelationalConstraint_candidate2TableIndex],siteRelationalConstraint_candidate2Index)
-                print routingDistance
-            if siteRelationalConstraint.tag == "SiteRelationalConstraint_Euclidean":
-                print "Euclidean distance test"
-                siteRelationalConstraint_constraintName = siteRelationalConstraint.attrib['constraintName']
-                siteRelationalConstraint_candidate1TableIndex = int(siteRelationalConstraint.attrib['candidate1TableIndex'])
-                siteRelationalConstraint_candidate1Index = int(siteRelationalConstraint.attrib['candidate1Index'])
-                siteRelationalConstraint_candidate2TableIndex = int(siteRelationalConstraint.attrib['candidate2TableIndex'])
-                siteRelationalConstraint_candidate2Index = int(siteRelationalConstraint.attrib['candidate2Index'])
-                siteRelationalConstraint_note = siteRelationalConstraint.attrib['note']
-                euclideanDistance = opt.evaluateCandidates_EuclideanDistance(evaluationDFs[siteRelationalConstraint_candidate1TableIndex],siteRelationalConstraint_candidate1Index,evaluationDFs[siteRelationalConstraint_candidate2TableIndex],siteRelationalConstraint_candidate2Index)
-                print euclideanDistance
+            siteRelationalConstraint_constraintName = siteRelationalConstraint.attrib['constraintName']
+            mcdaColumns.append(siteRelationalConstraint_constraintName)
+        scoreDF = gpd.GeoDataFrame(columns=mcdaColumns)
+        return scoreDF
 
-        return 0
     except Exception as e:
         print e
         print "GA evaluate failed"
 
+def testcode():
+    i = 0
+    for gene in individual:
+        print "i = %s.  gene = %s" %(i,gene)
+        candidate = listOfDataframes[i].iloc[gene,:]
+        print candidate
+        i += 1
+
+
+    for siteRelationalConstraint in siteRelationalConstraints:
+        if siteRelationalConstraint.tag == "SiteRelationalConstraint_Routing":
+            print "Routing distance test"
+            siteRelationalConstraint_constraintName = siteRelationalConstraint.attrib['constraintName']
+            siteRelationalConstraint_candidate1TableIndex = int(siteRelationalConstraint.attrib['candidate1TableIndex'])
+            siteRelationalConstraint_candidate1Index = int(siteRelationalConstraint.attrib['candidate1Index'])
+            siteRelationalConstraint_candidate2TableIndex = int(siteRelationalConstraint.attrib['candidate2TableIndex'])
+            siteRelationalConstraint_candidate2Index = int(siteRelationalConstraint.attrib['candidate2Index'])
+            siteRelationalConstraint_note = siteRelationalConstraint.attrib['note']
+            routingDistance = opt.evaluateCandidates_DrivingDistance(evaluationDFs[siteRelationalConstraint_candidate1TableIndex],siteRelationalConstraint_candidate1Index,evaluationDFs[siteRelationalConstraint_candidate2TableIndex],siteRelationalConstraint_candidate2Index)
+            print routingDistance
+        if siteRelationalConstraint.tag == "SiteRelationalConstraint_Euclidean":
+            print "Euclidean distance test"
+            siteRelationalConstraint_constraintName = siteRelationalConstraint.attrib['constraintName']
+            siteRelationalConstraint_candidate1TableIndex = int(siteRelationalConstraint.attrib['candidate1TableIndex'])
+            siteRelationalConstraint_candidate1Index = int(siteRelationalConstraint.attrib['candidate1Index'])
+            siteRelationalConstraint_candidate2TableIndex = int(siteRelationalConstraint.attrib['candidate2TableIndex'])
+            siteRelationalConstraint_candidate2Index = int(siteRelationalConstraint.attrib['candidate2Index'])
+            siteRelationalConstraint_note = siteRelationalConstraint.attrib['note']
+            euclideanDistance = opt.evaluateCandidates_EuclideanDistance(evaluationDFs[siteRelationalConstraint_candidate1TableIndex],siteRelationalConstraint_candidate1Index,evaluationDFs[siteRelationalConstraint_candidate2TableIndex],siteRelationalConstraint_candidate2Index)
+            print euclideanDistance
+
+    return 0
 
 
 

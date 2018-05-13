@@ -241,7 +241,9 @@ def evaluateXML(xmlPath,returnDFInsteadOfLayerID=True,limitReturn=True):
     print "Section: Site Relational Constraints"
     siteRelationalConstraints = root.find("SiteRelationalConstraints")
     individual = [22,4]
-    opt.evaluate(individual,evaluationDFs,siteRelationalConstraints)
+    scoreDF = opt.evaluate(individual,evaluationDFs,siteRelationalConstraints)
+    evaluationDFs.append(scoreDF)
+    """
     for siteRelationalConstraint in siteRelationalConstraints:
         if siteRelationalConstraint.tag == "SiteRelationalConstraint_Routing":
             print "Routing distance test"
@@ -263,7 +265,7 @@ def evaluateXML(xmlPath,returnDFInsteadOfLayerID=True,limitReturn=True):
             siteRelationalConstraint_note = siteRelationalConstraint.attrib['note']
             euclideanDistance = opt.evaluateCandidates_EuclideanDistance(evaluationDFs[siteRelationalConstraint_candidate1TableIndex],siteRelationalConstraint_candidate1Index,evaluationDFs[siteRelationalConstraint_candidate2TableIndex],siteRelationalConstraint_candidate2Index)
             print euclideanDistance
-
+    """
     if returnDFInsteadOfLayerID:
         return evaluationDFs
     else:
