@@ -53,29 +53,45 @@ import SpatialIO as io
 
 ## OBJECTIVE FUNCTIONS BETWEEN CANDIDATES
 def evaluateCandidates_EuclideanDistance(df1,index1,df2,index2):
-    geom1 = df1[index1:index1+1]
-    geom1.crs = {'init':'EPSG:3857'}
+    try:
+        geom1 = df1[index1:index1+1]
+        geom1.crs = {'init':'EPSG:3857'}
 
-    geom2 = df2[index2:index2+1]
-    geom2.crs = {'init':'EPSG:3857'}
+        print geom1.geometry[index1]
 
-    euclideanDistance = geom2.distance(geom1.geometry[index1]).min()
-    return euclideanDistance
+        geom2 = df2[index2:index2+1]
+        geom2.crs = {'init':'EPSG:3857'}
+
+        print geom2
+
+        euclideanDistance = geom2.distance(geom1.geometry[index1]).min()
+        return euclideanDistance
+    except Exception as e:
+        print e
+        print "Euclidean distance failed"
 
 def evaluateCandidates_DrivingDistance(df1,index1,df2,index2):
-    geom1 = df1[index1:index1+1]
-    geom1.crs = {'init':'EPSG:3857'}
-    geom1 = geom1.to_crs({'init':'EPSG:4326'})
-    geom1 = geom1['geometry']
+    try:
+        geom1 = df1[index1:index1+1]
+        geom1.crs = {'init':'EPSG:3857'}
+        geom1 = geom1.to_crs({'init':'EPSG:4326'})
+        geom1 = geom1['geometry']
 
-    geom2 = df2[index2:index2+1]
-    geom2.crs = {'init':'EPSG:3857'}
-    geom2 = geom2.to_crs({'init':'EPSG:4326'})
-    geom2 = geom2['geometry']
+        print geom1
 
-    # reproject the geometries
-    totalDriveDistance = pgdissroute.calculateRouteDistance(geom1.centroid.x[index1],geom1.centroid.y[index1],geom2.centroid.x[index2],geom2.centroid.y[index2])
-    return totalDriveDistance
+        geom2 = df2[index2:index2+1]
+        geom2.crs = {'init':'EPSG:3857'}
+        geom2 = geom2.to_crs({'init':'EPSG:4326'})
+        geom2 = geom2['geometry']
+
+        print geom2
+
+        # reproject the geometries
+        totalDriveDistance = pgdissroute.calculateRouteDistance(geom1.centroid.x[index1],geom1.centroid.y[index1],geom2.centroid.x[index2],geom2.centroid.y[index2])
+        return totalDriveDistance
+    except Exception as e:
+        print e
+        print "Driving distance failed"
 
 ## OBJECTIVE FUNCTIONS BETWEEN A CANDIDATE AND SOURCE
 
@@ -86,13 +102,45 @@ class CandidateSolution:
         self.geom2 = geom2
         self.geom3 = geom3
 
-def evaluate(individual,listOfDataframes,siteRelationalConstraints):
+def evaluate(individual,listOfDataFrames,siteRelationalConstraints):
+    """
+    individual is set of indices in the same order as the listOfDataFrames
+    """
     try:
         mcdaColumns = ['MCDA_SCORE']
         for siteRelationalConstraint in siteRelationalConstraints:
             siteRelationalConstraint_constraintName = siteRelationalConstraint.attrib['constraintName']
             mcdaColumns.append(siteRelationalConstraint_constraintName)
         scoreDF = gpd.GeoDataFrame(columns=mcdaColumns)
+        for siteRelationalConstraint in siteRelationalConstraints:
+            siteRelationalConstraint_constraintName = siteRelationalConstraint.attrib['constraintName']
+            if siteRelationalConstraint.tag == "SiteRelationalConstraint_Routing":
+                print "Site Relational Constraint: Routing"
+                siteRelationalConstraint_site1Index = int(siteRelationalConstraint.attrib['site1Index'])
+                print "1: %s" %(siteRelationalConstraint_site1Index)
+                siteRelationalConstraint_site2Index = int(siteRelationalConstraint.attrib['site2Index'])
+                print "2: %s" %(siteRelationalConstraint_site2Index)
+                siteRelationalConstraint_site1DF = listOfDataFrames[siteRelationalConstraint_site1Index]
+                print "3: %s" %("siteRelationalConstraint_site1DF")
+                siteRelationalConstraint_site2DF = listOfDataFrames[siteRelationalConstraint_site2Index]
+                print "4: %s" %("siteRelationalConstraint_site2DF")
+                siteRelationalConstraint_site1Candidate = individual[siteRelationalConstraint_site1Index]
+                print "5: %s" %(siteRelationalConstraint_site1Candidate)
+                siteRelationalConstraint_site2Candidate = individual[siteRelationalConstraint_site2Index]
+                print "6: %s" %(siteRelationalConstraint_site2Candidate)
+                routingDistance = evaluateCandidates_DrivingDistance(siteRelationalConstraint_site1DF,siteRelationalConstraint_site1Candidate,siteRelationalConstraint_site2DF,siteRelationalConstraint_site2Candidate)
+                print routingDistance
+            if siteRelationalConstraint.tag == "SiteRelationalConstraint_Euclidean":
+                print "Site Relational Constraint: Euclidean"
+                siteRelationalConstraint_site1Index = int(siteRelationalConstraint.attrib['site1Index'])
+                siteRelationalConstraint_site2Index = int(siteRelationalConstraint.attrib['site2Index'])
+                siteRelationalConstraint_site1DF = listOfDataFrames[siteRelationalConstraint_site1Index]
+                siteRelationalConstraint_site2DF = listOfDataFrames[siteRelationalConstraint_site2Index]
+                siteRelationalConstraint_site1Candidate = individual[siteRelationalConstraint_site1Index]
+                siteRelationalConstraint_site2Candidate = individual[siteRelationalConstraint_site2Index]
+                euclideanDistance = evaluateCandidates_EuclideanDistance(siteRelationalConstraint_site1DF,siteRelationalConstraint_site1Candidate,siteRelationalConstraint_site2DF,siteRelationalConstraint_site2Candidate)
+                print euclideanDistance
+        #site1Index="0" site2Index="1"
         return scoreDF
 
     except Exception as e:

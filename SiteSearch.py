@@ -227,7 +227,7 @@ def evaluateXML(xmlPath,returnDFInsteadOfLayerID=True,limitReturn=True):
         # implement nreturn
         if limitReturn:
             evaluationDF = evaluationDF.sort_values(by="MCDA_SCORE",ascending=False).head(int(siteSearch_nReturn))
-            evaluationDF.reset_index()
+            evaluationDF = evaluationDF.reset_index()
             print "Completed site search %s of %s for %s.  Returned top %s candidates of %s." %(searchID,len(siteSearches),siteSearch_name,int(siteSearch_nReturn),endingSize)
         evaluationDFs.append(evaluationDF)
 
