@@ -85,7 +85,8 @@ def generateRasterStatisticsForDataFrame(df,raster_path,stats="count majority mi
             newColName = "%s_%s" %(colName,stat)
             row_stats_df.rename(columns={stat:newColName}, inplace=True)
         # rename any remaining columns, such as those created using count
-        # this can be accomplished because the only columsn should be geometry or colName_preceeded
+        # this can be accomplished because the only columns should be geometry or colName_preceeded
+        columnsToDrop = []
         for columnName in row_stats_df.columns:
             originalName = columnName
             columnName = str(columnName)
@@ -93,9 +94,10 @@ def generateRasterStatisticsForDataFrame(df,raster_path,stats="count majority mi
                 pass
             else:
                 newColName = "%s_%s" %(colName,columnName)
+                columnsToDrop.append(newColName)
                 row_stats_df.rename(columns={originalName:newColName}, inplace=True)
         newDF = gpd.GeoDataFrame(pd.concat([df,row_stats_df],axis=1))
-        return newDF
+        return newDF,columnsToDrop
     except Exception as e:
         print e
 
@@ -173,7 +175,7 @@ def buildCategoricalRasterStatFromXML(evaluationDF,criteriaRow):
 
         initialDataFrameSize = len(evaluationDF.index)
 
-        evaluationDF = generateRasterStatisticsForDataFrame(evaluationDF,layerPath,stats="count",colName=criteriaName,isCategorical=True)
+        evaluationDF,columnsToDrop = generateRasterStatisticsForDataFrame(evaluationDF,layerPath,stats="count",colName=criteriaName,isCategorical=True)
         end_EvaluationDF = datetime.datetime.now()
         timeElapsed = end_EvaluationDF - start
         # replace NA values with zero, note this may need to be moved into the first pass function to make sure I do not unintentionally overwrite other data
@@ -209,19 +211,11 @@ def buildCategoricalRasterStatFromXML(evaluationDF,criteriaRow):
             scoreSet = [lowerBoundInclusive,upperBoundExclusive,score]
             scoreStructure.append(scoreSet)
         evaluationDF = candidates.scoreDF(evaluationDF,criteriaName,scoreStructure,isZeroExclusionary=isZeroExclusionary)
+        # remove the count columns
+        columnsToDrop.append(totalCountColumnName)
+        evaluationDF = evaluationDF.drop(columnsToDrop,axis=1)
         end_scoring = datetime.datetime.now()
         timeElapsed = end_scoring - end_CreatingCriteria
-        """
-            # trim the dataframe
-        if isZeroExclusionary == "True":
-            initialDataFrameSize = len(evaluationDF.index)
-            evaluationDF = evaluationDF[evaluationDF[criteriaName] > lowerBound]
-            numberAfterLowerBoundFilter = len(evaluationDF.index)
-            evaluationDF = evaluationDF[evaluationDF[criteriaName] < upperBound]
-            numberAfterUpperBoundFilter = len(evaluationDF.index)
-            """
-
-    #    print "Retained %s of %s candidates, with %s removed for being too low and %s removed for being too high" %(numberAfterUpperBoundFilter,initialDataFrameSize,initialDataFrameSize-numberAfterLowerBoundFilter,numberAfterLowerBoundFilter-numberAfterUpperBoundFilter)
         return evaluationDF
     except Exception as e:
         print e
@@ -263,7 +257,7 @@ def buildContinuousRasterStatFromXML(evaluationDF,criteriaRow):
         stat = criteriaRow.attrib['stat']
         initialDataFrameSize = len(evaluationDF.index)
 
-        evaluationDF = generateRasterStatisticsForDataFrame(evaluationDF,layerPath,stats=stat,colName=criteriaName,isCategorical=False)
+        evaluationDF,columnsToDrop = generateRasterStatisticsForDataFrame(evaluationDF,layerPath,stats=stat,colName=criteriaName,isCategorical=False)
         evaluationColumnName = "%s_%s" %(criteriaName,stat)
         # KLUDGE- copy the evaluation column
         evaluationDF[criteriaName] = evaluationDF[evaluationColumnName] # in the future replace instead of copy
@@ -280,6 +274,8 @@ def buildContinuousRasterStatFromXML(evaluationDF,criteriaRow):
             scoreSet = [lowerBoundInclusive,upperBoundExclusive,score]
             scoreStructure.append(scoreSet)
         evaluationDF = candidates.scoreDF(evaluationDF,criteriaName,scoreStructure,isZeroExclusionary=isZeroExclusionary)
+        columnsToDrop.append(evaluationColumnName)
+        evaluationDF = evaluationDF.drop(columnsToDrop,axis=1)
         return evaluationDF
     except Exception as e:
         print e

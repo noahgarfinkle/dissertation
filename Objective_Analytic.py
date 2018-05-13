@@ -165,4 +165,6 @@ def buildCutFillFromXML(evaluationDF,criteriaRow):
         scoreSet = [lowerBoundInclusive,upperBoundExclusive,score]
         scoreStructure.append(scoreSet)
     evaluationDF = candidates.scoreDF(evaluationDF,criteriaName,scoreStructure)
+    columnsToDrop = ['mini_raster_affine','mini_raster_array','mini_raster_nodata','count','max','mean','min','totalCutFillVolume']
+    evaluationDF = evaluationDF.drop(columnsToDrop,axis=1)
     return evaluationDF

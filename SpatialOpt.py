@@ -86,10 +86,6 @@ class CandidateSolution:
         self.geom2 = geom2
         self.geom3 = geom3
 
-weights=(-1.0,-1.0)
-creator.create("FitnessMin", base.Fitness, weights=weights)
-creator.create("Individual", list, fitness=creator.FitnessMin)
-
 def evaluate(individual):
     try:
         # retreive geometries
@@ -156,78 +152,84 @@ def createPopulation(populationSize):
     population = toolbox.population(n=populationSize)
     return population
 
-popSize = 10
-nGenerations = 10
-pMutation = 0.1
-pCrossover = 0.5
-maxElite = 4
+def cleanUp():
+    weights=(-1.0,-1.0)
+    creator.create("FitnessMin", base.Fitness, weights=weights)
+    creator.create("Individual", list, fitness=creator.FitnessMin)
 
-toolbox = base.Toolbox()
-toolbox.register("evaluate", evaluate)
-toolbox.register("mate", tools.cxTwoPoint)
-toolbox.register("mutate", mutate)
-toolbox.register("select", tools.selNSGA2)
-population = createPopulation(popSize)
-print population
-hallOfFame = tools.ParetoFront()
-logbook = tools.Logbook()
 
-# perform the GA
-stats = tools.Statistics(key= lambda ind: individual.fitness.values)
-stats.register("avg", np.mean)
-stats.register("std", np.std)
-stats.register("min", np.min)
-stats.register("max", np.max)
-for individual in population:
-    individual.fitness.values = toolbox.evaluate(individual)
-record = stats.compile(population)
-hallOfFame.update(population)
+    popSize = 10
+    nGenerations = 10
+    pMutation = 0.1
+    pCrossover = 0.5
+    maxElite = 4
 
-for generation in range(0,nGenerations):
-    print "GENERATION %s" %(generation)
-    theBestIndividuals = []
-    if len(hallOfFame.items) <= maxElite:
-        theBestIndividuals = hallOfFame.items
-    elif len(hallOfFame.items) > 0:
-        theBestIndividuals = hallOfFame.items[0:maxElite]
-    reducedOffspring = toolbox.select(population, len(population)-len(theBestIndividuals))
-    offspring = theBestIndividuals + reducedOffspring
-   # Clone the selected individuals
-    offspring = map(toolbox.clone, offspring)
+    toolbox = base.Toolbox()
+    toolbox.register("evaluate", evaluate)
+    toolbox.register("mate", tools.cxTwoPoint)
+    toolbox.register("mutate", mutate)
+    toolbox.register("select", tools.selNSGA2)
+    population = createPopulation(popSize)
+    print population
+    hallOfFame = tools.ParetoFront()
+    logbook = tools.Logbook()
 
-    # Apply crossover on the offspring
-    for child1, child2 in zip(offspring[::2], offspring[1::2]):
-        if random.random() <= pCrossover:
-            toolbox.mate(child1, child2)
-            del child1.fitness.values
-            del child2.fitness.values
-
-    # Apply mutation on the offspring, with a probability assigned to each gene  # nopep8
-    for mutant in offspring:
-        toolbox.mutate(mutant, pMutation)
-        del mutant.fitness.values
-
-     # Evaluate the individuals with an invalid fitness
-    invalid_ind = [ind for ind in offspring if not ind.fitness.valid]
-    for individual in invalid_ind:
-        individual.fitness.values = toolbox.evaluate(individual)
-
-    # The population is entirely replaced by the offspring
-    population[:] = offspring
-    hallOfFame.update(population)
-    record=stats.compile(population)
-
-    allScores = []
+    # perform the GA
+    stats = tools.Statistics(key= lambda ind: individual.fitness.values)
+    stats.register("avg", np.mean)
+    stats.register("std", np.std)
+    stats.register("min", np.min)
+    stats.register("max", np.max)
     for individual in population:
-        allScores.append(individual.fitness.values)
+        individual.fitness.values = toolbox.evaluate(individual)
+    record = stats.compile(population)
+    hallOfFame.update(population)
 
-    logbook.record(gen=generation, allIndividuals = list(population), allScores = allScores, top5 = theBestIndividuals[0], bestScore = theBestIndividuals[0].fitness.values,
-                       **record)
-    print theBestIndividuals[0], theBestIndividuals[0].fitness.values
+    for generation in range(0,nGenerations):
+        print "GENERATION %s" %(generation)
+        theBestIndividuals = []
+        if len(hallOfFame.items) <= maxElite:
+            theBestIndividuals = hallOfFame.items
+        elif len(hallOfFame.items) > 0:
+            theBestIndividuals = hallOfFame.items[0:maxElite]
+        reducedOffspring = toolbox.select(population, len(population)-len(theBestIndividuals))
+        offspring = theBestIndividuals + reducedOffspring
+       # Clone the selected individuals
+        offspring = map(toolbox.clone, offspring)
 
-logbookDF = pd.DataFrame(logbook)
+        # Apply crossover on the offspring
+        for child1, child2 in zip(offspring[::2], offspring[1::2]):
+            if random.random() <= pCrossover:
+                toolbox.mate(child1, child2)
+                del child1.fitness.values
+                del child2.fitness.values
 
-logbookDF
+        # Apply mutation on the offspring, with a probability assigned to each gene  # nopep8
+        for mutant in offspring:
+            toolbox.mutate(mutant, pMutation)
+            del mutant.fitness.values
+
+         # Evaluate the individuals with an invalid fitness
+        invalid_ind = [ind for ind in offspring if not ind.fitness.valid]
+        for individual in invalid_ind:
+            individual.fitness.values = toolbox.evaluate(individual)
+
+        # The population is entirely replaced by the offspring
+        population[:] = offspring
+        hallOfFame.update(population)
+        record=stats.compile(population)
+
+        allScores = []
+        for individual in population:
+            allScores.append(individual.fitness.values)
+
+        logbook.record(gen=generation, allIndividuals = list(population), allScores = allScores, top5 = theBestIndividuals[0], bestScore = theBestIndividuals[0].fitness.values,
+                           **record)
+        print theBestIndividuals[0], theBestIndividuals[0].fitness.values
+
+    logbookDF = pd.DataFrame(logbook)
+
+    logbookDF
 
 def convertLogBookIntoGenerationalCoordinates(logbookDF):
     airfieldDF = airfieldCandidates
