@@ -86,7 +86,7 @@ def returnCriteriaMetadataForMCDA(criteriaRow):
     isZeroExclusionary = scores.attrib["isZeroExclusionary"]
     return criteriaName,weight,isZeroExclusionary
 
-def evaluateXML(xmlPath,returnDFInsteadOfLayerID=True):
+def evaluateXML(xmlPath,returnDFInsteadOfLayerID=True,limitReturn=True):
     """ Runs site search for a given xml document
 
         Evaluation function
@@ -224,6 +224,12 @@ def evaluateXML(xmlPath,returnDFInsteadOfLayerID=True):
         # Build the standardized score
         maxScore = max(evaluationDF["MCDA_SCORE"])
         evaluationDF["MCDA_SCORE_STANDARDIZED"] = evaluationDF["MCDA_SCORE"] / maxScore * 100.0
+
+        # implement nreturn
+        if limitReturn:
+            evaluationDF = evaluationDF.sort_values(by="MCDA_SCORE",ascending=False).head(int(siteSearch_nReturn))
+            evaluationDF = evaluationDF.reset_index()
+            print "Completed site search %s for %s.  Returned top %s candidates of %s." %(searchID,siteSearch_name,int(siteSearch_nReturn),endingSize)
         evaluationDFs.append(evaluationDF)
 
         ensiteLayerName = "%s_%s" %(siteSearch_name,time.strftime("%Y_%m_%d_%H_%M_%S"))
@@ -234,6 +240,8 @@ def evaluateXML(xmlPath,returnDFInsteadOfLayerID=True):
     # SITE RELATIONAL CONSTRAINTS
     print "Section: Site Relational Constraints"
     siteRelationalConstraints = root.find("SiteRelationalConstraints")
+    individual = [22,4]
+    opt.evaluate(individual,evaluationDFs,siteRelationalConstraints)
     for siteRelationalConstraint in siteRelationalConstraints:
         if siteRelationalConstraint.tag == "SiteRelationalConstraint_Routing":
             print "Routing distance test"

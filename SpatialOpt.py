@@ -86,7 +86,17 @@ class CandidateSolution:
         self.geom2 = geom2
         self.geom3 = geom3
 
-def evaluate(individual):
+def evaluate(indivdiual,listOfDataframes,siteRelationalConstraints):
+    try:
+        for i,gene in iter(individual):
+            candidate = listOfDataframes[i].iloc[gene[0],:]
+            print candidate
+        return 0
+    except Exception as e:
+        print e
+        print "GA evaluate failed"
+
+def evaluate_old(individual):
     try:
         # retreive geometries
         airfieldCandidate = airfieldDF
