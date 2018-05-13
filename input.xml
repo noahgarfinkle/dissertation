@@ -85,13 +85,13 @@
    </SiteSearch>
   </SiteSearches>
   <SiteRelationalConstraints>
-    <SiteRelationalConstraint_Routing constraintName="Routing" candidate1TableIndex="0" candidate1Index="22" candidate2TableIndex="1" candidate2Index="4" note="CB access to airfield">
+    <SiteRelationalConstraint_Routing constraintName="Routing" site1Index="0" site2Index="1" note="Test of routing">
       <Scores default="0" isZeroExclusionary="False" weight="3">
         <Score lowerBoundInclusive="-INF" upperBoundExclusive="10000" score="100" />
         <Score lowerBoundInclusive="10000" upperBoundExclusive="INF" score="0" />
       </Scores>
     </SiteRelationalConstraint_Routing>
-    <SiteRelationalConstraint_Euclidean constraintName="Euclidean" candidate1TableIndex="0" candidate1Index="22" candidate2TableIndex="1" candidate2Index="4" note="CB access to airfield">
+    <SiteRelationalConstraint_Euclidean constraintName="Euclidean" site1Index="1" site2Index="0" note="Test of Euclidean distance">
       <Scores default="0" isZeroExclusionary="False" weight="3">
         <Score lowerBoundInclusive="-INF" upperBoundExclusive="10000" score="100" />
         <Score lowerBoundInclusive="10000" upperBoundExclusive="INF" score="0" />
