@@ -95,6 +95,8 @@ def evaluateCandidates_DrivingDistance(df1,index1,df2,index2):
 def evaluate(individual,listOfDataFrames,siteRelationalConstraints):
     """
     individual is set of indices in the same order as the listOfDataFrames
+    TODO: add caching
+    TODO: add individual MCDA score as objective function
     """
     try:
         results = {}
