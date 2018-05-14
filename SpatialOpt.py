@@ -366,7 +366,7 @@ def createPopulation(populationSize,listOfDataFrames):
     population = toolbox.population(n=populationSize)
     return population
 
-def optimize_GA(listOfDataFrames,siteRelationalConstraints,popSize=10,nGenerations=10,
+def optimize_GA(listOfDataFrames,siteRelationalConstraints,popSize=10,nGenerations=2,
                 pMutation=0.1,pCrossover=0.5,maxElite=4):
     try:
         cachedOptimizations = {}
