@@ -256,10 +256,14 @@ def mutate(individual,probElementMutation=0.1):
             individual[i] = newAttrValue
     return (individual,)
 
-def createPopulation(populationSize):
-    toolbox.register("index1",random.randint,0,len(airfieldCandidates.index))
-    toolbox.register("index2",random.randint,0,len(geomDF.index))
-    toolbox.register("index3",random.randint,0,len(geom2DF.index))
+def createPopulation(populationSize,listOfDataFrames):
+    genes = []
+    dfIndex = 1
+    for df in listOfDataFrames:
+        dfName = "index%s" %(dfIndex)
+        toolbox.register(dfName,random.randint,0,len(df.index))
+        dfIndex += 1
+    # need to unkludge
     genes = [toolbox.index1,toolbox.index2,toolbox.index3]
     toolbox.register("individual", tools.initCycle, creator.Individual,
                      genes, n=1)
