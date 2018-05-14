@@ -254,10 +254,12 @@ def evaluate_old(individual):
 
 
 
-def mutate(individual,probElementMutation=0.1):
-    attrDictionary = {0: (0, len(airfieldCandidates.index)),
-                  1: (0,len(geomDF.index)),
-                      2: (0,len(geom2DF.index))}# nopep8
+def mutate(individual,listOfDataFrames,probElementMutation=0.1):
+    attrDictionary = {}
+    i = 0
+    for df in listOfDataFrames:
+        attrDictionary[i] = (0,len(df.index))
+        i += 1
     for i in range(0,len(individual)):
         attr = individual[i]
         shouldWeMutate = np.random.random() <= probElementMutation
@@ -336,7 +338,7 @@ def optimize_GA(listOfDataFrames,siteRelationalConstraints,popSize=10,nGeneratio
 
             # Apply mutation on the offspring, with a probability assigned to each gene  # nopep8
             for mutant in offspring:
-                toolbox.mutate(mutant, pMutation)
+                toolbox.mutate(mutant,listOfDataFrames, pMutation)
                 del mutant.fitness.values
 
              # Evaluate the individuals with an invalid fitness
