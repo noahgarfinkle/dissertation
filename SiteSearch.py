@@ -87,7 +87,7 @@ def returnCriteriaMetadataForMCDA(criteriaRow):
     isZeroExclusionary = scores.attrib["isZeroExclusionary"]
     return criteriaName,weight,isZeroExclusionary
 
-def evaluateXML(xmlPath,returnDFInsteadOfLayerID=True,limitReturn=True,fromPickle=False,buildPickle=True):
+def evaluateXML(xmlPath,returnDFInsteadOfLayerID=True,limitReturn=True,fromPickle=True,buildPickle=False):
     """ Runs site search for a given xml document
 
         Evaluation function
@@ -242,8 +242,10 @@ def evaluateXML(xmlPath,returnDFInsteadOfLayerID=True,limitReturn=True,fromPickl
                 with open('pickledDF.pkl','wb') as f:
                     pickle.dump(evaluationDFs,f)
     else:
+        print "Unjarring some pickled dataframes to use to speed up testing"
         with open('pickledDF.pkl','wb') as f:
             evaluationDFs = pickle.load(f)
+            print "Unpickled %s DataFrames" %(evaluationDFs.length)
 
     # SITE RELATIONAL CONSTRAINTS
     print "Section: Site Relational Constraints"
