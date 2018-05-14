@@ -54,6 +54,7 @@ import SpatialIO as io
 
 ## GLOBALS
 toolbox = base.Toolbox()
+cachedOptimizations = {}
 
 ## OBJECTIVE FUNCTIONS BETWEEN CANDIDATES
 def evaluateCandidates_EuclideanDistance(df1,index1,df2,index2):
@@ -104,13 +105,21 @@ def evaluate(individual,listOfDataFrames,siteRelationalConstraints):
         totalWeight = 0
         #results[individual] = ",".join([str(x) for x in individual])
         geneIndex = 0
+        geneString = ""
         for gene in individual:
             colName = "gene_%s" %(geneIndex)
             results[colName] = gene
+            geneString += str(gene) + ","
             geneIndex += 1
+        geneString = geneString.rstrip(',')
         siteRelationalConstraint_constraintNames = []
         for siteRelationalConstraint in siteRelationalConstraints:
             siteRelationalConstraint_constraintName = siteRelationalConstraint.attrib['constraintName']
+            objectiveType = siteRelationalConstraint.tag
+            if objectiveType not in cachedOptimizations.keys:
+                cachedOptimizations[objectiveType] = {}
+            else:
+                print "cached optimization could exist, checking for gene string"
             if siteRelationalConstraint.tag == "SiteRelationalConstraint_Routing":
                 print "Site Relational Constraint: Routing"
                 siteRelationalConstraint_site1Index = int(siteRelationalConstraint.attrib['site1Index'])
@@ -288,6 +297,7 @@ def createPopulation(populationSize,listOfDataFrames):
 def optimize_GA(listOfDataFrames,siteRelationalConstraints,popSize=10,nGenerations=10,
                 pMutation=0.1,pCrossover=0.5,maxElite=4):
     try:
+        cachedOptimizations = {}
         # set up weights and fitness
         weights = [1.0 for i in range(0,len(siteRelationalConstraints))]
         creator.create("FitnessMax", base.Fitness, weights=weights)
