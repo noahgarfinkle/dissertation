@@ -38,6 +38,7 @@ from rasterstats import zonal_stats, raster_stats, point_query, utils
 import matplotlib.pyplot as plt
 import datetime
 import time
+import pickle
 
 import CandidateDataFrameOperations as candidates
 reload(candidates)
@@ -86,7 +87,7 @@ def returnCriteriaMetadataForMCDA(criteriaRow):
     isZeroExclusionary = scores.attrib["isZeroExclusionary"]
     return criteriaName,weight,isZeroExclusionary
 
-def evaluateXML(xmlPath,returnDFInsteadOfLayerID=True,limitReturn=True):
+def evaluateXML(xmlPath,returnDFInsteadOfLayerID=True,limitReturn=True,fromPickle=False,buildPickle=True):
     """ Runs site search for a given xml document
 
         Evaluation function
@@ -120,129 +121,140 @@ def evaluateXML(xmlPath,returnDFInsteadOfLayerID=True,limitReturn=True):
     layerIDs = []
     evaluationDFs = []
     searchID = 1
-    for siteSearch in siteSearches:
-        siteSearch_studyObjectiveID = siteSearch.attrib['studyObjectiveID']
-        siteSearch_layerID = siteSearch.attrib['layerID']
-        siteSearch_type = siteSearch.attrib['type']
-        siteSearch_name = siteSearch.attrib['name']
-        siteSearch_note = siteSearch.attrib['note']
-        siteSearch_nReturn = siteSearch.attrib['nReturn']
+    if not fromPickle:
+        for siteSearch in siteSearches:
+            siteSearch_studyObjectiveID = siteSearch.attrib['studyObjectiveID']
+            siteSearch_layerID = siteSearch.attrib['layerID']
+            siteSearch_type = siteSearch.attrib['type']
+            siteSearch_name = siteSearch.attrib['name']
+            siteSearch_note = siteSearch.attrib['note']
+            siteSearch_nReturn = siteSearch.attrib['nReturn']
 
-        print "Beginning site search %s of %s: %s" %(searchID,len(siteSearches),siteSearch_name)
-        siteConfiguration = siteSearch.find("SiteConfiguration")[0]
-        if siteConfiguration.tag == "WKTTemplate":
-            print "WKT Template"
+            print "Beginning site search %s of %s: %s" %(searchID,len(siteSearches),siteSearch_name)
+            siteConfiguration = siteSearch.find("SiteConfiguration")[0]
+            if siteConfiguration.tag == "WKTTemplate":
+                print "WKT Template"
 
-        searchParameters = siteSearch.find("SearchParameters")[0]
-        if searchParameters.tag == "GriddedSearch":
-            evaluationDF = candidates.buildGriddedSearchFromXML(siteConfiguration,searchParameters)
+            searchParameters = siteSearch.find("SearchParameters")[0]
+            if searchParameters.tag == "GriddedSearch":
+                evaluationDF = candidates.buildGriddedSearchFromXML(siteConfiguration,searchParameters)
 
-        if searchParameters.tag == "SingleSiteSearch":
-            evaluationDF = candidates.buildSingleSiteSearchFromXML(siteConfiguration,searchParameters)
+            if searchParameters.tag == "SingleSiteSearch":
+                evaluationDF = candidates.buildSingleSiteSearchFromXML(siteConfiguration,searchParameters)
 
-        if len(evaluationDF.index) == 0:
-            print "Area and search parameters did not generate any candidates"
-            return "No Results Found"
-
-
-        siteEvaluation = siteSearch.find("SiteEvaluation")
-        weights = []
-        qafNames = []
-        scoringDict = {}
-        criteriaCount = 0
-        for criteriaRow in siteEvaluation:
-            criteriaCount += 1
             if len(evaluationDF.index) == 0:
-                print "No Results Found"
+                print "Area and search parameters did not generate any candidates"
                 return "No Results Found"
-            # set the column name if none
-            if criteriaRow.attrib["criteriaName"] == "None":
-                criteriaRow.attrib["criteriaName"] = "Criteria_%s" %(criteriaCount)
 
-            # Get the metadata needed for scoring
-            criteriaName,weight,isZeroExclusionary = returnCriteriaMetadataForMCDA(criteriaRow)
-            qafName = "%s_QAF" %(criteriaName)
-            weights.append(float(weight))
-            qafNames.append(qafName)
-            scoringDict[qafName] = float(weight)
 
-            # Parse based on type of criteria
-            try:
-                if criteriaRow.tag == "CategoricalRasterStat":
-                    startingSize = len(evaluationDF.index)
-                    startingTime = datetime.datetime.now()
-                    evaluationDF = objective_raster.buildCategoricalRasterStatFromXML(evaluationDF,criteriaRow)
-                    endingTime = datetime.datetime.now()
-                    endingSize = len(evaluationDF.index)
-                    timeElapsed = endingTime - startingTime
-                    print "Categorical Raster Stat: %s. Processed %s candidates in %s seconds, retaining %s candidates" %(criteriaRow.attrib['criteriaName'], startingSize, timeElapsed.seconds, endingSize)
-                if criteriaRow.tag == "ContinuousRasterStat":
-                    startingSize = len(evaluationDF.index)
-                    startingTime = datetime.datetime.now()
-                    evaluationDF = objective_raster.buildContinuousRasterStatFromXML(evaluationDF,criteriaRow)
-                    endingTime = datetime.datetime.now()
-                    endingSize = len(evaluationDF.index)
-                    timeElapsed = endingTime - startingTime
-                    print "Continuous Raster Stat: %s. Processed %s candidates in %s seconds, retaining %s candidates" %(criteriaRow.attrib['criteriaName'], startingSize, timeElapsed.seconds, endingSize)
-                if criteriaRow.tag == "DistanceFromVectorLayer":
-                    startingSize = len(evaluationDF.index)
-                    startingTime = datetime.datetime.now()
-                    evaluationDF = objective_vector.buildDistanceFromVectorLayerFromXML(evaluationDF,criteriaRow)
-                    endingTime = datetime.datetime.now()
-                    endingSize = len(evaluationDF.index)
-                    timeElapsed = endingTime - startingTime
-                    print "Vector Layer: %s. Processed %s candidates in %s seconds, retaining %s candidates" %(criteriaRow.attrib['criteriaName'], startingSize, timeElapsed.seconds, endingSize)
-                if criteriaRow.tag == "CutFill":
-                    startingSize = len(evaluationDF.index)
-                    startingTime = datetime.datetime.now()
-                    evaluationDF = objective_analytic.buildCutFillFromXML(evaluationDF,criteriaRow)
-                    endingTime = datetime.datetime.now()
-                    endingSize = len(evaluationDF.index)
-                    timeElapsed = endingTime - startingTime
-                    print "Cut Fill: %s. Processed %s candidates in %s seconds, retaining %s candidates" %(criteriaRow.attrib['criteriaName'], startingSize, timeElapsed.seconds, endingSize)
-            except Exception as e:
-                print "exception hit on criteria row"
-                print e
-                return criteriaRow
+            siteEvaluation = siteSearch.find("SiteEvaluation")
+            weights = []
+            qafNames = []
+            scoringDict = {}
+            criteriaCount = 0
+            for criteriaRow in siteEvaluation:
+                criteriaCount += 1
+                if len(evaluationDF.index) == 0:
+                    print "No Results Found"
+                    return "No Results Found"
+                # set the column name if none
+                if criteriaRow.attrib["criteriaName"] == "None":
+                    criteriaRow.attrib["criteriaName"] = "Criteria_%s" %(criteriaCount)
 
-        # build the weights
-        totalWeight = sum(weights)
-        weightedMCDAColumns = []
-        for qafName in qafNames:
-            scoringDict[qafName] /= totalWeight
-            assignedWeight = scoringDict[qafName]
-            weightedMCDAColumn = "%s_weighted" %(qafName)
-            weightedMCDAColumns.append(weightedMCDAColumn)
-            evaluationDF[weightedMCDAColumn] = evaluationDF[qafName] * assignedWeight
+                # Get the metadata needed for scoring
+                criteriaName,weight,isZeroExclusionary = returnCriteriaMetadataForMCDA(criteriaRow)
+                qafName = "%s_QAF" %(criteriaName)
+                weights.append(float(weight))
+                qafNames.append(qafName)
+                scoringDict[qafName] = float(weight)
 
-        # Build the total score
-        evaluationDF["MCDA_SCORE"] = 0
-        for weightedMCDAColumn in weightedMCDAColumns:
-            evaluationDF["MCDA_SCORE"] += evaluationDF[weightedMCDAColumn]
+                # Parse based on type of criteria
+                try:
+                    if criteriaRow.tag == "CategoricalRasterStat":
+                        startingSize = len(evaluationDF.index)
+                        startingTime = datetime.datetime.now()
+                        evaluationDF = objective_raster.buildCategoricalRasterStatFromXML(evaluationDF,criteriaRow)
+                        endingTime = datetime.datetime.now()
+                        endingSize = len(evaluationDF.index)
+                        timeElapsed = endingTime - startingTime
+                        print "Categorical Raster Stat: %s. Processed %s candidates in %s seconds, retaining %s candidates" %(criteriaRow.attrib['criteriaName'], startingSize, timeElapsed.seconds, endingSize)
+                    if criteriaRow.tag == "ContinuousRasterStat":
+                        startingSize = len(evaluationDF.index)
+                        startingTime = datetime.datetime.now()
+                        evaluationDF = objective_raster.buildContinuousRasterStatFromXML(evaluationDF,criteriaRow)
+                        endingTime = datetime.datetime.now()
+                        endingSize = len(evaluationDF.index)
+                        timeElapsed = endingTime - startingTime
+                        print "Continuous Raster Stat: %s. Processed %s candidates in %s seconds, retaining %s candidates" %(criteriaRow.attrib['criteriaName'], startingSize, timeElapsed.seconds, endingSize)
+                    if criteriaRow.tag == "DistanceFromVectorLayer":
+                        startingSize = len(evaluationDF.index)
+                        startingTime = datetime.datetime.now()
+                        evaluationDF = objective_vector.buildDistanceFromVectorLayerFromXML(evaluationDF,criteriaRow)
+                        endingTime = datetime.datetime.now()
+                        endingSize = len(evaluationDF.index)
+                        timeElapsed = endingTime - startingTime
+                        print "Vector Layer: %s. Processed %s candidates in %s seconds, retaining %s candidates" %(criteriaRow.attrib['criteriaName'], startingSize, timeElapsed.seconds, endingSize)
+                    if criteriaRow.tag == "CutFill":
+                        startingSize = len(evaluationDF.index)
+                        startingTime = datetime.datetime.now()
+                        evaluationDF = objective_analytic.buildCutFillFromXML(evaluationDF,criteriaRow)
+                        endingTime = datetime.datetime.now()
+                        endingSize = len(evaluationDF.index)
+                        timeElapsed = endingTime - startingTime
+                        print "Cut Fill: %s. Processed %s candidates in %s seconds, retaining %s candidates" %(criteriaRow.attrib['criteriaName'], startingSize, timeElapsed.seconds, endingSize)
+                except Exception as e:
+                    print "exception hit on criteria row"
+                    print e
+                    return criteriaRow
 
-        # Build the standardized score
-        maxScore = max(evaluationDF["MCDA_SCORE"])
-        evaluationDF["MCDA_SCORE_STANDARDIZED"] = evaluationDF["MCDA_SCORE"] / maxScore * 100.0
+            # build the weights
+            totalWeight = sum(weights)
+            weightedMCDAColumns = []
+            for qafName in qafNames:
+                scoringDict[qafName] /= totalWeight
+                assignedWeight = scoringDict[qafName]
+                weightedMCDAColumn = "%s_weighted" %(qafName)
+                weightedMCDAColumns.append(weightedMCDAColumn)
+                evaluationDF[weightedMCDAColumn] = evaluationDF[qafName] * assignedWeight
 
-        # implement nreturn
-        if limitReturn:
-            evaluationDF = evaluationDF.sort_values(by="MCDA_SCORE",ascending=False).head(int(siteSearch_nReturn))
-            evaluationDF = evaluationDF.reset_index()
-            print "Completed site search %s of %s for %s.  Returned top %s candidates of %s." %(searchID,len(siteSearches),siteSearch_name,int(siteSearch_nReturn),endingSize)
-        evaluationDFs.append(evaluationDF)
+            # Build the total score
+            evaluationDF["MCDA_SCORE"] = 0
+            for weightedMCDAColumn in weightedMCDAColumns:
+                evaluationDF["MCDA_SCORE"] += evaluationDF[weightedMCDAColumn]
 
-        ensiteLayerName = "%s_%s" %(siteSearch_name,time.strftime("%Y_%m_%d_%H_%M_%S"))
-        if not returnDFInsteadOfLayerID:
-            layerID = io.dataFrameToENSITEDatabase(evaluationDF,studyID,ensiteLayerName)
-            layerIDs.append(layerID)
-        searchID += 1
+            # Build the standardized score
+            maxScore = max(evaluationDF["MCDA_SCORE"])
+            evaluationDF["MCDA_SCORE_STANDARDIZED"] = evaluationDF["MCDA_SCORE"] / maxScore * 100.0
+
+            # implement nreturn
+            if limitReturn:
+                evaluationDF = evaluationDF.sort_values(by="MCDA_SCORE",ascending=False).head(int(siteSearch_nReturn))
+                evaluationDF = evaluationDF.reset_index()
+                print "Completed site search %s of %s for %s.  Returned top %s candidates of %s." %(searchID,len(siteSearches),siteSearch_name,int(siteSearch_nReturn),endingSize)
+            evaluationDFs.append(evaluationDF)
+
+            ensiteLayerName = "%s_%s" %(siteSearch_name,time.strftime("%Y_%m_%d_%H_%M_%S"))
+            if not returnDFInsteadOfLayerID:
+                layerID = io.dataFrameToENSITEDatabase(evaluationDF,studyID,ensiteLayerName)
+                layerIDs.append(layerID)
+            searchID += 1
+            if buildPickle:
+                with open('pickledDF.pkl','wb') as f:
+                    pickle.dump(evaluationDFs,f)
+    else:
+        with open('pickledDF.pkl','wb') as f:
+            evaluationDFs = pickle.load(f)
 
     # SITE RELATIONAL CONSTRAINTS
     print "Section: Site Relational Constraints"
     siteRelationalConstraints = root.find("SiteRelationalConstraints")
-    individual = [22,4]
-    scoreDF = opt.evaluate(individual,evaluationDFs,siteRelationalConstraints)
-    evaluationDFs.append(scoreDF)
+
+    logbookDF = opt.optimize_GA(evaluationDFs,siteRelationalConstraints,popSize=10,nGenerations=10,
+                pMutation=0.1,pCrossover=0.5,maxElite=4)
+    evaluationDFs.append(logbookDF)
+    #individual = [22,4]
+    #scoreDF = opt.evaluate(individual,evaluationDFs,siteRelationalConstraints)
+    #evaluationDFs.append(scoreDF)
 
     if returnDFInsteadOfLayerID:
         return evaluationDFs

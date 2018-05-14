@@ -283,7 +283,7 @@ def optimize_GA(listOfDataFrames,siteRelationalConstraints,popSize=10,nGeneratio
         creator.create("Individual", list, fitness=creator.FitnessMax)
 
         # set up the functions
-        toolbox = base.Toolbox #KLUDGE, resets the global
+        #toolbox = base.Toolbox #KLUDGE, resets the global
         toolbox.register("evaluate", evaluate)
         toolbox.register("mate", tools.cxTwoPoint)
         toolbox.register("mutate", mutate)
@@ -302,7 +302,7 @@ def optimize_GA(listOfDataFrames,siteRelationalConstraints,popSize=10,nGeneratio
         stats.register("min", np.min)
         stats.register("max", np.max)
         for individual in population:
-            individual.fitness.values = toolbox.evaluate(individual,,listOfDataFrames,siteRelationalConstraints)
+            individual.fitness.values = toolbox.evaluate(individual,listOfDataFrames,siteRelationalConstraints)
         record = stats.compile(population)
         hallOfFame.update(population)
 
@@ -333,7 +333,7 @@ def optimize_GA(listOfDataFrames,siteRelationalConstraints,popSize=10,nGeneratio
              # Evaluate the individuals with an invalid fitness
             invalid_ind = [ind for ind in offspring if not ind.fitness.valid]
             for individual in invalid_ind:
-                individual.fitness.values = toolbox.evaluate(individual)
+                individual.fitness.values = toolbox.evaluate(individual,listOfDataFrames,siteRelationalConstraints)
 
             # The population is entirely replaced by the offspring
             population[:] = offspring
@@ -349,6 +349,7 @@ def optimize_GA(listOfDataFrames,siteRelationalConstraints,popSize=10,nGeneratio
             print theBestIndividuals[0], theBestIndividuals[0].fitness.values
 
         logbookDF = pd.DataFrame(logbook)
+        return logbookDF
 
     except Exception as e:
         print e
