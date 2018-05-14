@@ -51,6 +51,9 @@ import Objective_Raster as objective_raster
 import pgdissroute as pgdissroute
 import SpatialIO as io
 
+## GLOBALS
+toolbox = base.Toolbox()
+
 ## OBJECTIVE FUNCTIONS BETWEEN CANDIDATES
 def evaluateCandidates_EuclideanDistance(df1,index1,df2,index2):
     try:
@@ -160,7 +163,7 @@ def evaluate(individual,listOfDataFrames,siteRelationalConstraints):
                 results['MCDA_SCORE'] += float(weight) * float(evaluationDF[qafName][0])
         results['MCDA_SCORE'] /= float(totalWeight)
         scoreDF = pd.DataFrame(results,index=[0])
-        return scoreDF
+        return scoreDF # KLUDGE, should be a tuple
 
     except Exception as e:
         print e
@@ -270,6 +273,86 @@ def createPopulation(populationSize,listOfDataFrames):
     toolbox.register("population", tools.initRepeat, list, toolbox.individual)
     population = toolbox.population(n=populationSize)
     return population
+
+def optimize_GA(listOfDataFrames,siteRelationalConstraints,popSize=10,nGenerations=10,
+                pMutation=0.1,pCrossover=0.5,maxElite=4):
+    try:
+        # set up weights and fitness
+        weights = [1.0 for i in range(0,len(siteRelationalConstraints))]
+        creator.create("FitnessMax", base.Fitness, weights=weights)
+        creator.create("Individual", list, fitness=creator.FitnessMax)
+
+        # set up the functions
+        toolbox = base.Toolbox #KLUDGE, resets the global
+        toolbox.register("evaluate", evaluate)
+        toolbox.register("mate", tools.cxTwoPoint)
+        toolbox.register("mutate", mutate)
+        toolbox.register("select", tools.selNSGA2)
+
+        # create the initial population
+        population = createPopulation(popSize,listOfDataFrames)
+        print population
+        hallOfFame = tools.ParetoFront()
+        logbook = tools.Logbook()
+
+        # perform the GA
+        stats = tools.Statistics(key= lambda ind: individual.fitness.values)
+        stats.register("avg", np.mean)
+        stats.register("std", np.std)
+        stats.register("min", np.min)
+        stats.register("max", np.max)
+        for individual in population:
+            individual.fitness.values = toolbox.evaluate(individual,,listOfDataFrames,siteRelationalConstraints)
+        record = stats.compile(population)
+        hallOfFame.update(population)
+
+        for generation in range(0,nGenerations):
+            print "GENERATION %s" %(generation)
+            theBestIndividuals = []
+            if len(hallOfFame.items) <= maxElite:
+                theBestIndividuals = hallOfFame.items
+            elif len(hallOfFame.items) > 0:
+                theBestIndividuals = hallOfFame.items[0:maxElite]
+            reducedOffspring = toolbox.select(population, len(population)-len(theBestIndividuals))
+            offspring = theBestIndividuals + reducedOffspring
+           # Clone the selected individuals
+            offspring = map(toolbox.clone, offspring)
+
+            # Apply crossover on the offspring
+            for child1, child2 in zip(offspring[::2], offspring[1::2]):
+                if random.random() <= pCrossover:
+                    toolbox.mate(child1, child2)
+                    del child1.fitness.values
+                    del child2.fitness.values
+
+            # Apply mutation on the offspring, with a probability assigned to each gene  # nopep8
+            for mutant in offspring:
+                toolbox.mutate(mutant, pMutation)
+                del mutant.fitness.values
+
+             # Evaluate the individuals with an invalid fitness
+            invalid_ind = [ind for ind in offspring if not ind.fitness.valid]
+            for individual in invalid_ind:
+                individual.fitness.values = toolbox.evaluate(individual)
+
+            # The population is entirely replaced by the offspring
+            population[:] = offspring
+            hallOfFame.update(population)
+            record=stats.compile(population)
+
+            allScores = []
+            for individual in population:
+                allScores.append(individual.fitness.values)
+
+            logbook.record(gen=generation, allIndividuals = list(population), allScores = allScores, top5 = theBestIndividuals[0], bestScore = theBestIndividuals[0].fitness.values,
+                               **record)
+            print theBestIndividuals[0], theBestIndividuals[0].fitness.values
+
+        logbookDF = pd.DataFrame(logbook)
+
+    except Exception as e:
+        print e
+        print "GA FAILED"
 
 def cleanUp():
     weights=(-1.0,-1.0)
