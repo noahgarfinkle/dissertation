@@ -262,9 +262,9 @@ def createPopulation(populationSize,listOfDataFrames):
     for df in listOfDataFrames:
         dfName = "index%s" %(dfIndex)
         toolbox.register(dfName,random.randint,0,len(df.index))
+        deapName = "toolbox.%s" %(dfName)
+        genes.append(eval(deapName)) #This is HORRIBLE practice
         dfIndex += 1
-    # need to unkludge
-    genes = [toolbox.index1,toolbox.index2,toolbox.index3]
     toolbox.register("individual", tools.initCycle, creator.Individual,
                      genes, n=1)
     toolbox.register("population", tools.initRepeat, list, toolbox.individual)
