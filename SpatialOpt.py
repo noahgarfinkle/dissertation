@@ -38,6 +38,7 @@ from rasterstats import zonal_stats, raster_stats, point_query, utils
 import matplotlib.pyplot as plt
 import datetime
 import time
+import random
 
 from deap import base
 from deap import creator

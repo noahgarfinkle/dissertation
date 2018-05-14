@@ -243,7 +243,7 @@ def evaluateXML(xmlPath,returnDFInsteadOfLayerID=True,limitReturn=True,fromPickl
                     pickle.dump(evaluationDFs,f)
     else:
         print "Unjarring some pickled dataframes to use to speed up testing"
-        with open('pickledDF.pkl','wb') as f:
+        with open('pickledDF.pkl') as f:
             evaluationDFs = pickle.load(f)
             print "Unpickled %s DataFrames" %(evaluationDFs.length)
 
