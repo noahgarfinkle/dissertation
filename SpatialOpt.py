@@ -100,6 +100,8 @@ def evaluate(individual,listOfDataFrames,siteRelationalConstraints):
     """
     try:
         results = {}
+        results['MCDA_SCORE'] = 0.0
+        totalWeight = 0
         for siteRelationalConstraint in siteRelationalConstraints:
             siteRelationalConstraint_constraintName = siteRelationalConstraint.attrib['constraintName']
             if siteRelationalConstraint.tag == "SiteRelationalConstraint_Routing":
@@ -114,6 +116,7 @@ def evaluate(individual,listOfDataFrames,siteRelationalConstraints):
                 results[siteRelationalConstraint_constraintName] = routingDistance
                 scores = siteRelationalConstraint.find("Scores")
                 weight = scores.attrib['weight']
+                totalWeight += float(weight)
                 isZeroExclusionary = scores.attrib['isZeroExclusionary']
                 default = scores.attrib['default']
                 scoreStructure = []
@@ -127,6 +130,7 @@ def evaluate(individual,listOfDataFrames,siteRelationalConstraints):
                 evaluationDF = candidates.scoreDF(evaluationDF,siteRelationalConstraint_constraintName,scoreStructure,isZeroExclusionary=False)
                 qafName = "%s_QAF" %(siteRelationalConstraint_constraintName)
                 results[qafName] = evaluationDF[qafName][0]
+                results['MCDA_SCORE'] += float(weight) * float(evaluationDF[qafName][0])
             if siteRelationalConstraint.tag == "SiteRelationalConstraint_Euclidean":
                 print "Site Relational Constraint: Euclidean"
                 siteRelationalConstraint_site1Index = int(siteRelationalConstraint.attrib['site1Index'])
@@ -139,6 +143,7 @@ def evaluate(individual,listOfDataFrames,siteRelationalConstraints):
                 results[siteRelationalConstraint_constraintName] = euclideanDistance
                 scores = siteRelationalConstraint.find("Scores")
                 weight = scores.attrib['weight']
+                totalWeight += float(weight)
                 isZeroExclusionary = scores.attrib['isZeroExclusionary']
                 default = scores.attrib['default']
                 scoreStructure = []
@@ -152,7 +157,8 @@ def evaluate(individual,listOfDataFrames,siteRelationalConstraints):
                 evaluationDF = candidates.scoreDF(evaluationDF,siteRelationalConstraint_constraintName,scoreStructure,isZeroExclusionary=False)
                 qafName = "%s_QAF" %(siteRelationalConstraint_constraintName)
                 results[qafName] = evaluationDF[qafName][0]
-        results['MCDA_SCORE'] = 0.0
+                results['MCDA_SCORE'] += float(weight) * float(evaluationDF[qafName][0])
+        results['MCDA_SCORE'] /= float(totalWeight)
         scoreDF = pd.DataFrame(results,index=[0])
         return scoreDF
 
