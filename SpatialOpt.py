@@ -88,12 +88,6 @@ def evaluateCandidates_DrivingDistance(df1,index1,df2,index2):
 ## OBJECTIVE FUNCTIONS BETWEEN A CANDIDATE AND SOURCE
 
 ## SPATIAL OPTIMIZATION IMPLEMENTATION
-class CandidateSolution:
-    def __init__(self,geom1,geom2,geom3):
-        self.geom1 = geom1
-        self.geom2 = geom2
-        self.geom3 = geom3
-
 def evaluate(individual,listOfDataFrames,siteRelationalConstraints):
     """
     individual is set of indices in the same order as the listOfDataFrames
