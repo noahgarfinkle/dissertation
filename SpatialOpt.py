@@ -106,6 +106,7 @@ def evaluate(individual,listOfDataFrames,siteRelationalConstraints):
             colName = "gene_%s" %(geneIndex)
             results[colName] = gene
             geneIndex += 1
+        siteRelationalConstraint_constraintNames = []
         for siteRelationalConstraint in siteRelationalConstraints:
             siteRelationalConstraint_constraintName = siteRelationalConstraint.attrib['constraintName']
             if siteRelationalConstraint.tag == "SiteRelationalConstraint_Routing":
@@ -133,6 +134,7 @@ def evaluate(individual,listOfDataFrames,siteRelationalConstraints):
                 evaluationDF =  pd.DataFrame(results,index=[0])
                 evaluationDF = candidates.scoreDF(evaluationDF,siteRelationalConstraint_constraintName,scoreStructure,isZeroExclusionary=False)
                 qafName = "%s_QAF" %(siteRelationalConstraint_constraintName)
+                siteRelationalConstraint_constraintNames.append(qafName)
                 results[qafName] = evaluationDF[qafName][0]
                 results['MCDA_SCORE'] += float(weight) * float(evaluationDF[qafName][0])
             if siteRelationalConstraint.tag == "SiteRelationalConstraint_Euclidean":
@@ -160,11 +162,15 @@ def evaluate(individual,listOfDataFrames,siteRelationalConstraints):
                 evaluationDF =  pd.DataFrame(results,index=[0])
                 evaluationDF = candidates.scoreDF(evaluationDF,siteRelationalConstraint_constraintName,scoreStructure,isZeroExclusionary=False)
                 qafName = "%s_QAF" %(siteRelationalConstraint_constraintName)
+                siteRelationalConstraint_constraintNames.append(qafName)
                 results[qafName] = evaluationDF[qafName][0]
                 results['MCDA_SCORE'] += float(weight) * float(evaluationDF[qafName][0])
-        results['MCDA_SCORE'] /= float(totalWeight)
+        results['MCDA_SCORE'] /= float(totalWeight) # NOTE: MCDA NOT BEING USED
         scoreDF = pd.DataFrame(results,index=[0])
-        return scoreDF # KLUDGE, should be a tuple
+        scoreList = []
+        for qafColumn in siteRelationalConstraint_constraintNames:
+            scoreList.append(scoreDF[qafColumn][0])
+        return scoreList
 
     except Exception as e:
         print e
