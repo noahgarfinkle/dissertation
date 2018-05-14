@@ -102,6 +102,12 @@ def evaluate(individual,listOfDataFrames,siteRelationalConstraints):
         results = {}
         results['MCDA_SCORE'] = 0.0
         totalWeight = 0
+        #results[individual] = ",".join([str(x) for x in individual])
+        geneIndex = 0
+        for gene in individual:
+            colName = "gene_%s" %(geneIndex)
+            results[colName] = gene
+            geneIndex += 1
         for siteRelationalConstraint in siteRelationalConstraints:
             siteRelationalConstraint_constraintName = siteRelationalConstraint.attrib['constraintName']
             if siteRelationalConstraint.tag == "SiteRelationalConstraint_Routing":
