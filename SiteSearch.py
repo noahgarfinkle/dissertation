@@ -245,7 +245,7 @@ def evaluateXML(xmlPath,returnDFInsteadOfLayerID=True,limitReturn=True,fromPickl
         print "Unjarring some pickled dataframes to use to speed up testing"
         with open('pickledDF.pkl') as f:
             evaluationDFs = pickle.load(f)
-            print "Unpickled %s DataFrames" %(evaluationDFs.length)
+            print "Unpickled %s DataFrames" %(len(evaluationDFs))
 
     # SITE RELATIONAL CONSTRAINTS
     print "Section: Site Relational Constraints"
