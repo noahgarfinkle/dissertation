@@ -93,7 +93,7 @@ def evaluateCandidates_DrivingDistance(df1,index1,df2,index2):
 ## OBJECTIVE FUNCTIONS BETWEEN A CANDIDATE AND SOURCE
 
 ## SPATIAL OPTIMIZATION IMPLEMENTATION
-def evaluate(individual,listOfDataFrames,siteRelationalConstraints):
+def evaluate(individual,listOfDataFrames,siteRelationalConstraints,utilizeCaching=True):
     """
     individual is set of indices in the same order as the listOfDataFrames
     TODO: add caching
@@ -116,71 +116,74 @@ def evaluate(individual,listOfDataFrames,siteRelationalConstraints):
         for siteRelationalConstraint in siteRelationalConstraints:
             siteRelationalConstraint_constraintName = siteRelationalConstraint.attrib['constraintName']
             objectiveType = siteRelationalConstraint.tag
-            if objectiveType not in cachedOptimizations.keys:
+            if objectiveType not in cachedOptimizations.keys():
                 cachedOptimizations[objectiveType] = {}
-            else:
-                print "cached optimization could exist, checking for gene string"
-            if siteRelationalConstraint.tag == "SiteRelationalConstraint_Routing":
-                print "Site Relational Constraint: Routing"
-                siteRelationalConstraint_site1Index = int(siteRelationalConstraint.attrib['site1Index'])
-                siteRelationalConstraint_site2Index = int(siteRelationalConstraint.attrib['site2Index'])
-                siteRelationalConstraint_site1DF = listOfDataFrames[siteRelationalConstraint_site1Index]
-                siteRelationalConstraint_site2DF = listOfDataFrames[siteRelationalConstraint_site2Index]
-                siteRelationalConstraint_site1Candidate = individual[siteRelationalConstraint_site1Index]
-                siteRelationalConstraint_site2Candidate = individual[siteRelationalConstraint_site2Index]
-                routingDistance = evaluateCandidates_DrivingDistance(siteRelationalConstraint_site1DF,siteRelationalConstraint_site1Candidate,siteRelationalConstraint_site2DF,siteRelationalConstraint_site2Candidate)
-                results[siteRelationalConstraint_constraintName] = routingDistance
-                scores = siteRelationalConstraint.find("Scores")
-                weight = scores.attrib['weight']
-                totalWeight += float(weight)
-                isZeroExclusionary = scores.attrib['isZeroExclusionary']
-                default = scores.attrib['default']
-                scoreStructure = []
-                for scoreRow in scores:
-                    lowerBoundInclusive = str(scoreRow.attrib['lowerBoundInclusive'])
-                    upperBoundExclusive = str(scoreRow.attrib['upperBoundExclusive'])
-                    score = str(scoreRow.attrib['score'])
-                    scoreSet = [lowerBoundInclusive,upperBoundExclusive,score]
-                    scoreStructure.append(scoreSet)
-                evaluationDF =  pd.DataFrame(results,index=[0])
-                evaluationDF = candidates.scoreDF(evaluationDF,siteRelationalConstraint_constraintName,scoreStructure,isZeroExclusionary=False)
-                qafName = "%s_QAF" %(siteRelationalConstraint_constraintName)
-                siteRelationalConstraint_constraintNames.append(qafName)
-                results[qafName] = evaluationDF[qafName][0]
-                results['MCDA_SCORE'] += float(weight) * float(evaluationDF[qafName][0])
-            if siteRelationalConstraint.tag == "SiteRelationalConstraint_Euclidean":
-                print "Site Relational Constraint: Euclidean"
-                siteRelationalConstraint_site1Index = int(siteRelationalConstraint.attrib['site1Index'])
-                siteRelationalConstraint_site2Index = int(siteRelationalConstraint.attrib['site2Index'])
-                siteRelationalConstraint_site1DF = listOfDataFrames[siteRelationalConstraint_site1Index]
-                siteRelationalConstraint_site2DF = listOfDataFrames[siteRelationalConstraint_site2Index]
-                siteRelationalConstraint_site1Candidate = individual[siteRelationalConstraint_site1Index]
-                siteRelationalConstraint_site2Candidate = individual[siteRelationalConstraint_site2Index]
-                euclideanDistance = evaluateCandidates_EuclideanDistance(siteRelationalConstraint_site1DF,siteRelationalConstraint_site1Candidate,siteRelationalConstraint_site2DF,siteRelationalConstraint_site2Candidate)
-                results[siteRelationalConstraint_constraintName] = euclideanDistance
-                scores = siteRelationalConstraint.find("Scores")
-                weight = scores.attrib['weight']
-                totalWeight += float(weight)
-                isZeroExclusionary = scores.attrib['isZeroExclusionary']
-                default = scores.attrib['default']
-                scoreStructure = []
-                for scoreRow in scores:
-                    lowerBoundInclusive = str(scoreRow.attrib['lowerBoundInclusive'])
-                    upperBoundExclusive = str(scoreRow.attrib['upperBoundExclusive'])
-                    score = str(scoreRow.attrib['score'])
-                    scoreSet = [lowerBoundInclusive,upperBoundExclusive,score]
-                    scoreStructure.append(scoreSet)
-                evaluationDF =  pd.DataFrame(results,index=[0])
-                evaluationDF = candidates.scoreDF(evaluationDF,siteRelationalConstraint_constraintName,scoreStructure,isZeroExclusionary=False)
-                qafName = "%s_QAF" %(siteRelationalConstraint_constraintName)
-                siteRelationalConstraint_constraintNames.append(qafName)
-                results[qafName] = evaluationDF[qafName][0]
-                results['MCDA_SCORE'] += float(weight) * float(evaluationDF[qafName][0])
-        results['MCDA_SCORE'] /= float(totalWeight) # NOTE: MCDA NOT BEING USED
-        scoreDF = pd.DataFrame(results,index=[0])
-        scoreList = []
-        for qafColumn in siteRelationalConstraint_constraintNames:
-            scoreList.append(scoreDF[qafColumn][0])
+                if siteRelationalConstraint.tag == "SiteRelationalConstraint_Routing":
+                    print "Site Relational Constraint: Routing"
+                    siteRelationalConstraint_site1Index = int(siteRelationalConstraint.attrib['site1Index'])
+                    siteRelationalConstraint_site2Index = int(siteRelationalConstraint.attrib['site2Index'])
+                    siteRelationalConstraint_site1DF = listOfDataFrames[siteRelationalConstraint_site1Index]
+                    siteRelationalConstraint_site2DF = listOfDataFrames[siteRelationalConstraint_site2Index]
+                    siteRelationalConstraint_site1Candidate = individual[siteRelationalConstraint_site1Index]
+                    siteRelationalConstraint_site2Candidate = individual[siteRelationalConstraint_site2Index]
+                    routingDistance = evaluateCandidates_DrivingDistance(siteRelationalConstraint_site1DF,siteRelationalConstraint_site1Candidate,siteRelationalConstraint_site2DF,siteRelationalConstraint_site2Candidate)
+                    results[siteRelationalConstraint_constraintName] = routingDistance
+                    scores = siteRelationalConstraint.find("Scores")
+                    weight = scores.attrib['weight']
+                    totalWeight += float(weight)
+                    isZeroExclusionary = scores.attrib['isZeroExclusionary']
+                    default = scores.attrib['default']
+                    scoreStructure = []
+                    for scoreRow in scores:
+                        lowerBoundInclusive = str(scoreRow.attrib['lowerBoundInclusive'])
+                        upperBoundExclusive = str(scoreRow.attrib['upperBoundExclusive'])
+                        score = str(scoreRow.attrib['score'])
+                        scoreSet = [lowerBoundInclusive,upperBoundExclusive,score]
+                        scoreStructure.append(scoreSet)
+                    evaluationDF =  pd.DataFrame(results,index=[0])
+                    evaluationDF = candidates.scoreDF(evaluationDF,siteRelationalConstraint_constraintName,scoreStructure,isZeroExclusionary=False)
+                    qafName = "%s_QAF" %(siteRelationalConstraint_constraintName)
+                    siteRelationalConstraint_constraintNames.append(qafName)
+                    results[qafName] = evaluationDF[qafName][0]
+                    results['MCDA_SCORE'] += float(weight) * float(evaluationDF[qafName][0])
+                if siteRelationalConstraint.tag == "SiteRelationalConstraint_Euclidean":
+                    print "Site Relational Constraint: Euclidean"
+                    siteRelationalConstraint_site1Index = int(siteRelationalConstraint.attrib['site1Index'])
+                    siteRelationalConstraint_site2Index = int(siteRelationalConstraint.attrib['site2Index'])
+                    siteRelationalConstraint_site1DF = listOfDataFrames[siteRelationalConstraint_site1Index]
+                    siteRelationalConstraint_site2DF = listOfDataFrames[siteRelationalConstraint_site2Index]
+                    siteRelationalConstraint_site1Candidate = individual[siteRelationalConstraint_site1Index]
+                    siteRelationalConstraint_site2Candidate = individual[siteRelationalConstraint_site2Index]
+                    euclideanDistance = evaluateCandidates_EuclideanDistance(siteRelationalConstraint_site1DF,siteRelationalConstraint_site1Candidate,siteRelationalConstraint_site2DF,siteRelationalConstraint_site2Candidate)
+                    results[siteRelationalConstraint_constraintName] = euclideanDistance
+                    scores = siteRelationalConstraint.find("Scores")
+                    weight = scores.attrib['weight']
+                    totalWeight += float(weight)
+                    isZeroExclusionary = scores.attrib['isZeroExclusionary']
+                    default = scores.attrib['default']
+                    scoreStructure = []
+                    for scoreRow in scores:
+                        lowerBoundInclusive = str(scoreRow.attrib['lowerBoundInclusive'])
+                        upperBoundExclusive = str(scoreRow.attrib['upperBoundExclusive'])
+                        score = str(scoreRow.attrib['score'])
+                        scoreSet = [lowerBoundInclusive,upperBoundExclusive,score]
+                        scoreStructure.append(scoreSet)
+                    evaluationDF =  pd.DataFrame(results,index=[0])
+                    evaluationDF = candidates.scoreDF(evaluationDF,siteRelationalConstraint_constraintName,scoreStructure,isZeroExclusionary=False)
+                    qafName = "%s_QAF" %(siteRelationalConstraint_constraintName)
+                    siteRelationalConstraint_constraintNames.append(qafName)
+                    results[qafName] = evaluationDF[qafName][0]
+                    results['MCDA_SCORE'] += float(weight) * float(evaluationDF[qafName][0])
+            results['MCDA_SCORE'] /= float(totalWeight) # NOTE: MCDA NOT BEING USED
+            scoreDF = pd.DataFrame(results,index=[0])
+            scoreList = []
+            for qafColumn in siteRelationalConstraint_constraintNames:
+                scoreList.append(scoreDF[qafColumn][0])
+            cachedOptimizations[objectiveType][geneString] = scoreList
+        else:
+            print "cached optimization could exist, checking for gene string"
+            if geneString in cachedOptimizations[objectiveType].keys():
+                scoreList = cachedOptimizations[objectiveType][geneString]
         return scoreList
 
     except Exception as e:
