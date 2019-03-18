@@ -12,4 +12,4 @@ def main():
 
 if __name__ == "__main__":
     layerid = main()
-    print layerid
+    print(layerid)

@@ -44,7 +44,7 @@ import ENSITEIO as eio
 import Objective_Analytic as objective_analytic
 import Objective_Raster as objective_raster
 import Objective_Vector as objective_vector
-import pgdissroute as pgdissroute
+# import pgdissroute as pgdissroute
 import SpatialIO as io
 import SpatialOpt as opt
 
@@ -168,7 +168,7 @@ def polygonBuilder(aoiPolygon, epsg="3857", wkt="POLYGON ((0 0, 91 0, 91 1700, 0
     end = datetime.datetime.now()
     timeElapsed = end - start
     nFeatures = len(candidatesList)
-    print "Generated %s candidate polygons in %s seconds" %(nFeatures,timeElapsed.seconds)
+    print("Generated %s candidate polygons in %s seconds" %(nFeatures,timeElapsed.seconds))
     evaluationDF = gpd.GeoDataFrame(candidatesList)
     evaluationDF.columns = ['geometry']
     return evaluationDF
@@ -194,7 +194,7 @@ def buildGriddedSearchFromXML(siteConfiguration,searchParameters):
     Tests:
         None
     """
-    print "Gridded Search"
+    print("Gridded Search")
 
     siteConfiguration_WKT = siteConfiguration.attrib['wkt']
     siteConfiguration_Units = siteConfiguration.attrib['units']
@@ -217,7 +217,7 @@ def buildGriddedSearchFromXML(siteConfiguration,searchParameters):
     return evaluationDF
 
 def buildSingleSiteSearchFromXML(siteConfiguration,searchParameters):
-    print "Single Site Search"
+    print("Single Site Search")
 
     siteConfiguration_WKT = siteConfiguration.attrib['wkt']
     siteConfiguration_Units = siteConfiguration.attrib['units']
@@ -228,7 +228,7 @@ def buildSingleSiteSearchFromXML(siteConfiguration,searchParameters):
     # Reproject aoiPolygon
     if aoi_EPSG != "3857":
         aoi_WKT = projectWKT(aoi_WKT,aoi_EPSG,3857)
-    print aoi_WKT
+    print(aoi_WKT)
     aoiPolygon = loads(aoi_WKT)
     aoiPolygonList = [aoiPolygon]
 
@@ -263,4 +263,4 @@ def scoreDF(df,criteriaColumnName,scoreStructure,isZeroExclusionary = False):
             filteredSize = len(df.index)
         return df
     except Exception as e:
-        print e
+        print(e)

@@ -49,7 +49,7 @@ import CandidateDataFrameOperations as candidates
 import ENSITEIO as eio
 import Objective_Analytic as objective_analytic
 import Objective_Raster as objective_raster
-import pgdissroute as pgdissroute
+# import pgdissroute as pgdissroute
 import SpatialIO as io
 
 ## GLOBALS
@@ -68,8 +68,8 @@ def evaluateCandidates_EuclideanDistance(df1,index1,df2,index2):
         euclideanDistance = geom2.distance(geom1.geometry[index1]).min()
         return euclideanDistance
     except Exception as e:
-        print e
-        print "Euclidean distance failed"
+        print(e)
+        print("Euclidean distance failed")
 
 def evaluateCandidates_DrivingDistance(df1,index1,df2,index2):
     try:
@@ -87,8 +87,8 @@ def evaluateCandidates_DrivingDistance(df1,index1,df2,index2):
         totalDriveDistance = pgdissroute.calculateRouteDistance(geom1.centroid.x[index1],geom1.centroid.y[index1],geom2.centroid.x[index2],geom2.centroid.y[index2])
         return totalDriveDistance
     except Exception as e:
-        print e
-        print "Driving distance failed"
+        print(e)
+        print("Driving distance failed")
 
 ## OBJECTIVE FUNCTIONS BETWEEN A CANDIDATE AND SOURCE
 
@@ -120,14 +120,14 @@ def evaluate(individual,listOfDataFrames,siteRelationalConstraints,utilizeCachin
                 "This type of optimization hasn't even been performed yet"
                 cachedOptimizations[objectiveType] = {}
 
-            print "cached optimization could exist, checking for gene string"
+            print("cached optimization could exist, checking for gene string")
             if geneString in cachedOptimizations[objectiveType].keys():
-                print "Matching genestring found for this optimization type"
+                print("Matching genestring found for this optimization type")
                 scoreList = cachedOptimizations[objectiveType][geneString]
             else: # This is admittidly horrible coding because it is a copy and paste, fix this
-                print "This genome has not been analyzed before for this objective function"
+                print("This genome has not been analyzed before for this objective function")
                 if siteRelationalConstraint.tag == "SiteRelationalConstraint_Routing":
-                    print "Site Relational Constraint: Routing"
+                    print("Site Relational Constraint: Routing")
                     siteRelationalConstraint_site1Index = int(siteRelationalConstraint.attrib['site1Index'])
                     siteRelationalConstraint_site2Index = int(siteRelationalConstraint.attrib['site2Index'])
                     siteRelationalConstraint_site1DF = listOfDataFrames[siteRelationalConstraint_site1Index]
@@ -155,7 +155,7 @@ def evaluate(individual,listOfDataFrames,siteRelationalConstraints,utilizeCachin
                     results[qafName] = evaluationDF[qafName][0]
                     results['MCDA_SCORE'] += float(weight) * float(evaluationDF[qafName][0])
                 if siteRelationalConstraint.tag == "SiteRelationalConstraint_Euclidean":
-                    print "Site Relational Constraint: Euclidean"
+                    print("Site Relational Constraint: Euclidean")
                     siteRelationalConstraint_site1Index = int(siteRelationalConstraint.attrib['site1Index'])
                     siteRelationalConstraint_site2Index = int(siteRelationalConstraint.attrib['site2Index'])
                     siteRelationalConstraint_site1DF = listOfDataFrames[siteRelationalConstraint_site1Index]
@@ -188,16 +188,16 @@ def evaluate(individual,listOfDataFrames,siteRelationalConstraints,utilizeCachin
                     for qafColumn in siteRelationalConstraint_constraintNames:
                         scoreList.append(scoreDF[qafColumn][0])
                     cachedOptimizations[objectiveType][geneString] = scoreList
-                    print "optimization cached"
+                    print("optimization cached")
         return scoreList
 
     except Exception as e:
-        print e
-        print "GA evaluate failed"
+        print(e)
+        print("GA evaluate failed")
 
 def codeImTooChickenToDeleteYet():
     if siteRelationalConstraint.tag == "SiteRelationalConstraint_Routing":
-        print "Site Relational Constraint: Routing"
+        print("Site Relational Constraint: Routing")
         siteRelationalConstraint_site1Index = int(siteRelationalConstraint.attrib['site1Index'])
         siteRelationalConstraint_site2Index = int(siteRelationalConstraint.attrib['site2Index'])
         siteRelationalConstraint_site1DF = listOfDataFrames[siteRelationalConstraint_site1Index]
@@ -225,7 +225,7 @@ def codeImTooChickenToDeleteYet():
         results[qafName] = evaluationDF[qafName][0]
         results['MCDA_SCORE'] += float(weight) * float(evaluationDF[qafName][0])
     if siteRelationalConstraint.tag == "SiteRelationalConstraint_Euclidean":
-        print "Site Relational Constraint: Euclidean"
+        print("Site Relational Constraint: Euclidean")
         siteRelationalConstraint_site1Index = int(siteRelationalConstraint.attrib['site1Index'])
         siteRelationalConstraint_site2Index = int(siteRelationalConstraint.attrib['site2Index'])
         siteRelationalConstraint_site1DF = listOfDataFrames[siteRelationalConstraint_site1Index]
@@ -262,15 +262,15 @@ def codeImTooChickenToDeleteYet():
 def testcode():
     i = 0
     for gene in individual:
-        print "i = %s.  gene = %s" %(i,gene)
+        print("i = %s.  gene = %s" %(i,gene))
         candidate = listOfDataframes[i].iloc[gene,:]
-        print candidate
+        print(candidate)
         i += 1
 
 
     for siteRelationalConstraint in siteRelationalConstraints:
         if siteRelationalConstraint.tag == "SiteRelationalConstraint_Routing":
-            print "Routing distance test"
+            print("Routing distance test")
             siteRelationalConstraint_constraintName = siteRelationalConstraint.attrib['constraintName']
             siteRelationalConstraint_candidate1TableIndex = int(siteRelationalConstraint.attrib['candidate1TableIndex'])
             siteRelationalConstraint_candidate1Index = int(siteRelationalConstraint.attrib['candidate1Index'])
@@ -278,9 +278,9 @@ def testcode():
             siteRelationalConstraint_candidate2Index = int(siteRelationalConstraint.attrib['candidate2Index'])
             siteRelationalConstraint_note = siteRelationalConstraint.attrib['note']
             routingDistance = opt.evaluateCandidates_DrivingDistance(evaluationDFs[siteRelationalConstraint_candidate1TableIndex],siteRelationalConstraint_candidate1Index,evaluationDFs[siteRelationalConstraint_candidate2TableIndex],siteRelationalConstraint_candidate2Index)
-            print routingDistance
+            print(routingDistance)
         if siteRelationalConstraint.tag == "SiteRelationalConstraint_Euclidean":
-            print "Euclidean distance test"
+            print("Euclidean distance test")
             siteRelationalConstraint_constraintName = siteRelationalConstraint.attrib['constraintName']
             siteRelationalConstraint_candidate1TableIndex = int(siteRelationalConstraint.attrib['candidate1TableIndex'])
             siteRelationalConstraint_candidate1Index = int(siteRelationalConstraint.attrib['candidate1Index'])
@@ -288,7 +288,7 @@ def testcode():
             siteRelationalConstraint_candidate2Index = int(siteRelationalConstraint.attrib['candidate2Index'])
             siteRelationalConstraint_note = siteRelationalConstraint.attrib['note']
             euclideanDistance = opt.evaluateCandidates_EuclideanDistance(evaluationDFs[siteRelationalConstraint_candidate1TableIndex],siteRelationalConstraint_candidate1Index,evaluationDFs[siteRelationalConstraint_candidate2TableIndex],siteRelationalConstraint_candidate2Index)
-            print euclideanDistance
+            print(euclideanDistance)
 
     return 0
 
@@ -324,12 +324,12 @@ def evaluate_old(individual):
         blueToAirfieldDistance = pgdissroute.calculateRouteDistance(airfieldCentroidLon,airfieldCentroidLat,blueCentroidLon,blueCentroidLat)
 
         # print for debugging
-        print "red is %s m from airfield, at (%s,%s)" %(redToAirfieldDistance,redCentroidLon,redCentroidLat)
-        print "blue is %s m from airfield, at (%s,%s)" %(blueToAirfieldDistance,blueCentroidLon,blueCentroidLat)
+        print("red is %s m from airfield, at (%s,%s)" %(redToAirfieldDistance,redCentroidLon,redCentroidLat))
+        print("blue is %s m from airfield, at (%s,%s)" %(blueToAirfieldDistance,blueCentroidLon,blueCentroidLat))
         return redToAirfieldDistance, blueToAirfieldDistance
 
     except Exception, e:
-        print "Generated an error, returning very large number"
+        print("Generated an error, returning very large number")
         return 999999,999999
 
 
@@ -384,7 +384,7 @@ def optimize_GA(listOfDataFrames,siteRelationalConstraints,popSize=10,nGeneratio
 
         # create the initial population
         population = createPopulation(popSize,listOfDataFrames)
-        print population
+        print(population)
         hallOfFame = tools.ParetoFront()
         logbook = tools.Logbook()
 
@@ -400,7 +400,7 @@ def optimize_GA(listOfDataFrames,siteRelationalConstraints,popSize=10,nGeneratio
         hallOfFame.update(population)
 
         for generation in range(0,nGenerations):
-            print "GENERATION %s" %(generation)
+            print("GENERATION %s" %(generation))
             theBestIndividuals = []
             if len(hallOfFame.items) <= maxElite:
                 theBestIndividuals = hallOfFame.items
@@ -439,14 +439,14 @@ def optimize_GA(listOfDataFrames,siteRelationalConstraints,popSize=10,nGeneratio
 
             logbook.record(gen=generation, allIndividuals = list(population), allScores = allScores, top5 = theBestIndividuals[0], bestScore = theBestIndividuals[0].fitness.values,
                                **record)
-            print theBestIndividuals[0], theBestIndividuals[0].fitness.values
+            print(theBestIndividuals[0], theBestIndividuals[0].fitness.values)
 
         logbookDF = pd.DataFrame(logbook)
         return logbookDF
 
     except Exception as e:
-        print e
-        print "GA FAILED"
+        print(e)
+        print("GA FAILED")
 
 def cleanUp():
     weights=(-1.0,-1.0)
@@ -466,7 +466,7 @@ def cleanUp():
     toolbox.register("mutate", mutate)
     toolbox.register("select", tools.selNSGA2)
     population = createPopulation(popSize)
-    print population
+    print(population)
     hallOfFame = tools.ParetoFront()
     logbook = tools.Logbook()
 
@@ -482,7 +482,7 @@ def cleanUp():
     hallOfFame.update(population)
 
     for generation in range(0,nGenerations):
-        print "GENERATION %s" %(generation)
+        print("GENERATION %s" %(generation))
         theBestIndividuals = []
         if len(hallOfFame.items) <= maxElite:
             theBestIndividuals = hallOfFame.items
@@ -521,7 +521,7 @@ def cleanUp():
 
         logbook.record(gen=generation, allIndividuals = list(population), allScores = allScores, top5 = theBestIndividuals[0], bestScore = theBestIndividuals[0].fitness.values,
                            **record)
-        print theBestIndividuals[0], theBestIndividuals[0].fitness.values
+        print(theBestIndividuals[0], theBestIndividuals[0].fitness.values)
 
     logbookDF = pd.DataFrame(logbook)
 

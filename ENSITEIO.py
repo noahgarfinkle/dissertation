@@ -57,7 +57,7 @@ import CandidateDataFrameOperations as candidates
 import Objective_Analytic as objective_analytic
 import Objective_Raster as objective_raster
 import Objective_Vector as objective_vector
-import pgdissroute as pgdissroute
+# import pgdissroute as pgdissroute
 import SpatialIO as io
 import SpatialOpt as opt
 
@@ -170,9 +170,9 @@ def dataFrameToENSITEDatabase(df,studyID,layerName,layerID=None,geometryType = "
     cur = con.cursor()
     # get the projection of the df
     try:
-		projection = df.crs['init']
+        projection = df.crs['init']
     except:
-		projection = "epsg:3857" # kludge
+        projection = "epsg:3857" # kludge
 
 
     # insert the layer

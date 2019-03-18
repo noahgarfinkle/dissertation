@@ -41,21 +41,21 @@ import time
 import pickle
 
 import CandidateDataFrameOperations as candidates
-reload(candidates)
+# reload(candidates)
 import ENSITEIO as eio
-reload(eio)
+# reload(eio)
 import Objective_Analytic as objective_analytic
-reload(objective_analytic)
+# reload(objective_analytic)
 import Objective_Raster as objective_raster
-reload(objective_raster)
+# reload(objective_raster)
 import Objective_Vector as objective_vector
-reload(objective_vector)
-import pgdissroute as pgdissroute
-reload(pgdissroute)
+# reload(objective_vector)
+# import pgdissroute as pgdissroute
+# reload(pgdissroute)
 import SpatialIO as io
-reload(io)
+# reload(io)
 import SpatialOpt as opt
-reload(opt)
+# reload(opt)
 
 ## HELPFUL FOR DEBUGGING
 # %matplotlib inline
@@ -114,9 +114,9 @@ def evaluateXML(xmlPath,returnDFInsteadOfLayerID=True,limitReturn=True,fromPickl
     resultDir = root.attrib['resultDir']
     studyID = root.attrib['studyID']
     epsg = root.attrib['epsg']
-    print "%s %s %s" %(resultDir,studyID,epsg)
+    print("%s %s %s" %(resultDir,studyID,epsg))
 
-    print "Section: Site Searches"
+    print("Section: Site Searches")
     siteSearches = root.find("SiteSearches")
     layerIDs = []
     evaluationDFs = []
@@ -130,10 +130,10 @@ def evaluateXML(xmlPath,returnDFInsteadOfLayerID=True,limitReturn=True,fromPickl
             siteSearch_note = siteSearch.attrib['note']
             siteSearch_nReturn = siteSearch.attrib['nReturn']
 
-            print "Beginning site search %s of %s: %s" %(searchID,len(siteSearches),siteSearch_name)
+            print("Beginning site search %s of %s: %s" %(searchID,len(siteSearches),siteSearch_name))
             siteConfiguration = siteSearch.find("SiteConfiguration")[0]
             if siteConfiguration.tag == "WKTTemplate":
-                print "WKT Template"
+                print("WKT Template")
 
             searchParameters = siteSearch.find("SearchParameters")[0]
             if searchParameters.tag == "GriddedSearch":
@@ -143,7 +143,7 @@ def evaluateXML(xmlPath,returnDFInsteadOfLayerID=True,limitReturn=True,fromPickl
                 evaluationDF = candidates.buildSingleSiteSearchFromXML(siteConfiguration,searchParameters)
 
             if len(evaluationDF.index) == 0:
-                print "Area and search parameters did not generate any candidates"
+                print("Area and search parameters did not generate any candidates")
                 return "No Results Found"
 
 
@@ -155,7 +155,7 @@ def evaluateXML(xmlPath,returnDFInsteadOfLayerID=True,limitReturn=True,fromPickl
             for criteriaRow in siteEvaluation:
                 criteriaCount += 1
                 if len(evaluationDF.index) == 0:
-                    print "No Results Found"
+                    print("No Results Found")
                     return "No Results Found"
                 # set the column name if none
                 if criteriaRow.attrib["criteriaName"] == "None":
@@ -177,7 +177,7 @@ def evaluateXML(xmlPath,returnDFInsteadOfLayerID=True,limitReturn=True,fromPickl
                         endingTime = datetime.datetime.now()
                         endingSize = len(evaluationDF.index)
                         timeElapsed = endingTime - startingTime
-                        print "Categorical Raster Stat: %s. Processed %s candidates in %s seconds, retaining %s candidates" %(criteriaRow.attrib['criteriaName'], startingSize, timeElapsed.seconds, endingSize)
+                        print("Categorical Raster Stat: %s. Processed %s candidates in %s seconds, retaining %s candidates" %(criteriaRow.attrib['criteriaName'], startingSize, timeElapsed.seconds, endingSize))
                     if criteriaRow.tag == "ContinuousRasterStat":
                         startingSize = len(evaluationDF.index)
                         startingTime = datetime.datetime.now()
@@ -185,7 +185,7 @@ def evaluateXML(xmlPath,returnDFInsteadOfLayerID=True,limitReturn=True,fromPickl
                         endingTime = datetime.datetime.now()
                         endingSize = len(evaluationDF.index)
                         timeElapsed = endingTime - startingTime
-                        print "Continuous Raster Stat: %s. Processed %s candidates in %s seconds, retaining %s candidates" %(criteriaRow.attrib['criteriaName'], startingSize, timeElapsed.seconds, endingSize)
+                        print("Continuous Raster Stat: %s. Processed %s candidates in %s seconds, retaining %s candidates" %(criteriaRow.attrib['criteriaName'], startingSize, timeElapsed.seconds, endingSize))
                     if criteriaRow.tag == "DistanceFromVectorLayer":
                         startingSize = len(evaluationDF.index)
                         startingTime = datetime.datetime.now()
@@ -193,7 +193,7 @@ def evaluateXML(xmlPath,returnDFInsteadOfLayerID=True,limitReturn=True,fromPickl
                         endingTime = datetime.datetime.now()
                         endingSize = len(evaluationDF.index)
                         timeElapsed = endingTime - startingTime
-                        print "Vector Layer: %s. Processed %s candidates in %s seconds, retaining %s candidates" %(criteriaRow.attrib['criteriaName'], startingSize, timeElapsed.seconds, endingSize)
+                        print("Vector Layer: %s. Processed %s candidates in %s seconds, retaining %s candidates" %(criteriaRow.attrib['criteriaName'], startingSize, timeElapsed.seconds, endingSize))
                     if criteriaRow.tag == "CutFill":
                         startingSize = len(evaluationDF.index)
                         startingTime = datetime.datetime.now()
@@ -201,10 +201,10 @@ def evaluateXML(xmlPath,returnDFInsteadOfLayerID=True,limitReturn=True,fromPickl
                         endingTime = datetime.datetime.now()
                         endingSize = len(evaluationDF.index)
                         timeElapsed = endingTime - startingTime
-                        print "Cut Fill: %s. Processed %s candidates in %s seconds, retaining %s candidates" %(criteriaRow.attrib['criteriaName'], startingSize, timeElapsed.seconds, endingSize)
+                        print("Cut Fill: %s. Processed %s candidates in %s seconds, retaining %s candidates" %(criteriaRow.attrib['criteriaName'], startingSize, timeElapsed.seconds, endingSize))
                 except Exception as e:
-                    print "exception hit on criteria row"
-                    print e
+                    print("exception hit on criteria row")
+                    print(e)
                     return criteriaRow
 
             # build the weights
@@ -230,7 +230,7 @@ def evaluateXML(xmlPath,returnDFInsteadOfLayerID=True,limitReturn=True,fromPickl
             if limitReturn:
                 evaluationDF = evaluationDF.sort_values(by="MCDA_SCORE",ascending=False).head(int(siteSearch_nReturn))
                 evaluationDF = evaluationDF.reset_index()
-                print "Completed site search %s of %s for %s.  Returned top %s candidates of %s." %(searchID,len(siteSearches),siteSearch_name,int(siteSearch_nReturn),endingSize)
+                print("Completed site search %s of %s for %s.  Returned top %s candidates of %s." %(searchID,len(siteSearches),siteSearch_name,int(siteSearch_nReturn),endingSize))
             evaluationDFs.append(evaluationDF)
 
             ensiteLayerName = "%s_%s" %(siteSearch_name,time.strftime("%Y_%m_%d_%H_%M_%S"))
@@ -242,13 +242,13 @@ def evaluateXML(xmlPath,returnDFInsteadOfLayerID=True,limitReturn=True,fromPickl
                 with open('pickledDF.pkl','wb') as f:
                     pickle.dump(evaluationDFs,f)
     else:
-        print "Unjarring some pickled dataframes to use to speed up testing"
+        print("Unjarring some pickled dataframes to use to speed up testing")
         with open('pickledDF.pkl') as f:
             evaluationDFs = pickle.load(f)
-            print "Unpickled %s DataFrames" %(len(evaluationDFs))
+            print("Unpickled %s DataFrames" %(len(evaluationDFs)))
 
     # SITE RELATIONAL CONSTRAINTS
-    print "Section: Site Relational Constraints"
+    print("Section: Site Relational Constraints")
     siteRelationalConstraints = root.find("SiteRelationalConstraints")
 
     logbookDF = opt.optimize_GA(evaluationDFs,siteRelationalConstraints,popSize=10,nGenerations=10,

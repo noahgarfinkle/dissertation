@@ -43,7 +43,7 @@ import CandidateDataFrameOperations as candidates
 import ENSITEIO as eio
 import Objective_Analytic as objective_analytic
 import Objective_Vector as objective_vector
-import pgdissroute as pgdissroute
+# import pgdissroute as pgdissroute
 import SpatialIO as io
 import SpatialOpt as opt
 
@@ -99,7 +99,7 @@ def generateRasterStatisticsForDataFrame(df,raster_path,stats="count majority mi
         newDF = gpd.GeoDataFrame(pd.concat([df,row_stats_df],axis=1))
         return newDF,columnsToDrop
     except Exception as e:
-        print e
+        print(e)
 
 def rasterStatCroppedRaster(df,raster_path):
     """ Produces neighborhood statistics for a raster based on each feature in a
@@ -132,7 +132,7 @@ def rasterStatCroppedRaster(df,raster_path):
         rasterDF = pd.DataFrame(rasterSource)
         return rasterDF
     except Exception as e:
-        print e
+        print(e)
 
 def buildCategoricalRasterStatFromXML(evaluationDF,criteriaRow):
     """ Converts XML into categorical raster statistic evaluation
@@ -218,7 +218,7 @@ def buildCategoricalRasterStatFromXML(evaluationDF,criteriaRow):
         timeElapsed = end_scoring - end_CreatingCriteria
         return evaluationDF
     except Exception as e:
-        print e
+        print(e)
 
 def buildContinuousRasterStatFromXML(evaluationDF,criteriaRow):
     """ Converts XML into continuous raster statistic evaluation
@@ -278,4 +278,4 @@ def buildContinuousRasterStatFromXML(evaluationDF,criteriaRow):
         evaluationDF = evaluationDF.drop(columnsToDrop,axis=1)
         return evaluationDF
     except Exception as e:
-        print e
+        print(e)

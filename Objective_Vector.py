@@ -43,7 +43,7 @@ import CandidateDataFrameOperations as candidates
 import ENSITEIO as eio
 import Objective_Analytic as objective_analytic
 import Objective_Raster as objective_raster
-import pgdissroute as pgdissroute
+# import pgdissroute as pgdissroute
 import SpatialIO as io
 import SpatialOpt as opt
 
@@ -87,7 +87,7 @@ def filterByVectorBufferDistance(dfToFilter,vectorFilePath,bufferDistance,remove
     timeElapsed = end - start
     initialFeatures = len(dfToFilter.index)
     filteredFeatures = len(filteredDF.index)
-    print "%s %s of %s candidates in %s seconds" %(returnText,filteredFeatures,initialFeatures,timeElapsed.seconds)
+    print("%s %s of %s candidates in %s seconds" %(returnText,filteredFeatures,initialFeatures,timeElapsed.seconds))
     return filteredDF
 
 def minimumDistanceFromEvaluationToDataFrameFeatures(evaluationDF,vectorDF,columnName='distance'):
@@ -120,7 +120,7 @@ def minimumDistanceFromEvaluationToDataFrameFeatures(evaluationDF,vectorDF,colum
             evaluationDF[columnName] = minDistances
             return evaluationDF
         except Exception as e:
-            print e
+            print(e)
 
 def buildDistanceFromVectorLayerFromXML(evaluationDF,criteriaRow):
     """ Converts XML into vector distance evaluation
@@ -178,7 +178,7 @@ def buildDistanceFromVectorLayerFromXML(evaluationDF,criteriaRow):
         evaluationDF = candidates.scoreDF(evaluationDF,vectorQAFNameKludge,scoreStructure,isZeroExclusionary=False)
         return evaluationDF
     except Exception as e:
-        print e
+        print(e)
 
 """ Currently does not actually provide a score for vector distance
     scores = criteriaRow.find("Scores")
