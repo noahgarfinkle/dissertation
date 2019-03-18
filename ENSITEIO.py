@@ -57,7 +57,7 @@ import CandidateDataFrameOperations as candidates
 import Objective_Analytic as objective_analytic
 import Objective_Raster as objective_raster
 import Objective_Vector as objective_vector
-# import pgdissroute as pgdissroute
+import pgdissroute as pgdissroute
 import SpatialIO as io
 import SpatialOpt as opt
 

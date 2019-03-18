@@ -39,7 +39,7 @@ https://stackoverflow.com/questions/44778/how-would-you-make-a-comma-separated-s
 """
 
 ## SETUP
-connString = "dbname='routing' user='postgres' host='localhost' password='postgres'"
+connString = "dbname='routing' user='postgres' host='localhost' password='!QAZ1qaz'"
 conn = psycopg2.connect(connString)
 cur = conn.cursor()
 
