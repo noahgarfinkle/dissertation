@@ -328,7 +328,7 @@ def evaluate_old(individual):
         print("blue is %s m from airfield, at (%s,%s)" %(blueToAirfieldDistance,blueCentroidLon,blueCentroidLat))
         return redToAirfieldDistance, blueToAirfieldDistance
 
-    except Exception, e:
+    except Exception as e:
         print("Generated an error, returning very large number")
         return 999999,999999
 
