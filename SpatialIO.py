@@ -99,7 +99,7 @@ class PostGIS:
             self.conn = psycopg2.connect(connString)
         except:
             self.conn = None
-            print "Unable to connect to database"
+            print("Unable to connect to database")
 
     def query(self,sql):
         """ Submits a SQL query to the postgres connection and returns the result
@@ -147,7 +147,7 @@ class PostGIS:
             df = gpd.read_postgis(sql,con=self.conn,geom_col=geom_col)
             return df
         except:
-            print "Unable to execute query"
+            print("Unable to execute query")
 
 
 class VectorLayer:
@@ -398,7 +398,7 @@ class VectorLayer:
         Tests:
             None
         """
-        print self.df.head()
+        print(self.df.head())
 
     def crop(self,lx,ly,ux,uy):
         """ Crops the dataframe to a bounding box
@@ -974,7 +974,7 @@ def rasterizeGeodataFrameColumn(df,column,outputRasterPath,resolution=30,crs=Non
         out.write_band( 1, burned )
     stop = datetime.datetime.now()
     timeDelta = stop - start
-    print "Raster created with datatype %s in %s seconds at %s" %(dtype.name,timeDelta.seconds,outputRasterPath)
+    print("Raster created with datatype %s in %s seconds at %s" %(dtype.name,timeDelta.seconds,outputRasterPath))
     return outputRasterPath
 
 
@@ -986,7 +986,7 @@ def ensiteLayertoDF(layerID):
     for row in cur:
         #do something with every single row here
         #optionally print the row
-        print row
+        print(row)
 
 def dataFrameToENSITEDatabase(df,studyID,layerName,layerID=None,geometryType = "Polygon"):
     """ Writes a Vector GeoDataFrame into the ENSITE database
@@ -1022,9 +1022,9 @@ def dataFrameToENSITEDatabase(df,studyID,layerName,layerID=None,geometryType = "
     cur = con.cursor()
     # get the projection of the df
     try:
-		projection = df.crs['init']
+        projection = df.crs['init']
     except:
-		projection = "epsg:3857" # kludge
+        projection = "epsg:3857" # kludge
 
 
     # insert the layer
@@ -1202,10 +1202,10 @@ def testGeoDataFrame():
     g.createGeoDataFrame(CRS.WMAS,columns=['geometry','a'])
     g.addColumn('b')
     g.addRow({'geometry':Point(49,50),'a':1,'b':'c'})
-    print g.crs
+    print(g.crs)
     g.plot()
-    print g.to_json()
+    print(g.to_json())
     g.to_shapefile("./results/test.shp")
     g.reproject(CRS.WGS84)
     g.plot()
-    print g.crs
+    print(g.crs)
